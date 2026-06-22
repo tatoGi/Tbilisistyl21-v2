@@ -1,0 +1,37 @@
+FROM php:8.3-cli
+
+# Install system dependencies
+RUN apt-get update && apt-get install -y \
+    libpq-dev \
+    libpng-dev \
+    libjpeg-dev \
+    libfreetype6-dev \
+    libzip-dev \
+    libicu-dev \
+    libonig-dev \
+    zip \
+    unzip \
+    git \
+    curl \
+    && rm -rf /var/lib/apt/lists/*
+
+# Install PHP extensions
+RUN docker-php-ext-configure gd --with-freetype --with-jpeg \
+    && docker-php-ext-install \
+        pdo_pgsql \
+        pgsql \
+        gd \
+        intl \
+        zip \
+        bcmath \
+        opcache \
+        mbstring \
+        exif \
+        pcntl
+
+# Install Composer from official image
+COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
+
+WORKDIR /var/www/html
+
+CMD ["php", "artisan", "serve", "--host=0.0.0.0", "--port=8000"]
