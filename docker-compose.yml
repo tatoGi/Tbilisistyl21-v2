@@ -1,0 +1,102 @@
+services:
+  nginx:
+    image: nginx:alpine
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx/conf.d:/etc/nginx/conf.d:ro
+      - certbot-etc:/etc/letsencrypt:ro
+      - certbot-www:/var/www/certbot:ro
+      - laravel-storage:/var/www/html/storage/app/public:ro
+    depends_on:
+      - laravel
+      - nextjs
+    restart: unless-stopped
+
+  laravel:
+    build: ./backend
+    expose:
+      - "8000"
+    env_file: ./backend/.env
+    volumes:
+      - laravel-storage:/var/www/html/storage/app/public
+    depends_on:
+      postgres:
+        condition: service_healthy
+    restart: unless-stopped
+
+  queue:
+    build: ./backend
+    env_file: ./backend/.env
+    command: php artisan queue:work --sleep=3 --tries=3 --max-time=3600
+    volumes:
+      - laravel-storage:/var/www/html/storage/app/public
+    depends_on:
+      postgres:
+        condition: service_healthy
+    restart: unless-stopped
+
+  scheduler:
+    build: ./backend
+    env_file: ./backend/.env
+    command: >
+      sh -c "while true; do php artisan schedule:run --verbose --no-interaction; sleep 60; done"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    restart: unless-stopped
+
+  nextjs:
+    build: ./frontend
+    expose:
+      - "3000"
+    environment:
+      - NEXT_PUBLIC_API_URL=http://laravel:8000
+      - NEXT_PUBLIC_APP_URL=${APP_URL:-http://localhost}
+    depends_on:
+      - laravel
+    restart: unless-stopped
+
+  postgres:
+    image: postgres:16-alpine
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    environment:
+      POSTGRES_DB: ${DB_DATABASE:-tbilisistyle}
+      POSTGRES_USER: ${DB_USERNAME:-tbilisistyle}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-secret}
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USERNAME:-tbilisistyle}"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+    restart: unless-stopped
+
+  pgadmin:
+    image: dpage/pgadmin4
+    environment:
+      PGADMIN_DEFAULT_EMAIL: ${PGADMIN_EMAIL:-admin@tbilisistyle.ge}
+      PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_PASSWORD:-admin}
+      PGADMIN_CONFIG_SERVER_MODE: "False"
+    expose:
+      - "5050"
+    volumes:
+      - pgadmin-data:/var/lib/pgadmin
+    depends_on:
+      - postgres
+    restart: unless-stopped
+
+  certbot:
+    image: certbot/certbot
+    volumes:
+      - certbot-etc:/etc/letsencrypt
+      - certbot-www:/var/www/certbot
+    entrypoint: "/bin/sh -c 'trap exit TERM; while :; do sleep 12h; certbot renew; done'"
+
+volumes:
+  pgdata:
+  laravel-storage:
+  certbot-etc:
+  certbot-www:
+  pgadmin-data:
