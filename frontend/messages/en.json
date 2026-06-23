@@ -1,0 +1,34 @@
+{
+  "common": {
+    "home": "Home",
+    "tickets": "Tickets",
+    "products": "Products",
+    "music": "Music",
+    "partners": "Partners",
+    "news": "News",
+    "language": "Language",
+    "buyTicket": "Buy Ticket",
+    "buyProduct": "Buy",
+    "price": "Price",
+    "gel": "GEL",
+    "soldOut": "Sold Out",
+    "loading": "Loading...",
+    "error": "Error",
+    "notFound": "Page not found"
+  },
+  "ticketForm": {
+    "name": "First Name",
+    "surname": "Last Name",
+    "email": "Email",
+    "personalNumber": "Personal Number",
+    "submit": "Purchase",
+    "maxTicketsReached": "Maximum tickets reached for this event"
+  },
+  "productForm": {
+    "name": "Name",
+    "email": "Email",
+    "phone": "Phone",
+    "size": "Size",
+    "submit": "Order"
+  }
+}

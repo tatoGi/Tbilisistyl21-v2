@@ -1,0 +1,34 @@
+{
+  "common": {
+    "home": "Главная",
+    "tickets": "Билеты",
+    "products": "Продукция",
+    "music": "Музыка",
+    "partners": "Партнёры",
+    "news": "Новости",
+    "language": "Язык",
+    "buyTicket": "Купить билет",
+    "buyProduct": "Купить",
+    "price": "Цена",
+    "gel": "GEL",
+    "soldOut": "Распродано",
+    "loading": "Загрузка...",
+    "error": "Ошибка",
+    "notFound": "Страница не найдена"
+  },
+  "ticketForm": {
+    "name": "Имя",
+    "surname": "Фамилия",
+    "email": "Эл. почта",
+    "personalNumber": "Личный номер",
+    "submit": "Купить",
+    "maxTicketsReached": "Достигнуто максимальное количество билетов на это мероприятие"
+  },
+  "productForm": {
+    "name": "Имя",
+    "email": "Эл. почта",
+    "phone": "Телефон",
+    "size": "Размер",
+    "submit": "Заказать"
+  }
+}

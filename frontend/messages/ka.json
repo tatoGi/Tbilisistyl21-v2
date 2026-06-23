@@ -1,0 +1,34 @@
+{
+  "common": {
+    "home": "მთავარი",
+    "tickets": "ბილეთები",
+    "products": "პროდუქცია",
+    "music": "მუსიკა",
+    "partners": "პარტნიორები",
+    "news": "სიახლეები",
+    "language": "ენა",
+    "buyTicket": "ბილეთის ყიდვა",
+    "buyProduct": "შეძენა",
+    "price": "ფასი",
+    "gel": "₾",
+    "soldOut": "გაყიდულია",
+    "loading": "იტვირთება...",
+    "error": "შეცდომა",
+    "notFound": "გვერდი ვერ მოიძებნა"
+  },
+  "ticketForm": {
+    "name": "სახელი",
+    "surname": "გვარი",
+    "email": "ელ.ფოსტა",
+    "personalNumber": "პირადი ნომერი",
+    "submit": "შეძენა",
+    "maxTicketsReached": "ამ ღონისძიებაზე მაქსიმალური ბილეთების რაოდენობა მიღწეულია"
+  },
+  "productForm": {
+    "name": "სახელი",
+    "email": "ელ.ფოსტა",
+    "phone": "ტელეფონი",
+    "size": "ზომა",
+    "submit": "შეკვეთა"
+  }
+}

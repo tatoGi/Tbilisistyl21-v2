@@ -1,0 +1,34 @@
+{
+  "common": {
+    "home": "Головна",
+    "tickets": "Квитки",
+    "products": "Продукція",
+    "music": "Музика",
+    "partners": "Партнери",
+    "news": "Новини",
+    "language": "Мова",
+    "buyTicket": "Купити квиток",
+    "buyProduct": "Купити",
+    "price": "Ціна",
+    "gel": "GEL",
+    "soldOut": "Розпродано",
+    "loading": "Завантаження...",
+    "error": "Помилка",
+    "notFound": "Сторінку не знайдено"
+  },
+  "ticketForm": {
+    "name": "Ім'я",
+    "surname": "Прізвище",
+    "email": "Ел. пошта",
+    "personalNumber": "Особистий номер",
+    "submit": "Купити",
+    "maxTicketsReached": "Досягнуто максимальну кількість квитків на цю подію"
+  },
+  "productForm": {
+    "name": "Ім'я",
+    "email": "Ел. пошта",
+    "phone": "Телефон",
+    "size": "Розмір",
+    "submit": "Замовити"
+  }
+}
