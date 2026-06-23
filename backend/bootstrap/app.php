@@ -15,6 +15,7 @@ return Application::configure(basePath: dirname(__DIR__))
     ->withMiddleware(function (Middleware $middleware): void {
         $middleware->alias([
             'locale' => \App\Http\Middleware\LocaleFromHeader::class,
+            'quipu.hmac' => \App\Http\Middleware\VerifyQuipuHmac::class,
         ]);
         $middleware->statefulApi();
     })
