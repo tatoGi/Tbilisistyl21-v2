@@ -35,4 +35,14 @@ return [
         ],
     ],
 
+    'quipu' => [
+        'api_url' => env('PG_API_URL'),
+        'merchant_id' => env('PG_MERCHANT_ID'),
+        'type_rid' => env('PG_TEST_TYPE_RID'),
+        'cert_base64' => env('PG_CERT_BASE64'),
+        'key_base64' => env('PG_KEY_BASE64'),
+        'ca_base64' => env('PG_CA_BASE64'),
+        'tls_reject_unauthorized' => env('PG_TLS_REJECT_UNAUTHORIZED', true),
+    ],
+
 ];
