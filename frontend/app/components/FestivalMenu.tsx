@@ -4,6 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState, useEffect } from "react";
+import { useTranslations } from "next-intl";
 import LanguageSwitcher from "./LanguageSwitcher";
 import SocialLinksRow from "./SocialLinks";
 import type { SocialLinks } from "@/lib/nav";
@@ -21,6 +22,7 @@ export default function FestivalMenu({
   pages = [],
   social = { instagram: null, tiktok: null },
 }: FestivalMenuProps) {
+  const t = useTranslations();
   const pathname = usePathname();
   const isFestivalPage = pathname === "/dashboard/festival";
   const [navOpen, setNavOpen] = useState(false);
