@@ -2,6 +2,7 @@ FROM php:8.3-fpm-alpine
 
 RUN apk add --no-cache \
     postgresql-dev \
+    postgresql-client \
     libpng-dev \
     libjpeg-turbo-dev \
     freetype-dev \
@@ -41,15 +42,17 @@ RUN composer install --no-dev --no-scripts --optimize-autoloader --no-interactio
 # Copy application code
 COPY . .
 
-# Run post-install scripts and cache
-RUN composer dump-autoload --optimize \
-    && php artisan config:cache \
-    && php artisan route:cache \
-    && php artisan view:cache
+# Optimize the autoloader. config/route/view caching happens at runtime via the
+# entrypoint (build-time has no env_file vars and would bake wrong config).
+RUN composer dump-autoload --optimize
 
 RUN chown -R www-data:www-data storage bootstrap/cache \
     && chmod -R 775 storage bootstrap/cache
 
+COPY docker/entrypoint.sh /usr/local/bin/entrypoint.sh
+RUN sed -i 's/\r$//' /usr/local/bin/entrypoint.sh && chmod +x /usr/local/bin/entrypoint.sh
+
 EXPOSE 8000
 
+ENTRYPOINT ["entrypoint.sh"]
 CMD ["php", "artisan", "serve", "--host=0.0.0.0", "--port=8000"]

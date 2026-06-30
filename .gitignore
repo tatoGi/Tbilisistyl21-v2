@@ -5,3 +5,6 @@ vendor/
 
 # Windows reserved device name accidentally created by `> nul` redirects
 nul
+
+# Local-only operations docs (server IPs, credentials hints — never push)
+_ops/
