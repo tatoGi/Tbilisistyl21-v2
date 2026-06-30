@@ -3,15 +3,22 @@
 namespace App\Services;
 
 use App\Models\Product;
-use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\Cache;
 
 class ProductService
 {
-    public function listActive(): Collection
+    /**
+     * @return array<int, array<string, mixed>>
+     */
+    public function listActive(): array
     {
-        return Cache::remember('products:active', 3600, function () {
-            return Product::active()->with(['sizes', 'image'])->get();
+        // Cache the plain array, not the Eloquent Collection: serialized models
+        // contain NUL bytes that don't round-trip through the Postgres `text`
+        // cache column, so a cached Collection deserializes as an incomplete
+        // class. toArray() preserves the same JSON shape (full translations +
+        // nested image/sizes). Mirrors the MusicTrackController approach.
+        return Cache::remember(Product::API_CACHE_KEY, 3600, function () {
+            return Product::active()->with(['sizes', 'image'])->get()->toArray();
         });
     }
 

@@ -2,3 +2,6 @@
 .env
 node_modules/
 vendor/
+
+# Windows reserved device name accidentally created by `> nul` redirects
+nul

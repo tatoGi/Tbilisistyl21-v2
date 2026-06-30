@@ -24,6 +24,8 @@ services:
       PGADMIN_DEFAULT_EMAIL: admin@tbilisistyle.ge
       PGADMIN_DEFAULT_PASSWORD: admin
       PGADMIN_CONFIG_SERVER_MODE: "False"
+      PGADMIN_CONFIG_MASTER_PASSWORD_REQUIRED: "False"
+
     depends_on:
       postgres:
         condition: service_healthy

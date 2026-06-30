@@ -7,6 +7,8 @@ use App\Models\MusicTrack;
 use App\Models\Page;
 use App\Models\Partner;
 use App\Models\Post;
+use App\Models\Product;
+use App\Models\ProductSize;
 use App\Models\SiteSetting;
 use App\Models\Ticket;
 use Illuminate\Console\Command;
@@ -24,7 +26,7 @@ use Throwable;
  */
 class LegacySync extends Command
 {
-    protected $signature = 'legacy:sync {--dry-run : Report what would change without writing} {--only= : Comma list: media,pages,tickets,music,partners,posts,site}';
+    protected $signature = 'legacy:sync {--dry-run : Report what would change without writing} {--only= : Comma list: media,pages,tickets,products,music,partners,posts,site}';
 
     protected $description = 'Sync the local legacy snapshot into the Laravel models (idempotent)';
 
@@ -52,7 +54,7 @@ class LegacySync extends Command
 
         $only = $this->option('only')
             ? array_map('trim', explode(',', (string) $this->option('only')))
-            : ['media', 'pages', 'tickets', 'music', 'partners', 'posts', 'site'];
+            : ['media', 'pages', 'tickets', 'products', 'music', 'partners', 'posts', 'site'];
 
         if ($this->dry) {
             $this->warn('DRY RUN -- no changes will be written.');
@@ -264,6 +266,41 @@ class LegacySync extends Command
                 'status' => $r->status ?? 'active',
                 'sale_url' => $r->sale_url ?: null,
             ]);
+        }
+    }
+
+    // -------------------------------------------------------------- products
+
+    private function syncProducts(): void
+    {
+        $rows = DB::connection('legacy')->table('products')->get();
+        $this->line("Products: {$rows->count()} legacy records");
+
+        foreach ($rows as $r) {
+            $sizes = DB::connection('legacy')->table('products_sizes')
+                ->where('_parent_id', $r->id)->orderBy('_order')->get();
+            $this->line("  - " . ($r->title ?? $r->id) . ': ' . $sizes->count() . ' sizes');
+
+            if ($this->dry) {
+                continue;
+            }
+
+            $this->upsertById(Product::class, $r->id, [
+                'title' => $this->transBase($r, 'title'),
+                'description' => $this->transBase($r, 'description'),
+                'price_gel' => (float) $r->price_gel,
+                'category' => $r->category ?: null,
+                'is_vip' => (bool) $r->is_vip,
+                'image_id' => $this->mediaExists($r->image_id) ? $r->image_id : null,
+                'status' => $r->status ?? 'active',
+            ]);
+
+            foreach ($sizes as $s) {
+                ProductSize::updateOrCreate(
+                    ['product_id' => $r->id, 'size' => $s->size],
+                    ['quantity' => (int) $s->quantity],
+                );
+            }
         }
     }
 
