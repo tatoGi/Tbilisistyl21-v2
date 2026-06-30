@@ -31,6 +31,7 @@ export default function PartnersStrip({ partners, heading }: Props) {
               </h2>
             </div>
           ) : null}
+        </div>
 
         <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
           {partners.map((partner) => {
