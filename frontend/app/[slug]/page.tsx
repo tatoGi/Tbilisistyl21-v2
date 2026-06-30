@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { notFound } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 import { getPage } from "@/lib/pages";
 import { getSiteContact } from "@/lib/nav";
 import { getCurrentLocale } from "@/lib/locale";
@@ -22,9 +22,12 @@ export default async function CmsPage({ params }: PageProps) {
   const { slug } = await params;
   const page = await getPage(slug);
 
-  // Pages that live on a fixed React route (route_path) are rendered by that
-  // route, not here — and unknown slugs 404.
-  if (!page || page.routePath) {
+  // Pages that live on a fixed React route (route_path) redirect there.
+  if (page?.routePath) {
+    redirect(page.routePath);
+  }
+
+  if (!page) {
     notFound();
   }
 

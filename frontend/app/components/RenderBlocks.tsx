@@ -4,14 +4,12 @@ import { t } from "@/lib/utils";
 import type { PageBlock } from "@/lib/pages";
 import type { SiteContact } from "@/lib/nav";
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
-
 /** Resolve an image value coming from the API (absolute, or /storage-relative). */
 function imageSrc(value: unknown): string | null {
   if (typeof value !== "string" || !value) return null;
   if (value.startsWith("http://") || value.startsWith("https://")) return value;
-  if (value.startsWith("/")) return `${API_URL}${value}`;
-  return `${API_URL}/storage/${value}`;
+  if (value.startsWith("/")) return value;
+  return `/storage/${value}`;
 }
 
 type Localized = Record<string, string> | undefined;

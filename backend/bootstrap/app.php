@@ -13,6 +13,10 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware): void {
+        // nginx terminates TLS and forwards X-Forwarded-*; without this Laravel
+        // generates http:// asset URLs on an https:// site (mixed content).
+        $middleware->trustProxies(at: '*');
+
         $middleware->alias([
             'locale' => \App\Http\Middleware\LocaleFromHeader::class,
             'quipu.hmac' => \App\Http\Middleware\VerifyQuipuHmac::class,

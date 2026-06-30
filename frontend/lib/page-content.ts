@@ -2,8 +2,6 @@ import { getPage } from "./pages";
 import { getCurrentLocale } from "./locale";
 import { t } from "./utils";
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
-
 /**
  * Admin-managed content for a bespoke page, extracted from its CMS blocks and
  * localized for the current request. Everything is optional: the bespoke React
@@ -26,9 +24,8 @@ function absolute(url: unknown): string | null {
   if (url.startsWith("http://") || url.startsWith("https://")) return url;
   // Admin uploads live on the backend (/storage/...); seeded references to the
   // frontend's own assets (/images/...) are served locally and pass through.
-  if (url.startsWith("/storage/")) return `${API_URL}${url}`;
-  if (url.startsWith("/")) return url;
-  return `${API_URL}/storage/${url}`;
+  if (url.startsWith("/storage/") || url.startsWith("/")) return url;
+  return `/storage/${url}`;
 }
 
 export async function getPageContent(slug: string): Promise<PageContent> {
