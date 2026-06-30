@@ -58,6 +58,10 @@ class PageSeeder extends Seeder
             return [];
         }
 
+        if (!empty($config['contact'])) {
+            return [['type' => 'contact', 'data' => ['showPayments' => true]]];
+        }
+
         $blocks = [];
 
         foreach ($config['images'] ?? [] as $src) {
@@ -170,8 +174,10 @@ class PageSeeder extends Seeder
                 'ns' => 'rulesAndTerms',
                 'body' => 'body',
             ],
-            // contact-us is driven by Site settings (phone/email/address), so it
-            // needs no content blocks.
+            'contact-us' => [
+                'contact' => true,
+            ],
+            // contact-us contact block uses Site settings for phone/email.
         ];
     }
 

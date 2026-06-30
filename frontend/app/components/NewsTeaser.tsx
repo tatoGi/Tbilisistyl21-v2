@@ -33,23 +33,33 @@ export default function NewsTeaser({ posts, heading, viewAllLabel }: Props) {
 
       <div className="relative z-10 mx-auto w-full max-w-6xl">
         <div className="mb-12 flex flex-col gap-3 md:flex-row md:items-end md:justify-between">
-          <div className="flex flex-col gap-1">
-            <p className="text-[10px] font-bold uppercase tracking-[0.25em] text-yellow-300">
-              Latest Happenings
-            </p>
-            <h2 className="font-heading text-2xl font-extrabold uppercase tracking-wide text-white md:text-3xl">
-              {heading}
-            </h2>
-          </div>
-          <Link
-            href="/news"
-            className="font-heading group inline-flex items-center gap-2 text-xs font-bold uppercase tracking-[0.2em] text-white/50 transition duration-300 hover:text-yellow-300"
-          >
-            <span>{viewAllLabel}</span>
-            <span aria-hidden className="transition-transform duration-300 group-hover:translate-x-1.5">
-              →
-            </span>
-          </Link>
+          {heading || viewAllLabel ? (
+            <>
+              {heading ? (
+                <div className="flex flex-col gap-1">
+                  <p className="text-[10px] font-bold uppercase tracking-[0.25em] text-yellow-300">
+                    Tbilisi Style 21
+                  </p>
+                  <h2 className="font-heading text-2xl font-extrabold uppercase tracking-wide text-white md:text-3xl">
+                    {heading}
+                  </h2>
+                </div>
+              ) : (
+                <div />
+              )}
+              {viewAllLabel ? (
+                <Link
+                  href="/news"
+                  className="font-heading group inline-flex items-center gap-2 text-xs font-bold uppercase tracking-[0.2em] text-white/50 transition duration-300 hover:text-yellow-300"
+                >
+                  <span>{viewAllLabel}</span>
+                  <span aria-hidden className="transition-transform duration-300 group-hover:translate-x-1.5">
+                    →
+                  </span>
+                </Link>
+              ) : null}
+            </>
+          ) : null}
         </div>
 
         <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">

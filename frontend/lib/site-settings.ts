@@ -2,7 +2,12 @@ import { api } from "./api";
 import type { Translatable } from "./types";
 
 export type SiteSettingsData = {
-  hero?: { heading?: Translatable; subheading?: Translatable };
+  hero?: {
+    badge?: Translatable;
+    heading?: Translatable;
+    subheading?: Translatable;
+    image?: string | null;
+  };
   instagramUrl?: string | null;
   tiktokUrl?: string | null;
   contact?: {

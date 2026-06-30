@@ -1,7 +1,6 @@
 import { api } from "./api";
 import { t, mediaUrl } from "./utils";
 import { getCurrentLocale } from "./locale";
-import { SITE_EMAIL, SITE_PHONE_DISPLAY, SITE_PHONE_HREF } from "./site-contact";
 import { listNavPages, listFeaturedPages, pageHref, pageLabel } from "./pages";
 import { getSiteSettings } from "./site-settings";
 import type { Partner as ApiPartner, Post as ApiPost, Media } from "./types";
@@ -35,9 +34,7 @@ export type NewsCard = {
 };
 
 /**
- * Site menu links, managed in the admin (Pages flagged "Show in site menu",
- * ordered by "Menu order"). Returns an empty list on failure so `FestivalMenu`
- * falls back to its canonical static `navItems`.
+ * Site menu links from the admin (Pages → Show in site menu, Menu order).
  */
 export async function getNavPages(): Promise<NavLink[]> {
   const locale = await getCurrentLocale();
@@ -59,9 +56,9 @@ export async function getFeaturedPages(): Promise<NavLink[]> {
 export async function getSiteContact(): Promise<SiteContact> {
   const { contact } = await getSiteSettings();
   return {
-    phone: contact?.phone?.trim() || SITE_PHONE_DISPLAY,
-    phoneHref: contact?.phoneHref?.trim() || SITE_PHONE_HREF,
-    email: contact?.email?.trim() || SITE_EMAIL,
+    phone: contact?.phone?.trim() || "",
+    phoneHref: contact?.phoneHref?.trim() || "",
+    email: contact?.email?.trim() || "",
     address: contact?.address?.trim() || null,
   };
 }

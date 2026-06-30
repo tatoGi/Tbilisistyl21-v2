@@ -2,10 +2,8 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { useTranslations } from "next-intl";
 import { usePathname } from "next/navigation";
 import { useState, useEffect } from "react";
-import { navItems } from "./navItems";
 import LanguageSwitcher from "./LanguageSwitcher";
 import SocialLinksRow from "./SocialLinks";
 import type { SocialLinks } from "@/lib/nav";
@@ -23,7 +21,6 @@ export default function FestivalMenu({
   pages = [],
   social = { instagram: null, tiktok: null },
 }: FestivalMenuProps) {
-  const t = useTranslations();
   const pathname = usePathname();
   const isFestivalPage = pathname === "/dashboard/festival";
   const [navOpen, setNavOpen] = useState(false);
@@ -35,26 +32,8 @@ export default function FestivalMenu({
     };
   }, [navOpen]);
 
-  // Functional routes are not CMS content — keep them fixed.
-  const functional: NavLink[] = [
-    { label: t("nav.ticket"), href: "/dashboard/tickets" },
-    { label: t("nav.shop"), href: "/dashboard/shop" },
-  ];
-
-  // CMS pages + functional links; fall back to the static list if the CMS
-  // returns nothing, so the menu is never empty. Dedupe by href because the CMS
-  // nav may already include the Shop/Tickets pages (seeded with their
-  // /dashboard/* routePath), which would otherwise show up twice.
-  const merged: NavLink[] = pages.length
-    ? [...pages, ...functional]
-    : navItems.map((item) => ({ label: t(`nav.${item.labelKey}`), href: item.href }));
-
-  const seenHrefs = new Set<string>();
-  const links: NavLink[] = merged.filter((link) => {
-    if (seenHrefs.has(link.href)) return false;
-    seenHrefs.add(link.href);
-    return true;
-  });
+  // Menu links come entirely from the admin (Pages → Show in site menu).
+  const links = pages;
 
   return (
     <>

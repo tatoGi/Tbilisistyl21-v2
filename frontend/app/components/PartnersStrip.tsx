@@ -1,5 +1,4 @@
 import Image from "next/image";
-import Link from "next/link";
 import type { PartnerCard } from "@/lib/nav";
 
 type Props = {
@@ -22,24 +21,16 @@ export default function PartnersStrip({ partners, heading }: Props) {
 
       <div className="relative z-10 mx-auto w-full max-w-6xl">
         <div className="mb-12 flex flex-col gap-3 md:flex-row md:items-end md:justify-between">
-          <div className="flex flex-col gap-1">
-            <p className="text-[10px] font-bold uppercase tracking-[0.25em] text-yellow-300">
-              Tbilisi Style 21
-            </p>
-            <h2 className="font-heading text-2xl font-extrabold uppercase tracking-wide text-white md:text-3xl">
-              {heading}
-            </h2>
-          </div>
-          <Link
-            href="/partners"
-            className="font-heading group inline-flex items-center gap-2 text-xs font-bold uppercase tracking-[0.2em] text-white/50 transition duration-300 hover:text-yellow-300"
-          >
-            <span>{heading}</span>
-            <span aria-hidden className="transition-transform duration-300 group-hover:translate-x-1.5">
-              →
-            </span>
-          </Link>
-        </div>
+          {heading ? (
+            <div className="flex flex-col gap-1">
+              <p className="text-[10px] font-bold uppercase tracking-[0.25em] text-yellow-300">
+                Tbilisi Style 21
+              </p>
+              <h2 className="font-heading text-2xl font-extrabold uppercase tracking-wide text-white md:text-3xl">
+                {heading}
+              </h2>
+            </div>
+          ) : null}
 
         <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
           {partners.map((partner) => {

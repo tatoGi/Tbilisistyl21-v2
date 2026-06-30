@@ -30,7 +30,12 @@ class SiteSettings extends Page implements HasForms
     public function mount(): void
     {
         $this->form->fill([
-            'hero' => SiteSetting::get('hero', ['heading' => [], 'subheading' => []]),
+            'hero' => SiteSetting::get('hero', [
+                'badge' => [],
+                'heading' => [],
+                'subheading' => [],
+                'image' => null,
+            ]),
             'instagramUrl' => SiteSetting::get('instagramUrl'),
             'tiktokUrl' => SiteSetting::get('tiktokUrl'),
             'contact' => SiteSetting::get('contact', [
@@ -46,8 +51,13 @@ class SiteSettings extends Page implements HasForms
         return $form
             ->schema([
                 Forms\Components\Section::make('Festival hero')
-                    ->description('Headline shown on the festival landing page.')
+                    ->description('Headline and background for the festival landing page (/dashboard/festival).')
                     ->schema([
+                        Forms\Components\Fieldset::make('Badge (optional)')
+                            ->schema(collect($locales)->map(
+                                fn ($label, $code) => Forms\Components\TextInput::make("hero.badge.{$code}")->label($label)
+                            )->values()->all())
+                            ->columns(2),
                         Forms\Components\Fieldset::make('Heading')
                             ->schema(collect($locales)->map(
                                 fn ($label, $code) => Forms\Components\TextInput::make("hero.heading.{$code}")->label($label)
@@ -58,6 +68,13 @@ class SiteSettings extends Page implements HasForms
                                 fn ($label, $code) => Forms\Components\Textarea::make("hero.subheading.{$code}")->label($label)->rows(2)
                             )->values()->all())
                             ->columns(2),
+                        Forms\Components\FileUpload::make('hero.image')
+                            ->label('Hero background image')
+                            ->disk('public')
+                            ->directory('media')
+                            ->visibility('public')
+                            ->image()
+                            ->imageEditor(),
                     ]),
                 Forms\Components\Section::make('Social links')
                     ->schema([

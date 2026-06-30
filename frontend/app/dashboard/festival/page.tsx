@@ -1,5 +1,3 @@
-import AboutImg from "@/public/images/secondImg_1920x1080.jpeg";
-import { getTranslations } from "next-intl/server";
 import { getFestivalHeroContent } from "@/lib/festival-landing";
 import { getFeaturedPages, getFeaturedPartners, getFeaturedNews } from "@/lib/nav";
 import { listProducts } from "@/lib/products";
@@ -11,10 +9,6 @@ import NewsTeaser from "../../components/NewsTeaser";
 export const dynamic = "force-dynamic";
 
 export default async function FestivalPage() {
-  const tNav = await getTranslations("nav");
-  const tHome = await getTranslations("home");
-  const t = await getTranslations("festivalLanding");
-
   const [hero, featured, products, partners, featuredNews] = await Promise.all([
     getFestivalHeroContent(),
     getFeaturedPages(),
@@ -26,21 +20,17 @@ export default async function FestivalPage() {
   return (
     <main className="relative w-full bg-black">
       <FestivalHero
-        image={AboutImg}
-        badge={hero.badge}
+        imageUrl={hero.imageUrl}
         pages={featured}
-        emptyPagesMessage={t("emptyFeatured")}
       />
 
       <ProductReel products={products} />
 
-      <PartnersStrip partners={partners} heading={tNav("partners")} />
+      {partners.length > 0 ? <PartnersStrip partners={partners} heading="" /> : null}
 
-      <NewsTeaser
-        posts={featuredNews}
-        heading={tNav("news")}
-        viewAllLabel={tHome("allNews")}
-      />
+      {featuredNews.length > 0 ? (
+        <NewsTeaser posts={featuredNews} heading="" viewAllLabel="" />
+      ) : null}
     </main>
   );
 }

@@ -1,46 +1,33 @@
-import { getTranslations } from "next-intl/server";
-import { getSiteSettings } from "./site-settings";
 import { getCurrentLocale } from "./locale";
+import { getSiteSettings } from "./site-settings";
 import { t } from "./utils";
 
 export type FestivalHeroContent = {
   badge: string;
   title: string;
   tagline: string;
+  /** Background image URL from Site settings (admin). */
+  imageUrl: string | null;
 };
 
-/**
- * Hero copy for /dashboard/festival. Title/tagline come from the admin
- * (Site settings → Festival hero) when set, otherwise fall back to the i18n
- * translations so the landing is never empty.
- */
+function resolveStorageUrl(path: unknown): string | null {
+  if (typeof path !== "string" || !path.trim()) return null;
+  if (path.startsWith("http://") || path.startsWith("https://")) return path;
+  if (path.startsWith("/")) return path;
+  return `/storage/${path.replace(/^\/+/, "")}`;
+}
+
+/** Hero copy and image for /dashboard/festival — admin Site settings only. */
 export async function getFestivalHeroContent(): Promise<FestivalHeroContent> {
-  let badge = "";
-  let title = "Tbilisi Style 21";
-  let tagline = "";
+  const locale = await getCurrentLocale();
+  const { hero } = await getSiteSettings();
 
-  try {
-    const tHome = await getTranslations("home");
-    const tLanding = await getTranslations("festivalLanding");
-    badge = tHome("subtitle");
-    title = tHome("title");
-    tagline = tLanding("heroTagline");
-  } catch {
-    // keep defaults
-  }
-
-  try {
-    const locale = await getCurrentLocale();
-    const { hero } = await getSiteSettings();
-    const adminTitle = t(hero?.heading, locale);
-    const adminTagline = t(hero?.subheading, locale);
-    if (adminTitle) title = adminTitle;
-    if (adminTagline) tagline = adminTagline;
-  } catch {
-    // keep i18n / defaults
-  }
-
-  return { badge, title, tagline };
+  return {
+    badge: t(hero?.badge as Record<string, string> | undefined, locale),
+    title: t(hero?.heading, locale),
+    tagline: t(hero?.subheading, locale),
+    imageUrl: resolveStorageUrl(hero?.image),
+  };
 }
 
 export type FestivalMusic = {
@@ -49,10 +36,6 @@ export type FestivalMusic = {
   loop: boolean;
 };
 
-/**
- * Background-music track for the festival landing. The site uses the
- * `MusicTrackList` playlist player instead, so this returns null.
- */
 export async function getFestivalMusic(): Promise<FestivalMusic | null> {
   return null;
 }
