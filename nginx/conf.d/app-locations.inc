@@ -1,0 +1,85 @@
+    client_max_body_size 20M;
+
+    location = /api/admin/login {
+        limit_req zone=api_login burst=3 nodelay;
+        proxy_pass http://laravel;
+        include /etc/nginx/conf.d/proxy-laravel.conf;
+    }
+
+    location = /api/check-personal-number {
+        limit_req zone=api_personal burst=2 nodelay;
+        proxy_pass http://laravel;
+        include /etc/nginx/conf.d/proxy-laravel.conf;
+    }
+
+    location ~ ^/api/orders/ {
+        limit_req zone=api_orders burst=5 nodelay;
+        proxy_pass http://laravel;
+        include /etc/nginx/conf.d/proxy-laravel.conf;
+    }
+
+    location /api/ {
+        limit_req zone=api_general burst=20 nodelay;
+        proxy_pass http://laravel;
+        include /etc/nginx/conf.d/proxy-laravel.conf;
+    }
+
+    location /admin {
+        proxy_pass http://laravel;
+        include /etc/nginx/conf.d/proxy-laravel.conf;
+    }
+
+    location /sanctum/ {
+        proxy_pass http://laravel;
+        include /etc/nginx/conf.d/proxy-laravel.conf;
+    }
+
+    location /livewire {
+        proxy_pass http://laravel;
+        include /etc/nginx/conf.d/proxy-laravel.conf;
+    }
+
+    location /css/filament/ {
+        proxy_pass http://laravel;
+        include /etc/nginx/conf.d/proxy-laravel.conf;
+    }
+
+    location /js/filament/ {
+        proxy_pass http://laravel;
+        include /etc/nginx/conf.d/proxy-laravel.conf;
+    }
+
+    location ~ ^/(brand-logo\.jpeg|favicon\.ico|robots\.txt)$ {
+        proxy_pass http://laravel;
+        include /etc/nginx/conf.d/proxy-laravel.conf;
+    }
+
+    location /storage/ {
+        alias /var/www/html/storage/app/public/;
+        expires 30d;
+        add_header Cache-Control "public, immutable";
+        try_files $uri =404;
+    }
+
+    location /pgadmin/ {
+        proxy_pass http://pgadmin:5050/;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Script-Name /pgadmin;
+        proxy_redirect off;
+    }
+
+    location /.well-known/acme-challenge/ {
+        root /var/www/certbot;
+    }
+
+    location / {
+        proxy_pass http://nextjs;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection "upgrade";
+    }
