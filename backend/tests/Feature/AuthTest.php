@@ -24,7 +24,23 @@ class AuthTest extends TestCase
         ]);
 
         $response->assertOk()
-            ->assertJsonStructure(['token', 'user' => ['id', 'name', 'email', 'role']]);
+            ->assertJsonStructure(['token', 'expiresAt', 'user' => ['id', 'name', 'email', 'role']]);
+    }
+
+    public function test_editor_cannot_login_to_scanner_api(): void
+    {
+        User::factory()->create([
+            'email' => 'editor@tbilisistyle.ge',
+            'password' => bcrypt('password'),
+            'role' => 'editor',
+        ]);
+
+        $response = $this->postJson('/api/admin/login', [
+            'email' => 'editor@tbilisistyle.ge',
+            'password' => 'password',
+        ]);
+
+        $response->assertForbidden();
     }
 
     public function test_login_fails_with_wrong_password(): void

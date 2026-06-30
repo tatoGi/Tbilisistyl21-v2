@@ -6,6 +6,7 @@ use App\Models\SoldTicket;
 use App\Models\Ticket;
 use App\Services\PaymentService;
 use App\Services\QrCodeService;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 
 class CreateTicketOrderAction
@@ -17,76 +18,71 @@ class CreateTicketOrderAction
 
     public function execute(array $data): array
     {
-        $ticket = Ticket::findOrFail($data['ticketId']);
+        return DB::transaction(function () use ($data) {
+            $ticket = Ticket::where('id', $data['ticketId'])->lockForUpdate()->firstOrFail();
 
-        // Check status and quantity
-        if ($ticket->status !== 'active' || $ticket->quantity <= 0) {
-            return ['error' => 'sold_out', 'status' => 400];
-        }
+            if ($ticket->status !== 'active' || $ticket->quantity <= 0) {
+                return ['error' => 'sold_out', 'status' => 400];
+            }
 
-        // Max 3 tickets per personal number
-        $paidCount = SoldTicket::where('personal_number', $data['personalNumber'])
-            ->where('status', 'paid')
-            ->count();
+            $reservedCount = SoldTicket::where('personal_number', $data['personalNumber'])
+                ->whereIn('status', ['paid', 'pending'])
+                ->lockForUpdate()
+                ->get()
+                ->count();
 
-        if ($paidCount >= 3) {
-            return ['error' => 'max_tickets_reached', 'status' => 400];
-        }
+            if ($reservedCount >= config('app.max_tickets_per_person', 3)) {
+                return ['error' => 'max_tickets_reached', 'status' => 400];
+            }
 
-        // Generate internal ID
-        $internalId = strtoupper(Str::random(8));
+            $internalId = strtoupper(Str::random(8));
+            $hmac = $this->paymentService->createCallbackHmac($internalId);
 
-        // Create callback HMAC
-        $hmac = $this->paymentService->createCallbackHmac($internalId);
+            $appUrl = config('app.url');
+            $callbackUrl = "{$appUrl}/api/payments/callback?ref={$internalId}&sig={$hmac}";
+            $redirectUrl = "{$appUrl}/api/payments/redirect";
 
-        // Build PG order
-        $appUrl = config('app.url');
-        $callbackUrl = "{$appUrl}/api/payments/callback?ref={$internalId}&sig={$hmac}";
-        $redirectUrl = "{$appUrl}/api/payments/redirect";
+            $pgResponse = $this->paymentService->createOrder([
+                'amount' => (int) ($ticket->price_gel * 100),
+                'description' => $ticket->setLocale('en')->title ?? $ticket->setLocale('ka')->title,
+                'merchantId' => config('services.quipu.merchant_id'),
+                'callbackUrl' => $callbackUrl,
+                'redirectUrl' => $redirectUrl,
+            ]);
 
-        $pgResponse = $this->paymentService->createOrder([
-            'amount' => (int) ($ticket->price_gel * 100),
-            'description' => $ticket->setLocale('en')->title ?? $ticket->setLocale('ka')->title,
-            'merchantId' => config('services.quipu.merchant_id'),
-            'callbackUrl' => $callbackUrl,
-            'redirectUrl' => $redirectUrl,
-        ]);
+            $qrData = $this->qrCodeService->generateTicketData(
+                $internalId,
+                $data['personalNumber'],
+                $ticket->id,
+            );
 
-        // Generate QR
-        $qrData = $this->qrCodeService->generateTicketData(
-            $internalId,
-            $data['personalNumber'],
-            $ticket->id,
-        );
+            SoldTicket::create([
+                'id' => $internalId,
+                'personal_number' => $data['personalNumber'],
+                'email' => $data['email'],
+                'name' => $data['name'],
+                'surname' => $data['surname'],
+                'amount' => $ticket->price_gel,
+                'status' => 'pending',
+                'original_ticket_id' => $ticket->id,
+                'event_name' => $ticket->setLocale('ka')->title,
+                'event_date' => $ticket->event_date,
+                'location' => $ticket->location,
+                'pg_order_id' => $pgResponse['orderId'],
+                'pg_hpp_url' => $pgResponse['hppUrl'],
+                'pg_password' => $pgResponse['password'],
+                'qr_code' => $qrData,
+            ]);
 
-        // Store pending ticket
-        SoldTicket::create([
-            'id' => $internalId,
-            'personal_number' => $data['personalNumber'],
-            'email' => $data['email'],
-            'name' => $data['name'],
-            'surname' => $data['surname'],
-            'amount' => $ticket->price_gel,
-            'status' => 'pending',
-            'original_ticket_id' => $ticket->id,
-            'event_name' => $ticket->setLocale('ka')->title,
-            'event_date' => $ticket->event_date,
-            'location' => $ticket->location,
-            'pg_order_id' => $pgResponse['orderId'],
-            'pg_hpp_url' => $pgResponse['hppUrl'],
-            'pg_password' => $pgResponse['password'],
-            'qr_code' => $qrData,
-        ]);
+            $token = $this->paymentService->createRedirectToken(
+                $pgResponse['orderId'],
+                'soldTickets',
+            );
 
-        // Create signed redirect token
-        $token = $this->paymentService->createRedirectToken(
-            $pgResponse['orderId'],
-            'soldTickets',
-        );
-
-        return [
-            'redirectUrl' => "/api/payments/redirect?token={$token}",
-            'status' => 200,
-        ];
+            return [
+                'redirectUrl' => "/api/payments/redirect?token={$token}",
+                'status' => 200,
+            ];
+        });
     }
 }

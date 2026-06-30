@@ -3,18 +3,21 @@
 namespace App\Actions;
 
 use App\Models\SoldTicket;
+use App\Services\QrCodeService;
 use Illuminate\Support\Facades\DB;
 
 class ValidateTicketAction
 {
+    public function __construct(private QrCodeService $qrCodeService) {}
+
     public function execute(array $qrData): array
     {
-        $ticketId = $qrData['ticketId'] ?? null;
-        $personalNumber = $qrData['personalNumber'] ?? null;
-
-        if (!$ticketId || !$personalNumber) {
-            return ['error' => 'invalid_qr_data', 'status' => 400];
+        if (!$this->qrCodeService->verifyPayload($qrData)) {
+            return ['error' => 'invalid_qr_signature', 'status' => 400];
         }
+
+        $ticketId = $qrData['ticketId'];
+        $personalNumber = $qrData['personalNumber'];
 
         $soldTicket = SoldTicket::find($ticketId);
 
@@ -23,7 +26,7 @@ class ValidateTicketAction
         }
 
         if ($soldTicket->personal_number !== $personalNumber) {
-            return ['error' => 'personal_number_mismatch', 'status' => 400];
+            return ['error' => 'ticket_not_found', 'status' => 404];
         }
 
         if ($soldTicket->status !== 'paid') {

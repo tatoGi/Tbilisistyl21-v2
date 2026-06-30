@@ -1,0 +1,16 @@
+export const navItems = [
+  { labelKey: "mainStage", href: "/dashboard/mainStage" },
+  { labelKey: "qvevri", href: "/dashboard/qvevriStage" },
+  { labelKey: "technoQvevri", href: "/dashboard/technoQvevri" },
+  { labelKey: "lineup", href: "/dashboard/lineUp" },
+  { labelKey: "joker", href: "/dashboard/jokerTicket" },
+  { labelKey: "ukrainianDay", href: "/dashboard/ukrainianPage" },
+  { labelKey: "fourStages", href: "/dashboard/fourStages" },
+  { labelKey: "ourStory", href: "/dashboard/ourStory" },
+  { labelKey: "ticket", href: "/dashboard/tickets" },
+  { labelKey: "shop", href: "/dashboard/shop" },
+  { labelKey: "mission", href: "/dashboard/mission" },
+  { labelKey: "foodZone", href: "/dashboard/foodZone" },
+  { labelKey: "contactUs", href: "/dashboard/contactUs" },
+  { labelKey: "festivalRulesTerms", href: "/dashboard/rulesAndTerms" },
+];

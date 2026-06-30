@@ -13,6 +13,7 @@ RUN apt-get update && apt-get install -y \
     unzip \
     git \
     curl \
+    postgresql-client \
     && rm -rf /var/lib/apt/lists/*
 
 # Install PHP extensions
@@ -32,6 +33,15 @@ RUN docker-php-ext-configure gd --with-freetype --with-jpeg \
 # Install Composer from official image
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
+# Dev PHP tuning (OPcache + realpath cache) so `artisan serve` is fast.
+COPY docker/php-dev.ini /usr/local/etc/php/conf.d/zz-dev.ini
+
 WORKDIR /var/www/html
+
+# Install PHP dependencies INTO THE IMAGE so vendor/ lives on the container's
+# fast filesystem (served via a named volume), not the slow Windows bind mount.
+# This is the single biggest dev-performance win on Docker Desktop / WSL2.
+COPY composer.json composer.lock ./
+RUN composer install --no-interaction --no-scripts --optimize-autoloader --prefer-dist
 
 CMD ["php", "artisan", "serve", "--host=0.0.0.0", "--port=8000"]

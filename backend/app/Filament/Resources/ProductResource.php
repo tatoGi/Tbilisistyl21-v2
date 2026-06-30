@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources;
 
+use App\Filament\Concerns\AdminOnlyResource;
 use App\Filament\Resources\ProductResource\Pages;
 use App\Models\Product;
 use Filament\Forms;
@@ -14,11 +15,13 @@ use Illuminate\Support\Facades\Cache;
 
 class ProductResource extends Resource
 {
+    use AdminOnlyResource;
     use Translatable;
 
     protected static ?string $model = Product::class;
     protected static ?string $navigationIcon = 'heroicon-o-shopping-bag';
-    protected static ?string $navigationGroup = 'Shop';
+    protected static ?string $navigationGroup = 'Catalog';
+    protected static ?int $navigationSort = 2;
 
     public static function form(Form $form): Form
     {
@@ -44,6 +47,10 @@ class ProductResource extends Resource
     public static function table(Table $table): Table
     {
         return $table->columns([
+            Tables\Columns\ImageColumn::make('image')
+                ->label('')
+                ->getStateUsing(fn ($record) => $record->image ? '/storage/media/' . $record->image->filename : null)
+                ->square(),
             Tables\Columns\TextColumn::make('title')->searchable(),
             Tables\Columns\TextColumn::make('price_gel')->money('GEL')->sortable(),
             Tables\Columns\TextColumn::make('category')->searchable(),

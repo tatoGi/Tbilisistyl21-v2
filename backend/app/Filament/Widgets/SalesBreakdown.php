@@ -2,6 +2,7 @@
 
 namespace App\Filament\Widgets;
 
+use App\Filament\Concerns\AdminOnlyWidget;
 use App\Models\ProductOrder;
 use App\Models\SoldTicket;
 use Filament\Widgets\StatsOverviewWidget;
@@ -9,7 +10,9 @@ use Filament\Widgets\StatsOverviewWidget\Stat;
 
 class SalesBreakdown extends StatsOverviewWidget
 {
-    protected static ?int $sort = 2;
+    use AdminOnlyWidget;
+
+    protected static ?int $sort = 1;
 
     protected function getStats(): array
     {

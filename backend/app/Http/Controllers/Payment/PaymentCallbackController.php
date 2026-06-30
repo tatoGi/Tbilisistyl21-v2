@@ -22,7 +22,7 @@ class PaymentCallbackController extends Controller
         }
 
         $frontendUrl = config('app.frontend_url');
-        return redirect("{$frontendUrl}/dashboard/success?ticketId={$result['ticketId']}");
+        return redirect("{$frontendUrl}/dashboard/success");
     }
 
     public function redirect(Request $request, PaymentService $paymentService)

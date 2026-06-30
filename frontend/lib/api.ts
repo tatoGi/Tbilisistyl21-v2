@@ -22,7 +22,6 @@ export async function api<T>(
       'Accept-Language': locale || 'ka',
       ...fetchOptions?.headers,
     },
-    credentials: 'include',
     next: { revalidate: 60 },
   } as RequestInit);
 

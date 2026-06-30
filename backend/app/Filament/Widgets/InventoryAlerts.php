@@ -2,6 +2,7 @@
 
 namespace App\Filament\Widgets;
 
+use App\Filament\Concerns\AdminOnlyWidget;
 use App\Models\Ticket;
 use Filament\Tables;
 use Filament\Tables\Table;
@@ -9,8 +10,10 @@ use Filament\Widgets\TableWidget as BaseWidget;
 
 class InventoryAlerts extends BaseWidget
 {
+    use AdminOnlyWidget;
+
     protected static ?string $heading = 'Low Stock Alerts';
-    protected static ?int $sort = 3;
+    protected static ?int $sort = 5;
     protected int|string|array $columnSpan = 'full';
 
     public function table(Table $table): Table

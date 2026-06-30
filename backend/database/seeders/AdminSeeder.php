@@ -9,13 +9,18 @@ class AdminSeeder extends Seeder
 {
     public function run(): void
     {
-        User::firstOrCreate(
+        $user = User::updateOrCreate(
             ['email' => 'admin@tbilisistyle.ge'],
             [
                 'name' => 'Admin',
-                'password' => bcrypt('changeme'),
-                'role' => 'admin',
+                // Plain text — User model `hashed` cast handles bcrypt.
+                'password' => 'secret',
             ]
         );
+
+        // role is guarded from mass assignment; set explicitly in seeder.
+        if ($user->role !== 'admin') {
+            $user->forceFill(['role' => 'admin'])->save();
+        }
     }
 }

@@ -17,7 +17,11 @@ class MusicTrackResource extends Resource
 {
     protected static ?string $model = MusicTrack::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
+    protected static ?string $navigationIcon = 'heroicon-o-musical-note';
+
+    protected static ?string $navigationGroup = 'Content';
+
+    protected static ?int $navigationSort = 4;
 
     public static function form(Form $form): Form
     {

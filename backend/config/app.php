@@ -54,6 +54,10 @@ return [
 
     'url' => env('APP_URL', 'http://localhost'),
 
+    'frontend_url' => env('FRONTEND_URL', 'http://localhost:3000'),
+
+    'max_tickets_per_person' => (int) env('MAX_TICKETS_PER_PERSON', 3),
+
     /*
     |--------------------------------------------------------------------------
     | Application Timezone

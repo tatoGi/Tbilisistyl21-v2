@@ -6,15 +6,26 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Support\Facades\Cache;
 use Spatie\Translatable\HasTranslations;
 
 class MusicTrack extends Model
 {
     use HasUuids, HasTranslations;
 
+    public const API_CACHE_KEY = 'music-tracks';
+
     public array $translatable = ['title'];
 
     protected $fillable = ['title', 'artist', 'audio_file_id', 'order', 'status'];
+
+    protected static function booted(): void
+    {
+        $flush = fn () => Cache::forget(self::API_CACHE_KEY);
+
+        static::saved($flush);
+        static::deleted($flush);
+    }
 
     public function audioFile(): BelongsTo
     {

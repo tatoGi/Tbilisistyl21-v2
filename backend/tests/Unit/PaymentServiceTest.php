@@ -47,4 +47,11 @@ class PaymentServiceTest extends TestCase
         $token = $this->service->createRedirectToken(12345, 'soldTickets');
         $this->assertNull($this->service->verifyRedirectToken($token . 'x'));
     }
+
+    public function test_verify_paid_amount_matches_tetri(): void
+    {
+        $this->assertTrue($this->service->verifyPaidAmount(50.0, ['amount' => 5000]));
+        $this->assertFalse($this->service->verifyPaidAmount(50.0, ['amount' => 100]));
+        $this->assertFalse($this->service->verifyPaidAmount(50.0, ['status' => 'paid']));
+    }
 }

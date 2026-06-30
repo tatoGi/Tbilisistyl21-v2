@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources;
 
+use App\Filament\Concerns\AdminOnlyResource;
 use App\Filament\Resources\ProductOrderResource\Pages;
 use App\Filament\Resources\ProductOrderResource\RelationManagers;
 use App\Models\ProductOrder;
@@ -15,9 +16,30 @@ use Illuminate\Database\Eloquent\SoftDeletingScope;
 
 class ProductOrderResource extends Resource
 {
+    use AdminOnlyResource;
+
     protected static ?string $model = ProductOrder::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
+    protected static ?string $navigationIcon = 'heroicon-o-shopping-cart';
+
+    protected static ?string $navigationGroup = 'Sales';
+
+    protected static ?int $navigationSort = 2;
+
+    public static function canCreate(): bool
+    {
+        return false;
+    }
+
+    public static function canEdit($record): bool
+    {
+        return false;
+    }
+
+    public static function canDelete($record): bool
+    {
+        return false;
+    }
 
     public static function form(Form $form): Form
     {

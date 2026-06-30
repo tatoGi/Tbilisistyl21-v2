@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources;
 
+use App\Filament\Concerns\AdminOnlyResource;
 use App\Filament\Resources\TicketResource\Pages;
 use App\Models\Ticket;
 use Filament\Forms;
@@ -14,11 +15,13 @@ use Illuminate\Support\Facades\Cache;
 
 class TicketResource extends Resource
 {
+    use AdminOnlyResource;
     use Translatable;
 
     protected static ?string $model = Ticket::class;
     protected static ?string $navigationIcon = 'heroicon-o-ticket';
-    protected static ?string $navigationGroup = 'Shop';
+    protected static ?string $navigationGroup = 'Catalog';
+    protected static ?int $navigationSort = 1;
 
     public static function form(Form $form): Form
     {

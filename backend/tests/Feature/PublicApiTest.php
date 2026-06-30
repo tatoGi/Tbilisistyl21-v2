@@ -44,6 +44,28 @@ class PublicApiTest extends TestCase
         $response->assertOk()->assertJsonPath('data.title.en', 'Test EN');
     }
 
+    public function test_get_draft_ticket_returns_404(): void
+    {
+        $ticket = Ticket::create([
+            'title' => ['ka' => 'Draft'],
+            'price_gel' => 50, 'quantity' => 10,
+            'event_date' => '2026-08-01', 'location' => 'Tbilisi', 'status' => 'draft',
+        ]);
+
+        $this->getJson("/api/tickets/{$ticket->id}")->assertNotFound();
+    }
+
+    public function test_get_draft_product_returns_404(): void
+    {
+        $product = Product::create([
+            'title' => ['ka' => 'Draft shirt'],
+            'price_gel' => 30,
+            'status' => 'draft',
+        ]);
+
+        $this->getJson("/api/products/{$product->id}")->assertNotFound();
+    }
+
     public function test_list_products_with_sizes(): void
     {
         $product = Product::create([

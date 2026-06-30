@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources;
 
+use App\Filament\Concerns\AdminOnlyResource;
 use App\Filament\Resources\SoldTicketResource\Pages;
 use App\Models\SoldTicket;
 use Filament\Forms;
@@ -12,9 +13,12 @@ use Filament\Tables\Table;
 
 class SoldTicketResource extends Resource
 {
+    use AdminOnlyResource;
+
     protected static ?string $model = SoldTicket::class;
     protected static ?string $navigationIcon = 'heroicon-o-clipboard-document-check';
-    protected static ?string $navigationGroup = 'Shop';
+    protected static ?string $navigationGroup = 'Sales';
+    protected static ?int $navigationSort = 1;
 
     public static function canCreate(): bool
     {

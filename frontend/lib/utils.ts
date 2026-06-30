@@ -14,5 +14,5 @@ export function formatPrice(price: number): string {
 
 export function mediaUrl(filename: string): string {
   const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
-  return `${apiUrl}/storage/media/${filename}`;
+  return `${apiUrl}/storage/media/${encodeURIComponent(filename)}`;
 }

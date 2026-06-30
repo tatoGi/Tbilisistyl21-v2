@@ -44,6 +44,9 @@ services:
       - "8000:8000"
     volumes:
       - ./backend:/var/www/html
+      # Keep vendor/ on the container's fast filesystem instead of the slow
+      # Windows bind mount. Initialised from the image build above.
+      - vendor-dev:/var/www/html/vendor
     environment:
       APP_ENV: local
       APP_DEBUG: "true"
@@ -64,3 +67,4 @@ services:
 volumes:
   pgdata-dev:
   pgadmin-data:
+  vendor-dev:

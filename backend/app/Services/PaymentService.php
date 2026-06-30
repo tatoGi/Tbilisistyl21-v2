@@ -82,6 +82,29 @@ class PaymentService
         return $decoded;
     }
 
+    public function verifyPaidAmount(float $expectedGel, array $details): bool
+    {
+        $expectedTetri = (int) round($expectedGel * 100);
+        $actualTetri = $this->extractPaidAmountTetri($details);
+
+        if ($actualTetri === null) {
+            return false;
+        }
+
+        return $actualTetri === $expectedTetri;
+    }
+
+    public function extractPaidAmountTetri(array $details): ?int
+    {
+        foreach (['amount', 'totalAmount', 'orderAmount', 'Amount'] as $key) {
+            if (isset($details[$key]) && is_numeric($details[$key])) {
+                return (int) $details[$key];
+            }
+        }
+
+        return null;
+    }
+
     private function getSecret(): string
     {
         return config('app.key');

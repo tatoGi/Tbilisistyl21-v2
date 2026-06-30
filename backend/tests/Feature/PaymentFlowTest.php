@@ -44,19 +44,24 @@ class PaymentFlowTest extends TestCase
         return [$ticket, $soldTicket];
     }
 
+    private function mockPaidPaymentGateway(array $details = ['status' => 'paid', 'amount' => 5000]): void
+    {
+        $this->partialMock(PaymentService::class, function ($mock) use ($details) {
+            $mock->shouldReceive('getOrderDetails')
+                ->once()
+                ->andReturn($details);
+            $mock->shouldReceive('verifyCallbackHmac')
+                ->andReturn(true);
+        });
+    }
+
     public function test_payment_callback_marks_ticket_paid_on_success(): void
     {
         Bus::fake([SendTicketEmailJob::class]);
 
         [$ticket, $soldTicket] = $this->createActiveTicketAndSoldTicket();
 
-        $this->mock(PaymentService::class, function ($mock) {
-            $mock->shouldReceive('getOrderDetails')
-                ->once()
-                ->andReturn(['status' => 'paid']);
-            $mock->shouldReceive('verifyCallbackHmac')
-                ->andReturn(true);
-        });
+        $this->mockPaidPaymentGateway();
 
         $this->withoutMiddleware(\App\Http\Middleware\VerifyQuipuHmac::class);
 
@@ -81,7 +86,7 @@ class PaymentFlowTest extends TestCase
     {
         [$ticket, $soldTicket] = $this->createActiveTicketAndSoldTicket();
 
-        $this->mock(PaymentService::class, function ($mock) {
+        $this->partialMock(PaymentService::class, function ($mock) {
             $mock->shouldReceive('getOrderDetails')
                 ->once()
                 ->andReturn(['status' => 'declined']);
@@ -132,13 +137,7 @@ class PaymentFlowTest extends TestCase
         // Set quantity to 0 to simulate race condition
         $ticket->update(['quantity' => 0, 'status' => 'sold_out']);
 
-        $this->mock(PaymentService::class, function ($mock) {
-            $mock->shouldReceive('getOrderDetails')
-                ->once()
-                ->andReturn(['status' => 'paid']);
-            $mock->shouldReceive('verifyCallbackHmac')
-                ->andReturn(true);
-        });
+        $this->mockPaidPaymentGateway();
 
         $this->withoutMiddleware(\App\Http\Middleware\VerifyQuipuHmac::class);
 
@@ -179,13 +178,7 @@ class PaymentFlowTest extends TestCase
             'pg_password' => 'secret',
         ]);
 
-        $this->mock(PaymentService::class, function ($mock) {
-            $mock->shouldReceive('getOrderDetails')
-                ->once()
-                ->andReturn(['status' => 'paid']);
-            $mock->shouldReceive('verifyCallbackHmac')
-                ->andReturn(true);
-        });
+        $this->mockPaidPaymentGateway();
 
         $this->withoutMiddleware(\App\Http\Middleware\VerifyQuipuHmac::class);
 
@@ -194,6 +187,73 @@ class PaymentFlowTest extends TestCase
         $ticket->refresh();
         $this->assertEquals(0, $ticket->quantity);
         $this->assertEquals('sold_out', $ticket->status);
+    }
+
+    public function test_payment_callback_rejects_amount_mismatch(): void
+    {
+        [$ticket, $soldTicket] = $this->createActiveTicketAndSoldTicket();
+
+        $this->mockPaidPaymentGateway(['status' => 'paid', 'amount' => 100]);
+
+        $this->withoutMiddleware(\App\Http\Middleware\VerifyQuipuHmac::class);
+
+        $response = $this->get("/api/payments/callback?ref=ABCD1234&ID=999&sig=valid");
+        $response->assertRedirect();
+
+        $soldTicket->refresh();
+        $this->assertEquals('failed', $soldTicket->status);
+        $this->assertEquals('amount_mismatch', $soldTicket->fail_reason);
+    }
+
+    public function test_payment_callback_rejects_fourth_paid_ticket(): void
+    {
+        [$ticket, $soldTicket] = $this->createActiveTicketAndSoldTicket();
+
+        for ($i = 0; $i < 3; $i++) {
+            SoldTicket::create([
+                'id' => 'PD' . str_pad((string) $i, 6, '0', STR_PAD_LEFT),
+                'personal_number' => '12345678901',
+                'email' => 'test@test.com',
+                'name' => 'John',
+                'surname' => 'Doe',
+                'amount' => 50,
+                'status' => 'paid',
+                'paid_at' => now(),
+                'event_name' => 'Test',
+                'event_date' => '2026-08-01',
+                'location' => 'Tbilisi',
+            ]);
+        }
+
+        $this->mockPaidPaymentGateway();
+
+        $this->withoutMiddleware(\App\Http\Middleware\VerifyQuipuHmac::class);
+
+        $response = $this->get("/api/payments/callback?ref=ABCD1234&ID=999&sig=valid");
+        $response->assertRedirect();
+
+        $soldTicket->refresh();
+        $this->assertEquals('failed', $soldTicket->status);
+        $this->assertEquals('max_tickets_reached', $soldTicket->fail_reason);
+    }
+
+    public function test_payment_callback_success_redirect_omits_ticket_id(): void
+    {
+        Bus::fake([SendTicketEmailJob::class]);
+
+        [$ticket, $soldTicket] = $this->createActiveTicketAndSoldTicket();
+
+        $this->mockPaidPaymentGateway();
+
+        $this->withoutMiddleware(\App\Http\Middleware\VerifyQuipuHmac::class);
+
+        config(['app.frontend_url' => 'http://localhost:3000']);
+
+        $response = $this->get("/api/payments/callback?ref=ABCD1234&ID=999&sig=valid");
+        $location = $response->headers->get('Location');
+
+        $this->assertStringContainsString('/dashboard/success', $location);
+        $this->assertStringNotContainsString('ticketId=', $location);
     }
 
     public function test_redirect_endpoint_with_valid_token(): void

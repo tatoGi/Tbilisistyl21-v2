@@ -19,16 +19,18 @@ class AuthController extends Controller
             return response()->json(['message' => 'Invalid credentials'], 401);
         }
 
-        $token = $user->createToken('admin')->plainTextToken;
+        if (!$user->isAdmin()) {
+            return response()->json(['message' => 'Scanner access requires an admin account'], 403);
+        }
+
+        $expirationMinutes = config('sanctum.expiration');
+        $expiresAt = $expirationMinutes ? now()->addMinutes((int) $expirationMinutes) : null;
+        $token = $user->createToken('admin-scanner', ['ticket:scan'], $expiresAt)->plainTextToken;
 
         return response()->json([
             'token' => $token,
-            'user' => [
-                'id' => $user->id,
-                'name' => $user->name,
-                'email' => $user->email,
-                'role' => $user->role,
-            ],
+            'expiresAt' => $expiresAt?->toIso8601String(),
+            'user' => $this->userPayload($user),
         ]);
     }
 
@@ -41,6 +43,16 @@ class AuthController extends Controller
 
     public function user(Request $request): JsonResponse
     {
-        return response()->json($request->user());
+        return response()->json($this->userPayload($request->user()));
+    }
+
+    private function userPayload(User $user): array
+    {
+        return [
+            'id' => $user->id,
+            'name' => $user->name,
+            'email' => $user->email,
+            'role' => $user->role,
+        ];
     }
 }

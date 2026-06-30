@@ -1,9 +1,285 @@
-@import 'tailwindcss';
+@import "tailwindcss";
 
-@theme {
-  --color-primary: #f97316;
-  --color-primary-dark: #ea580c;
-  --color-surface: #111111;
-  --color-surface-light: #1a1a1a;
-  --color-border: #333333;
+:root {
+  --background: #ffffff;
+  --foreground: #171717;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: var(--font-display), Arial, sans-serif;
+  --font-mono: var(--font-display);
+  /* Bebas (Latin) → Oswald (Cyrillic) → Noto (Georgian + body fallback) */
+  --font-heading: var(--font-bebas), var(--font-oswald), var(--font-display), Arial,
+    sans-serif;
+  --font-bitcount: "Bitcount Single", var(--font-display), system-ui, sans-serif;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: #0a0a0a;
+    --foreground: #ededed;
+  }
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-display), Arial, Helvetica, sans-serif;
+  line-height: 1.55;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.font-heading {
+  font-family: var(--font-heading);
+}
+
+/* Headings & festival display type */
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-family: var(--font-heading);
+  letter-spacing: 0.03em;
+  text-wrap: balance;
+}
+
+/* Branded uppercase UI (nav, CTAs, section titles) */
+.uppercase:is(.font-semibold, .font-bold, .font-extrabold, .font-black) {
+  font-family: var(--font-heading);
+  letter-spacing: 0.08em;
+}
+
+/* Continuously scrolling product reel (two copies of the track sit side by
+   side; translating by -50% loops seamlessly). */
+@keyframes ts-marquee {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+.ts-marquee-track {
+  display: flex;
+  width: max-content;
+  animation: ts-marquee 40s linear infinite;
+  will-change: transform;
+}
+
+.ts-marquee:hover .ts-marquee-track {
+  animation-play-state: paused;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ts-marquee-track {
+    animation: none;
+  }
+}
+
+/* Attention-grabbing pulse for the floating "Buy Tickets" call to action. */
+@keyframes ts-ticket-pulse {
+  0%,
+  100% {
+    box-shadow: 0 0 0 0 rgba(253, 224, 71, 0.55),
+      0 10px 30px rgba(0, 0, 0, 0.45);
+  }
+  50% {
+    box-shadow: 0 0 0 14px rgba(253, 224, 71, 0),
+      0 10px 30px rgba(0, 0, 0, 0.45);
+  }
+}
+
+.ts-ticket-pulse {
+  animation: ts-ticket-pulse 2.2s ease-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ts-ticket-pulse {
+    animation: none;
+  }
+}
+
+/* ───────────── Festival landing — hero & motion ───────────── */
+
+@keyframes ts-fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.ts-fade-up {
+  animation: ts-fade-up 0.75s ease-out both;
+}
+
+@keyframes ts-hero-kenburns {
+  from {
+    transform: scale(1);
+  }
+  to {
+    transform: scale(1.06);
+  }
+}
+
+.ts-hero-kenburns {
+  animation: ts-hero-kenburns 18s ease-out forwards;
+}
+
+@keyframes ts-scroll-hint {
+  0%,
+  100% {
+    opacity: 0.45;
+    transform: scaleY(0.85);
+  }
+  50% {
+    opacity: 1;
+    transform: scaleY(1);
+  }
+}
+
+.ts-scroll-hint {
+  animation: ts-scroll-hint 2s ease-in-out infinite;
+  transform-origin: top;
+}
+
+@keyframes ts-ticker {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+.ts-ticker-track {
+  animation: ts-ticker 28s linear infinite;
+}
+
+/* Festival slogan ticker — Bitcount Single (Google Fonts) */
+.ts-festival-ticker {
+  font-family: var(--font-bitcount);
+  font-optical-sizing: auto;
+  font-weight: 600;
+  font-style: normal;
+  font-variation-settings: "slnt" 0, "CRSV" 0.5, "ELSH" 0, "ELXP" 0;
+  letter-spacing: 0.04em;
+  text-transform: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ts-fade-up,
+  .ts-hero-kenburns,
+  .ts-scroll-hint,
+  .ts-ticker-track {
+    animation: none;
+  }
+}
+
+/* ───────────── Content pages — readable prose ───────────── */
+
+.ts-content-prose {
+  color: rgba(255, 255, 255, 0.84);
+  font-size: 0.9375rem;
+  line-height: 1.8;
+}
+
+.ts-content-prose p + p {
+  margin-top: 1.25rem;
+}
+
+.ts-content-prose.whitespace-pre-line {
+  white-space: pre-line;
+}
+
+/* Rich-text element styling (replaces Tailwind `prose`, which forced ALL-CAPS
+   body copy). Headings stay uppercase for the festival look; paragraphs are
+   sentence-case and easy to read. */
+.ts-content-prose h1,
+.ts-content-prose h2,
+.ts-content-prose h3,
+.ts-content-prose h4 {
+  font-family: var(--font-heading, inherit);
+  color: #fff;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  line-height: 1.15;
+}
+
+.ts-content-prose h2 {
+  font-size: clamp(1.35rem, 3vw, 1.9rem);
+  margin: 2.25rem 0 1rem;
+}
+
+.ts-content-prose h3 {
+  font-size: clamp(1.15rem, 2.4vw, 1.45rem);
+  margin: 1.75rem 0 0.75rem;
+}
+
+.ts-content-prose h4 {
+  font-size: 1.05rem;
+  margin: 1.5rem 0 0.5rem;
+}
+
+.ts-content-prose ul,
+.ts-content-prose ol {
+  margin: 1.25rem 0;
+  padding-left: 1.4rem;
+}
+
+.ts-content-prose ul {
+  list-style: disc;
+}
+.ts-content-prose ol {
+  list-style: decimal;
+}
+.ts-content-prose li {
+  margin: 0.4rem 0;
+}
+
+.ts-content-prose a {
+  color: #fde047;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  transition: opacity 0.2s ease;
+}
+.ts-content-prose a:hover {
+  opacity: 0.75;
+}
+
+.ts-content-prose strong {
+  color: #fff;
+  font-weight: 700;
+}
+
+.ts-content-prose blockquote {
+  margin: 1.5rem 0;
+  padding-left: 1rem;
+  border-left: 3px solid rgba(253, 224, 71, 0.6);
+  color: rgba(255, 255, 255, 0.7);
+  font-style: italic;
+}
+
+/* ───────────── Content pages — scroll-reveal ─────────────
+   Fade-up as each section scrolls into view. CSS scroll-driven animation, so
+   no JS. Gated behind @supports so unsupported browsers just show the content
+   (no permanent opacity:0), and disabled for reduced-motion users. */
+@supports (animation-timeline: view()) {
+  @media (prefers-reduced-motion: no-preference) {
+    .ts-reveal {
+      animation: ts-fade-up linear both;
+      animation-timeline: view();
+      animation-range: entry 5% cover 22%;
+    }
+  }
 }

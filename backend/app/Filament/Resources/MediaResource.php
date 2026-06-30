@@ -17,7 +17,11 @@ class MediaResource extends Resource
 {
     protected static ?string $model = Media::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
+    protected static ?string $navigationIcon = 'heroicon-o-photo';
+
+    protected static ?string $navigationGroup = 'Content';
+
+    protected static ?int $navigationSort = 5;
 
     public static function form(Form $form): Form
     {
@@ -44,8 +48,10 @@ class MediaResource extends Resource
     {
         return $table
             ->columns([
-                Tables\Columns\TextColumn::make('id')
-                    ->label('ID'),
+                Tables\Columns\ImageColumn::make('preview')
+                    ->label('')
+                    ->getStateUsing(fn ($record) => '/storage/media/' . $record->filename)
+                    ->square(),
                 Tables\Columns\TextColumn::make('filename')
                     ->searchable(),
                 Tables\Columns\TextColumn::make('path')

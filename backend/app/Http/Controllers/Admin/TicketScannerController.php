@@ -4,14 +4,14 @@ namespace App\Http\Controllers\Admin;
 
 use App\Actions\ValidateTicketAction;
 use App\Http\Controllers\Controller;
+use App\Http\Requests\ValidateTicketRequest;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Http\Request;
 
 class TicketScannerController extends Controller
 {
-    public function validateTicket(Request $request, ValidateTicketAction $action): JsonResponse
+    public function validateTicket(ValidateTicketRequest $request, ValidateTicketAction $action): JsonResponse
     {
-        $result = $action->execute($request->all());
+        $result = $action->execute($request->validated());
         return response()->json($result, $result['status']);
     }
 }

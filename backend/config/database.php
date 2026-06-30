@@ -99,6 +99,31 @@ return [
             'sslmode' => env('DB_SSLMODE', 'prefer'),
         ],
 
+        // Read-only connection to the LOCAL snapshot of the old Payload CMS
+        // database. `legacy:snapshot` pg_dumps Neon (read-only) and restores it
+        // into this local "legacy" database, so the ETL never touches production.
+        // Defaults point at the local Postgres container; override with
+        // LEGACY_DATABASE_URL only if you really want to read Neon directly.
+        'legacy' => [
+            'driver' => 'pgsql',
+            'url' => env('LEGACY_DATABASE_URL'),
+            // Production Neon URL used ONLY by `legacy:snapshot` for a read-only
+            // pg_dump. Read via config() so it survives `config:cache`.
+            'neon_url' => env('NEON_DATABASE_URL'),
+            // Vercel Blob token, used by `legacy:sync` to download media files.
+            'blob_token' => env('BLOB_READ_WRITE_TOKEN'),
+            'host' => env('LEGACY_DB_HOST', 'postgres'),
+            'port' => env('LEGACY_DB_PORT', '5432'),
+            'database' => env('LEGACY_DB_DATABASE', 'legacy'),
+            'username' => env('LEGACY_DB_USERNAME', 'tbilisistyle'),
+            'password' => env('LEGACY_DB_PASSWORD', 'secret'),
+            'charset' => 'utf8',
+            'prefix' => '',
+            'prefix_indexes' => true,
+            'search_path' => 'public',
+            'sslmode' => env('LEGACY_DB_SSLMODE', 'prefer'),
+        ],
+
         'sqlsrv' => [
             'driver' => 'sqlsrv',
             'url' => env('DB_URL'),

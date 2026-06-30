@@ -16,8 +16,9 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->alias([
             'locale' => \App\Http\Middleware\LocaleFromHeader::class,
             'quipu.hmac' => \App\Http\Middleware\VerifyQuipuHmac::class,
+            'admin.role' => \App\Http\Middleware\EnsureAdminRole::class,
         ]);
-        $middleware->statefulApi();
+        $middleware->append(\App\Http\Middleware\SecurityHeaders::class);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         $exceptions->shouldRenderJsonWhen(

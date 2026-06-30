@@ -10,13 +10,14 @@ class PersonalNumberController extends Controller
 {
     public function check(CheckPersonalNumberRequest $request)
     {
-        $count = SoldTicket::where('personal_number', $request->personalNumber)
-            ->where('status', 'paid')
+        $maxTickets = config('app.max_tickets_per_person', 3);
+
+        $reservedCount = SoldTicket::where('personal_number', $request->personalNumber)
+            ->whereIn('status', ['paid', 'pending'])
             ->count();
 
         return response()->json([
-            'count' => $count,
-            'remaining' => max(0, 3 - $count),
+            'canPurchase' => $reservedCount < $maxTickets,
         ]);
     }
 }

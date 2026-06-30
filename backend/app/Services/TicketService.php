@@ -15,9 +15,15 @@ class TicketService
         });
     }
 
+    public function findActive(string $id): ?Ticket
+    {
+        return Ticket::active()->find($id);
+    }
+
+    /** @deprecated Use findActive() for public API */
     public function find(string $id): ?Ticket
     {
-        return Ticket::find($id);
+        return $this->findActive($id);
     }
 
     public function clearCache(): void

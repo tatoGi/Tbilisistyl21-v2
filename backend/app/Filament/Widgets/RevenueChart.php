@@ -2,14 +2,17 @@
 
 namespace App\Filament\Widgets;
 
+use App\Filament\Concerns\AdminOnlyWidget;
 use App\Models\SoldTicket;
 use Filament\Widgets\ChartWidget;
 use Illuminate\Support\Carbon;
 
 class RevenueChart extends ChartWidget
 {
+    use AdminOnlyWidget;
+
     protected static ?string $heading = 'Daily Revenue (Last 30 Days)';
-    protected static ?int $sort = 1;
+    protected static ?int $sort = 2;
 
     protected function getData(): array
     {

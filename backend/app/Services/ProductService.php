@@ -15,9 +15,15 @@ class ProductService
         });
     }
 
+    public function findActive(string $id): ?Product
+    {
+        return Product::active()->with(['sizes', 'image'])->find($id);
+    }
+
+    /** @deprecated Use findActive() for public API */
     public function find(string $id): ?Product
     {
-        return Product::with(['sizes', 'image'])->find($id);
+        return $this->findActive($id);
     }
 
     public function clearCache(): void
