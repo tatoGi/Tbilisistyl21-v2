@@ -8,7 +8,7 @@ import { getPageContent } from "@/lib/page-content";
 
 export default async function FoodAndBarsPage() {
   const t = await getTranslations("foodZone");
-  const cms = await getPageContent("food-zone");
+  const cms = await getPageContent({ routePath: "/dashboard/foodZone" });
 
   const title = cms.title || t("title");
   const body = cms.texts[0] ?? t("body");

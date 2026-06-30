@@ -7,7 +7,7 @@ import { getPageContent } from "@/lib/page-content";
 
 export default async function TechnoRavePage() {
   const t = await getTranslations("technoQvevri");
-  const cms = await getPageContent("techno-qvevri");
+  const cms = await getPageContent({ routePath: "/dashboard/technoQvevri" });
 
   const title = cms.title || t("title");
   const heroImage = cms.images[0] ?? TechnoRaveImg;

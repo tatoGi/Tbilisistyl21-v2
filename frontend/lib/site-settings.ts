@@ -17,7 +17,7 @@ export type SiteSettingsData = {
 /** All site settings managed in the admin (Site settings page). */
 export async function getSiteSettings(): Promise<SiteSettingsData> {
   try {
-    const res = await api<{ data: SiteSettingsData }>("/api/site-settings");
+    const res = await api<{ data: SiteSettingsData }>("/api/site-settings", { fresh: true });
     return res?.data && typeof res.data === "object" ? res.data : {};
   } catch {
     return {};

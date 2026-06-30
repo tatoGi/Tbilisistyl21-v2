@@ -8,7 +8,7 @@ import { getPageContent } from "@/lib/page-content";
 
 export default async function QvevriStagePage() {
   const t = await getTranslations("qvevriStage");
-  const cms = await getPageContent("qvevri-stage");
+  const cms = await getPageContent({ routePath: "/dashboard/qvevriStage" });
 
   const title = cms.title || t("title");
   const paragraphs =

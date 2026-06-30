@@ -67,7 +67,7 @@ export function pageLabel(p: { navLabel: Translatable; title: Translatable }, lo
 async function listPages(params: "nav" | "featured" | "all"): Promise<PageSummary[]> {
   const query = params === "all" ? "" : `?${params}=1`;
   try {
-    const res = await api<{ data: ApiPageSummary[] }>(`/api/pages${query}`);
+    const res = await api<{ data: ApiPageSummary[] }>(`/api/pages${query}`, { fresh: true });
     const data = Array.isArray(res?.data) ? res.data : [];
     return data.map(toSummary);
   } catch {
@@ -83,17 +83,40 @@ export function listFeaturedPages(): Promise<PageSummary[]> {
   return listPages("featured");
 }
 
+function toDetail(p: ApiPageDetail): PageDetail {
+  return {
+    ...toSummary(p),
+    isPublished: Boolean(p.is_published),
+    blocks: Array.isArray(p.content_blocks) ? p.content_blocks : [],
+  };
+}
+
 export async function getPage(slug: string): Promise<PageDetail | null> {
   const locale = await getCurrentLocale();
   try {
-    const res = await api<{ data: ApiPageDetail }>(`/api/pages/${slug}`, { locale });
+    const res = await api<{ data: ApiPageDetail }>(`/api/pages/${encodeURIComponent(slug)}`, {
+      locale,
+      fresh: true,
+    });
     const p = res?.data;
     if (!p) return null;
-    return {
-      ...toSummary(p),
-      isPublished: Boolean(p.is_published),
-      blocks: Array.isArray(p.content_blocks) ? p.content_blocks : [],
-    };
+    return toDetail(p);
+  } catch {
+    return null;
+  }
+}
+
+/** Load a CMS page by its fixed React route (e.g. `/dashboard/mainStage`). */
+export async function getPageByRoute(routePath: string): Promise<PageDetail | null> {
+  const locale = await getCurrentLocale();
+  try {
+    const res = await api<{ data: ApiPageDetail }>(
+      `/api/pages/by-route?path=${encodeURIComponent(routePath)}`,
+      { locale, fresh: true },
+    );
+    const p = res?.data;
+    if (!p) return null;
+    return toDetail(p);
   } catch {
     return null;
   }

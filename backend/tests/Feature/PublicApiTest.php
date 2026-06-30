@@ -89,6 +89,19 @@ class PublicApiTest extends TestCase
         $response->assertOk()->assertJsonPath('data.slug', 'about');
     }
 
+    public function test_get_page_by_route(): void
+    {
+        Page::create([
+            'title' => ['ka' => 'Main'],
+            'slug' => 'main-stage',
+            'route_path' => '/dashboard/mainStage',
+            'is_published' => true,
+        ]);
+
+        $response = $this->getJson('/api/pages/by-route?path='.urlencode('/dashboard/mainStage'));
+        $response->assertOk()->assertJsonPath('data.route_path', '/dashboard/mainStage');
+    }
+
     public function test_get_unpublished_page_returns_404(): void
     {
         Page::create([

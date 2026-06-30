@@ -25,6 +25,7 @@ Route::middleware(['locale', 'throttle:api'])->group(function () {
     Route::get('/products/{id}', [ProductController::class, 'show']);
     Route::get('/music-tracks', [MusicTrackController::class, 'index']);
     Route::get('/pages', [PageController::class, 'index']);
+    Route::get('/pages/by-route', [PageController::class, 'showByRoute']);
     Route::get('/pages/{slug}', [PageController::class, 'show']);
     Route::get('/posts', [PostController::class, 'index']);
     Route::get('/partners', [PartnerController::class, 'index']);

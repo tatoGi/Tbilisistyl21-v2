@@ -5,7 +5,7 @@ import { getPageContent } from "@/lib/page-content";
 
 export default async function RulesPage() {
   const t = await getTranslations("rulesAndTerms");
-  const cms = await getPageContent("rules-and-terms");
+  const cms = await getPageContent({ routePath: "/dashboard/rulesAndTerms" });
 
   const title = cms.title || t("title");
   const body = cms.texts[0] ?? t("body");

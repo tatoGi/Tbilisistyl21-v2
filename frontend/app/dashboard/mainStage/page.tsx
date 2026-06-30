@@ -9,7 +9,7 @@ import { getPageContent } from "@/lib/page-content";
 export default async function MainStagePage() {
   const t = await getTranslations("mainStage");
   // Admin overrides (Pages → "main-stage"); falls back to i18n + static images.
-  const cms = await getPageContent("main-stage");
+  const cms = await getPageContent({ routePath: "/dashboard/mainStage" });
 
   const title = cms.title || t("title");
   const paragraphs =

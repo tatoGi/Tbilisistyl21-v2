@@ -1,6 +1,8 @@
-import { getPage } from "./pages";
+import { getPage, getPageByRoute } from "./pages";
 import { getCurrentLocale } from "./locale";
 import { t } from "./utils";
+
+export type PageContentKey = string | { slug?: string; routePath?: string };
 
 /**
  * Admin-managed content for a bespoke page, extracted from its CMS blocks and
@@ -28,9 +30,22 @@ function absolute(url: unknown): string | null {
   return `/storage/${url}`;
 }
 
-export async function getPageContent(slug: string): Promise<PageContent> {
+async function resolvePage(key: PageContentKey) {
+  if (typeof key === "string") {
+    return getPage(key);
+  }
+  if (key.routePath) {
+    return getPageByRoute(key.routePath);
+  }
+  if (key.slug) {
+    return getPage(key.slug);
+  }
+  return null;
+}
+
+export async function getPageContent(key: PageContentKey): Promise<PageContent> {
   const locale = await getCurrentLocale();
-  const page = await getPage(slug);
+  const page = await resolvePage(key);
 
   if (!page) {
     return { title: "", texts: [], paragraphs: [], images: [] };

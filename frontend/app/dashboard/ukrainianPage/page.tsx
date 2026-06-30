@@ -5,7 +5,7 @@ import { getPageContent } from "@/lib/page-content";
 
 export default async function UkrainianDayPage() {
   const t = await getTranslations("ukrainianDay");
-  const cms = await getPageContent("ukrainian-day");
+  const cms = await getPageContent({ routePath: "/dashboard/ukrainianPage" });
 
   const title = cms.title || t("title");
   const heroImage = cms.images[0] ?? UkrainianImg;

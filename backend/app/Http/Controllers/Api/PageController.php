@@ -33,6 +33,23 @@ class PageController extends Controller
         ]);
     }
 
+    /** Resolve a published page by its public URL path, e.g. `/dashboard/mainStage`. */
+    public function showByRoute(Request $request)
+    {
+        $path = $request->query('path');
+        if (! is_string($path) || $path === '') {
+            return response()->json(['error' => 'invalid_path'], 422);
+        }
+
+        $page = Page::published()->where('route_path', $path)->first();
+
+        if (! $page) {
+            return response()->json(['error' => 'not_found'], 404);
+        }
+
+        return response()->json(['data' => $this->detail($page)]);
+    }
+
     public function show(string $slug)
     {
         $page = Page::published()->where('slug', $slug)->first();

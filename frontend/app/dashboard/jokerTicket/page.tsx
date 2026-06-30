@@ -10,7 +10,7 @@ import { getPageContent } from "@/lib/page-content";
 export default async function JokerTicketPage() {
   const t = await getTranslations("jokerTicket");
   const tNav = await getTranslations("nav");
-  const cms = await getPageContent("joker-ticket");
+  const cms = await getPageContent({ routePath: "/dashboard/jokerTicket" });
 
   const title = cms.title || tNav("joker");
   const body = cms.texts[0] ?? t("body");

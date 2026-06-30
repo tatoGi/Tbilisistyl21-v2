@@ -9,7 +9,7 @@ import { getPageContent } from "@/lib/page-content";
 
 export default async function LineUpPage() {
   const t = await getTranslations("lineUp");
-  const cms = await getPageContent("lineup");
+  const cms = await getPageContent({ routePath: "/dashboard/lineUp" });
 
   const title = cms.title || t("festivalTitle");
   const dayImages = [

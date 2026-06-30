@@ -7,7 +7,7 @@ import { getPageContent } from "@/lib/page-content";
 
 export default async function MissionVisionPage() {
   const t = await getTranslations("mission");
-  const cms = await getPageContent("mission");
+  const cms = await getPageContent({ routePath: "/dashboard/mission" });
 
   const title = cms.title || t("title");
   const image = cms.images[0] ?? MissionImg;

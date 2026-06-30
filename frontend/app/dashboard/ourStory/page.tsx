@@ -5,7 +5,7 @@ import { getPageContent } from "@/lib/page-content";
 
 export default async function OurStoryPage() {
   const t = await getTranslations("ourStory");
-  const cms = await getPageContent("our-story");
+  const cms = await getPageContent({ routePath: "/dashboard/ourStory" });
 
   const title = cms.title || t("title");
   const body = cms.texts[0] ?? t("body");
