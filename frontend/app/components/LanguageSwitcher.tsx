@@ -19,7 +19,7 @@ export default function LanguageSwitcher() {
 
   function selectLocale(locale: Locale) {
     startTransition(async () => {
-      await fetch("/api/locale", {
+      await fetch("/locale", {
         method: "POST",
         headers: {
           "content-type": "application/json",

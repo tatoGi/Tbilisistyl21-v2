@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Bebas_Neue, Noto_Sans_Georgian, Oswald } from "next/font/google";
 import { cookies } from "next/headers";
 import { NextIntlClientProvider } from "next-intl";
+import { getMessages } from "next-intl/server";
 import { defaultLocale, isLocale, localeCookieName } from "@/i18n/config";
 import { getNavPages, getSocialLinks, getSiteContact } from "@/lib/nav";
 import { getFestivalMusic } from "@/lib/festival-landing";
@@ -50,6 +51,7 @@ export default async function RootLayout({
   const store = await cookies();
   const requestedLocale = store.get(localeCookieName)?.value;
   const locale = isLocale(requestedLocale) ? requestedLocale : defaultLocale;
+  const messages = await getMessages();
   const [pages, social, contact, music, musicTracks] = await Promise.all([
     getNavPages(),
     getSocialLinks(),
@@ -72,7 +74,7 @@ export default async function RootLayout({
         />
       </head>
       <body className="min-h-full flex flex-col" suppressHydrationWarning>
-        <NextIntlClientProvider>
+        <NextIntlClientProvider locale={locale} messages={messages}>
           <SiteChrome
             pages={pages}
             social={social}
