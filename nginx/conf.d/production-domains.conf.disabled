@@ -1,6 +1,4 @@
-# Enable after DNS points to Hetzner and certbot issued tbilisistyle.com cert:
-#   cp nginx/conf.d/production-domains.conf.disabled nginx/conf.d/production-domains.conf
-#   docker compose restart nginx
+# Enabled by scripts/production-switchover.sh after certbot succeeds.
 
 server {
     listen 443 ssl;
