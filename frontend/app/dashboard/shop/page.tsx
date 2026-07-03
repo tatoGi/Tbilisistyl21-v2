@@ -8,7 +8,7 @@ export const dynamic = "force-dynamic";
 export default async function ShopPage() {
   const [products, title] = await Promise.all([
     listProducts({ publicOnly: true }),
-    getCmsPageTitle("/dashboard/shop"),
+    getCmsPageTitle("shop"),
   ]);
 
   if (!title) notFound();

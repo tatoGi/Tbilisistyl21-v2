@@ -30,6 +30,12 @@ class SiteSettings extends Page implements HasForms
     public function mount(): void
     {
         $this->form->fill([
+            'landing' => SiteSetting::get('landing', [
+                'title' => [],
+                'subtitle' => [],
+                'buttonLabel' => [],
+                'image' => null,
+            ]),
             'hero' => SiteSetting::get('hero', [
                 'badge' => [],
                 'heading' => [],
@@ -50,6 +56,32 @@ class SiteSettings extends Page implements HasForms
 
         return $form
             ->schema([
+                Forms\Components\Section::make('Landing splash')
+                    ->description('First page ("enter the energy") shown at the site root (/). Button leads to the festival page.')
+                    ->schema([
+                        Forms\Components\Fieldset::make('Title')
+                            ->schema(collect($locales)->map(
+                                fn ($label, $code) => Forms\Components\TextInput::make("landing.title.{$code}")->label($label)
+                            )->values()->all())
+                            ->columns(2),
+                        Forms\Components\Fieldset::make('Subtitle')
+                            ->schema(collect($locales)->map(
+                                fn ($label, $code) => Forms\Components\TextInput::make("landing.subtitle.{$code}")->label($label)
+                            )->values()->all())
+                            ->columns(2),
+                        Forms\Components\Fieldset::make('Button label')
+                            ->schema(collect($locales)->map(
+                                fn ($label, $code) => Forms\Components\TextInput::make("landing.buttonLabel.{$code}")->label($label)
+                            )->values()->all())
+                            ->columns(2),
+                        Forms\Components\FileUpload::make('landing.image')
+                            ->label('Background image')
+                            ->disk('public')
+                            ->directory('media')
+                            ->visibility('public')
+                            ->image()
+                            ->imageEditor(),
+                    ]),
                 Forms\Components\Section::make('Festival hero')
                     ->description('Headline and background for the festival landing page (/dashboard/festival).')
                     ->schema([
@@ -98,7 +130,7 @@ class SiteSettings extends Page implements HasForms
     {
         $data = $this->form->getState();
 
-        foreach (['hero', 'instagramUrl', 'tiktokUrl', 'contact'] as $key) {
+        foreach (['landing', 'hero', 'instagramUrl', 'tiktokUrl', 'contact'] as $key) {
             SiteSetting::set($key, $data[$key] ?? null);
         }
 

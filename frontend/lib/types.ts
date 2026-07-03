@@ -9,6 +9,7 @@ export interface Ticket {
   id: string;
   title: Translatable;
   description: Translatable;
+  image?: string | null;
   price_gel: number;
   quantity: number;
   event_date: string;
@@ -76,11 +77,13 @@ export interface Page {
 export interface Post {
   id: string;
   title: Translatable;
-  body: Translatable;
   slug: string;
   status: string;
   featured: boolean;
   created_at: string;
+  cover?: string | null;
+  excerpt?: Translatable;
+  content_blocks?: unknown[];
 }
 
 export interface Partner {

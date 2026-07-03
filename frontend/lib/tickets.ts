@@ -9,6 +9,7 @@ export type Ticket = {
   id: string;
   title: string;
   description: string;
+  imageUrl: string | null;
   priceGel: number;
   eventDate: string;
   location: string;
@@ -19,11 +20,19 @@ export type Ticket = {
   updatedAt: string;
 };
 
+function imageUrlOf(image: unknown): string | null {
+  if (typeof image !== "string" || !image) return null;
+  if (image.startsWith("http://") || image.startsWith("https://")) return image;
+  if (image.startsWith("/")) return image;
+  return `/storage/${image}`;
+}
+
 function mapTicket(t0: ApiTicket, locale: string): Ticket {
   return {
     id: String(t0.id),
     title: t(t0.title, locale),
     description: t(t0.description, locale),
+    imageUrl: imageUrlOf(t0.image),
     priceGel: Number(t0.price_gel ?? 0),
     eventDate: t0.event_date ?? "",
     location: t0.location ?? "",

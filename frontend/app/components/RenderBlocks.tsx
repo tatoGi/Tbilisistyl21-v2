@@ -92,11 +92,31 @@ function BlockRenderer({
       if (!src) return null;
       const caption = t(data.caption as Localized, locale);
       const contained = data.width === "contained";
+      // "full" shows the whole image at its natural aspect ratio (no crop);
+      // default "cover" crops to a uniform 16:9 banner.
+      const full = data.fit === "full";
       return (
-        <figure className={contained ? "mx-auto max-w-2xl" : ""}>
-          <div className="relative aspect-[16/9] overflow-hidden rounded-2xl border border-white/10">
-            <Image src={src} alt={caption || ""} fill className="object-cover" sizes="100vw" />
-          </div>
+        // `w-full` is required: the figure is a flex item and `<Image fill>` is
+        // absolutely positioned (zero intrinsic width). Without an explicit width
+        // the `mx-auto` (contained) auto-margins disable flex stretch and the
+        // figure collapses to 0, hiding the image.
+        <figure className={contained ? "mx-auto w-full max-w-2xl" : "w-full"}>
+          {full ? (
+            // Unknown intrinsic size: the width=0/height=0 + sizes pattern lets
+            // next/image render responsively at the image's natural ratio.
+            <Image
+              src={src}
+              alt={caption || ""}
+              width={0}
+              height={0}
+              sizes="100vw"
+              className="h-auto w-full rounded-2xl border border-white/10"
+            />
+          ) : (
+            <div className="relative aspect-[16/9] overflow-hidden rounded-2xl border border-white/10">
+              <Image src={src} alt={caption || ""} fill className="object-cover" sizes="100vw" />
+            </div>
+          )}
           {caption ? (
             <figcaption className="mt-2 text-center text-sm text-white/50">{caption}</figcaption>
           ) : null}

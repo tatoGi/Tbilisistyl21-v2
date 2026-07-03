@@ -13,11 +13,14 @@ class Post extends Model
 
     public array $translatable = ['title', 'body'];
 
-    protected $fillable = ['title', 'body', 'slug', 'status', 'featured'];
+    protected $fillable = ['title', 'body', 'content_blocks', 'slug', 'status', 'featured'];
 
     protected function casts(): array
     {
-        return ['featured' => 'boolean'];
+        return [
+            'content_blocks' => 'array',
+            'featured' => 'boolean',
+        ];
     }
 
     public function scopePublished(Builder $query): Builder

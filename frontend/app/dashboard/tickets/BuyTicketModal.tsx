@@ -369,7 +369,7 @@ export default function BuyTicketModal({ isOpen, onClose, ticket }: BuyTicketMod
               <span>
                 I agree to the{' '}
                 <a
-                  href="/dashboard/rulesAndTerms"
+                  href="/rules-and-terms"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="text-yellow-300 underline"

@@ -3,20 +3,19 @@
 namespace App\Filament\Resources;
 
 use App\Filament\Concerns\AdminOnlyResource;
+use App\Filament\Concerns\HasContentBlocks;
 use App\Filament\Resources\TicketResource\Pages;
 use App\Models\Ticket;
 use Filament\Forms;
 use Filament\Forms\Form;
-use Filament\Resources\Concerns\Translatable;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
-use Illuminate\Support\Facades\Cache;
 
 class TicketResource extends Resource
 {
     use AdminOnlyResource;
-    use Translatable;
+    use HasContentBlocks;
 
     protected static ?string $model = Ticket::class;
     protected static ?string $navigationIcon = 'heroicon-o-ticket';
@@ -25,45 +24,135 @@ class TicketResource extends Resource
 
     public static function form(Form $form): Form
     {
-        return $form->schema([
-            Forms\Components\TextInput::make('title')->required(),
-            Forms\Components\Textarea::make('description'),
-            Forms\Components\TextInput::make('price_gel')->numeric()->required(),
-            Forms\Components\TextInput::make('quantity')->numeric()->required(),
-            Forms\Components\DatePicker::make('event_date')->required(),
-            Forms\Components\TextInput::make('location')->required(),
-            Forms\Components\Select::make('status')
-                ->options(['draft' => 'Draft', 'active' => 'Active', 'sold_out' => 'Sold Out'])
-                ->required(),
-            Forms\Components\TextInput::make('sale_url')->url(),
-        ]);
+        $locales = ['ka' => 'ქართული', 'en' => 'English', 'ru' => 'Русский', 'ua' => 'Українська'];
+
+        return $form
+            ->schema([
+                Forms\Components\Group::make()
+                    ->schema([
+                        Forms\Components\Section::make('Ticket details')
+                            ->description('Same fields shown on the public /dashboard/tickets page.')
+                            ->schema([
+                                Forms\Components\Fieldset::make('Title')
+                                    ->schema(collect($locales)->map(
+                                        fn ($label, $code) => Forms\Components\TextInput::make("title.{$code}")
+                                            ->label($label)
+                                            ->required($code === 'ka')
+                                    )->values()->all())
+                                    ->columns(2),
+                                Forms\Components\Fieldset::make('Description')
+                                    ->schema(collect($locales)->map(
+                                        fn ($label, $code) => Forms\Components\Textarea::make("description.{$code}")
+                                            ->label($label)
+                                            ->rows(4)
+                                    )->values()->all())
+                                    ->columns(2),
+                                static::imageUpload('image', 'Cover image')
+                                    ->helperText('Shown on the ticket card on the frontend.'),
+                            ]),
+                        Forms\Components\Section::make('Event & pricing')
+                            ->schema([
+                                Forms\Components\TextInput::make('price_gel')
+                                    ->label('Price (GEL)')
+                                    ->numeric()
+                                    ->required()
+                                    ->prefix('₾'),
+                                Forms\Components\TextInput::make('quantity')
+                                    ->numeric()
+                                    ->required()
+                                    ->helperText('Remaining inventory shown as “X available” on the site.'),
+                                Forms\Components\DatePicker::make('event_date')
+                                    ->label('Event date')
+                                    ->required(),
+                                Forms\Components\TextInput::make('location')
+                                    ->required()
+                                    ->placeholder('e.g. Tbilisi'),
+                            ])
+                            ->columns(2),
+                    ])
+                    ->columnSpan(['lg' => 2]),
+
+                Forms\Components\Group::make()
+                    ->schema([
+                        Forms\Components\Section::make('Publish')
+                            ->schema([
+                                Forms\Components\Select::make('status')
+                                    ->options([
+                                        'draft' => 'Draft — hidden from site',
+                                        'active' => 'Active — on sale',
+                                        'sold_out' => 'Sold out — visible, not purchasable',
+                                    ])
+                                    ->default('draft')
+                                    ->required(),
+                                Forms\Components\TextInput::make('sale_url')
+                                    ->label('External sale URL (optional)')
+                                    ->url()
+                                    ->helperText('Leave empty to use the built-in checkout.'),
+                            ]),
+                    ])
+                    ->columnSpan(['lg' => 1]),
+            ])
+            ->columns(3);
     }
 
     public static function table(Table $table): Table
     {
-        return $table->columns([
-            Tables\Columns\TextColumn::make('title')->searchable(),
-            Tables\Columns\TextColumn::make('price_gel')->money('GEL')->sortable(),
-            Tables\Columns\TextColumn::make('quantity')->sortable(),
-            Tables\Columns\TextColumn::make('event_date')->date()->sortable(),
-            Tables\Columns\TextColumn::make('status')
-                ->badge()
-                ->color(fn (string $state): string => match ($state) {
-                    'draft' => 'warning',
-                    'active' => 'success',
-                    'sold_out' => 'danger',
-                    default => 'gray',
-                }),
-        ])->filters([
-            Tables\Filters\SelectFilter::make('status')
-                ->options(['draft' => 'Draft', 'active' => 'Active', 'sold_out' => 'Sold Out']),
-        ])->actions([
-            Tables\Actions\EditAction::make(),
-        ])->bulkActions([
-            Tables\Actions\BulkActionGroup::make([
-                Tables\Actions\DeleteBulkAction::make(),
-            ]),
-        ]);
+        return $table
+            ->defaultSort('created_at', 'desc')
+            ->columns([
+                Tables\Columns\ImageColumn::make('image')
+                    ->label('')
+                    ->disk('public')
+                    ->getStateUsing(fn (?string $state): ?string => static::diskPath($state))
+                    ->square(),
+                Tables\Columns\TextColumn::make('title')
+                    ->label('Title')
+                    ->formatStateUsing(fn ($state) => is_array($state) ? ($state['ka'] ?? $state['en'] ?? '—') : $state)
+                    ->searchable()
+                    ->wrap(),
+                Tables\Columns\TextColumn::make('price_gel')
+                    ->label('Price')
+                    ->money('GEL')
+                    ->sortable(),
+                Tables\Columns\TextColumn::make('event_date')
+                    ->label('Date')
+                    ->date()
+                    ->sortable(),
+                Tables\Columns\TextColumn::make('location')
+                    ->searchable()
+                    ->toggleable(),
+                Tables\Columns\TextColumn::make('quantity')
+                    ->label('Stock')
+                    ->formatStateUsing(fn ($state, Ticket $record): string => match (true) {
+                        $record->status === 'sold_out', (int) $state <= 0 => 'Sold out',
+                        default => "{$state} available",
+                    })
+                    ->sortable(),
+                Tables\Columns\TextColumn::make('status')
+                    ->badge()
+                    ->color(fn (string $state): string => match ($state) {
+                        'draft' => 'warning',
+                        'active' => 'success',
+                        'sold_out' => 'danger',
+                        default => 'gray',
+                    }),
+                Tables\Columns\TextColumn::make('updated_at')
+                    ->dateTime()
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: true),
+            ])
+            ->filters([
+                Tables\Filters\SelectFilter::make('status')
+                    ->options(['draft' => 'Draft', 'active' => 'Active', 'sold_out' => 'Sold Out']),
+            ])
+            ->actions([
+                Tables\Actions\EditAction::make(),
+            ])
+            ->bulkActions([
+                Tables\Actions\BulkActionGroup::make([
+                    Tables\Actions\DeleteBulkAction::make(),
+                ]),
+            ]);
     }
 
     public static function getPages(): array
@@ -73,15 +162,5 @@ class TicketResource extends Resource
             'create' => Pages\CreateTicket::route('/create'),
             'edit' => Pages\EditTicket::route('/{record}/edit'),
         ];
-    }
-
-    public static function afterSave(): void
-    {
-        Cache::forget('tickets:active');
-    }
-
-    public static function afterDelete(): void
-    {
-        Cache::forget('tickets:active');
     }
 }

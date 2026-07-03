@@ -8,7 +8,7 @@ export const dynamic = "force-dynamic";
 export default async function TicketsPage() {
   const [tickets, title] = await Promise.all([
     listTickets({ publicOnly: true }),
-    getCmsPageTitle("/dashboard/tickets"),
+    getCmsPageTitle("tickets"),
   ]);
 
   if (!title) notFound();

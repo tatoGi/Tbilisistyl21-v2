@@ -7,6 +7,7 @@ interface Ticket {
   id: string
   title: string
   priceGel: number
+  imageUrl?: string | null
   eventDate?: string
   location?: string
   description?: string
@@ -33,13 +34,32 @@ export default function TicketsClient({ tickets }: { tickets: Ticket[] }) {
             return (
               <article
                 key={ticket.id}
-                className="group relative flex flex-col gap-5 overflow-hidden rounded-2xl border border-white/10 bg-gradient-to-b from-white/[0.06] to-white/[0.02] p-6 shadow-xl shadow-black/30 transition duration-300 hover:-translate-y-0.5 hover:border-yellow-300/40 hover:shadow-2xl hover:shadow-black/50"
+                className="group relative flex flex-col overflow-hidden rounded-2xl border border-white/10 bg-gradient-to-b from-white/[0.06] to-white/[0.02] shadow-xl shadow-black/30 transition duration-300 hover:-translate-y-0.5 hover:border-yellow-300/40 hover:shadow-2xl hover:shadow-black/50"
               >
+                <div className="relative aspect-[16/9] w-full overflow-hidden bg-white/[0.04]">
+                  {ticket.imageUrl ? (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img
+                      src={ticket.imageUrl}
+                      alt={ticket.title}
+                      className="h-full w-full object-cover transition duration-500 group-hover:scale-105"
+                    />
+                  ) : (
+                    <div className="flex h-full w-full items-center justify-center text-[11px] font-bold uppercase tracking-[0.25em] text-white/25">
+                      Tbilisi Style 21
+                    </div>
+                  )}
+                  <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent" />
+                  <span className="absolute right-4 top-4 rounded-full bg-yellow-300 px-4 py-1.5 text-sm font-black text-black shadow-lg shadow-yellow-300/20">
+                    {ticket.priceGel} ₾
+                  </span>
+                </div>
+
+                <div className="relative flex flex-col gap-5 p-6">
                 {/* Soft accent glow */}
                 <div className="pointer-events-none absolute -right-16 -top-16 h-40 w-40 rounded-full bg-yellow-300/10 blur-3xl transition duration-500 group-hover:bg-yellow-300/20" />
 
-                <div className="relative flex items-start justify-between gap-4">
-                  <div className="min-w-0">
+                <div className="relative min-w-0">
                     <h2 className="font-heading text-2xl font-black uppercase leading-tight">
                       {ticket.title}
                     </h2>
@@ -47,10 +67,6 @@ export default function TicketsClient({ tickets }: { tickets: Ticket[] }) {
                       {ticket.eventDate || "Date TBA"} ·{" "}
                       {ticket.location || "Location TBA"}
                     </p>
-                  </div>
-                  <span className="shrink-0 rounded-full bg-yellow-300 px-4 py-1.5 text-sm font-black text-black shadow-lg shadow-yellow-300/20">
-                    {ticket.priceGel} ₾
-                  </span>
                 </div>
 
                 {ticket.description ? (
@@ -86,6 +102,7 @@ export default function TicketsClient({ tickets }: { tickets: Ticket[] }) {
                       Buy Ticket
                     </button>
                   ) : null}
+                </div>
                 </div>
               </article>
             );

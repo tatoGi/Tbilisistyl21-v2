@@ -37,13 +37,13 @@ export default function Footer({
             {t("contactUs.phone")}: {contact.phone}
           </a>
           <Link
-            href="/dashboard/contactUs"
+            href="/contact-us"
             className="mt-1 text-xs font-bold uppercase tracking-[0.2em] text-white/55 transition-colors hover:text-yellow-300"
           >
             {t("contactUs.title")} →
           </Link>
           <Link
-            href="/dashboard/rulesAndTerms"
+            href="/rules-and-terms"
             className="text-xs font-bold uppercase tracking-[0.2em] text-white/55 transition-colors hover:text-yellow-300"
           >
             {t("nav.festivalRulesTerms")} →

@@ -28,6 +28,7 @@ Route::middleware(['locale', 'throttle:api'])->group(function () {
     Route::get('/pages/by-route', [PageController::class, 'showByRoute']);
     Route::get('/pages/{slug}', [PageController::class, 'show']);
     Route::get('/posts', [PostController::class, 'index']);
+    Route::get('/posts/{slug}', [PostController::class, 'show']);
     Route::get('/partners', [PartnerController::class, 'index']);
     Route::get('/site-settings', [SiteSettingController::class, 'index']);
 

@@ -1,5 +1,5 @@
 import CmsPageView from "@/app/components/CmsPageView";
 
 export default function FoodZonePage() {
-  return <CmsPageView routePath="/dashboard/foodZone" />;
+  return <CmsPageView slug="food-zone" />;
 }

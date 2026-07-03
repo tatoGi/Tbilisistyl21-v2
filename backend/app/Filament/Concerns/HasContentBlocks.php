@@ -1,0 +1,228 @@
+<?php
+
+namespace App\Filament\Concerns;
+
+use Filament\Forms;
+use Filament\Forms\Components\Builder as BlockBuilder;
+use Illuminate\Support\Str;
+
+/**
+ * Shared Filament content-block builder and image path helpers.
+ * Used by PageResource and PostResource (stored in `content_blocks` JSON).
+ */
+trait HasContentBlocks
+{
+    /**
+     * The content block builder. Block payloads are stored as
+     * `[{ type, data: {...} }]` in the `content_blocks` JSON column. Text fields
+     * keep a `{ka,en,ru,ua}` shape so the frontend can localize them.
+     */
+    protected static function contentBlocksBuilder(): BlockBuilder
+    {
+        return BlockBuilder::make('content_blocks')
+            ->label('')
+            ->blockNumbers(false)
+            ->collapsible()
+            ->cloneable()
+            ->afterStateHydrated(function (BlockBuilder $component, ?array $state): void {
+                if (is_array($state) && $state !== []) {
+                    $component->state(static::blocksForForm($state));
+                }
+            })
+            ->blocks([
+                BlockBuilder\Block::make('hero')
+                    ->icon('heroicon-o-photo')
+                    ->schema([
+                        static::localizedInput('heading', 'Heading'),
+                        static::localizedInput('subheading', 'Subheading', textarea: true),
+                        static::localizedInput('ctaLabel', 'Button label'),
+                        Forms\Components\TextInput::make('ctaHref')->label('Button link'),
+                        static::imageUpload('image', 'Background image'),
+                    ]),
+
+                BlockBuilder\Block::make('richText')
+                    ->label('Text')
+                    ->icon('heroicon-o-bars-3-bottom-left')
+                    ->schema([
+                        static::localizedInput('content', 'Content', textarea: true),
+                    ]),
+
+                BlockBuilder\Block::make('image')
+                    ->icon('heroicon-o-photo')
+                    ->schema([
+                        static::imageUpload('image', 'Image'),
+                        static::localizedInput('caption', 'Caption'),
+                        Forms\Components\Select::make('width')
+                            ->options(['full' => 'Full width', 'contained' => 'Contained'])
+                            ->default('full'),
+                        Forms\Components\Select::make('fit')
+                            ->label('Image display')
+                            ->helperText('Crop keeps a uniform 16:9 banner; Full shows the whole image without cropping.')
+                            ->options([
+                                'cover' => 'Crop to banner (16:9)',
+                                'full' => 'Show full image (no crop)',
+                            ])
+                            ->default('cover'),
+                    ]),
+
+                BlockBuilder\Block::make('gallery')
+                    ->icon('heroicon-o-squares-2x2')
+                    ->schema([
+                        Forms\Components\Repeater::make('images')
+                            ->label('Images')
+                            ->schema([
+                                static::imageUpload('image', 'Image'),
+                                static::localizedInput('caption', 'Caption'),
+                            ])
+                            ->minItems(1)
+                            ->columns(2),
+                        Forms\Components\Select::make('columns')
+                            ->options(['2' => '2', '3' => '3', '4' => '4'])
+                            ->default('3'),
+                    ]),
+
+                BlockBuilder\Block::make('contact')
+                    ->icon('heroicon-o-phone')
+                    ->schema([
+                        Forms\Components\Toggle::make('showPayments')
+                            ->label('Show payment methods (Visa / Mastercard)')
+                            ->default(true),
+                    ]),
+
+                BlockBuilder\Block::make('cta')
+                    ->label('Call to action')
+                    ->icon('heroicon-o-cursor-arrow-rays')
+                    ->schema([
+                        static::localizedInput('label', 'Button label'),
+                        Forms\Components\TextInput::make('href')->label('Button link')->required(),
+                    ]),
+            ]);
+    }
+
+    /** A 4-language ({ka,en,ru,ua}) input group inside a block's `data` payload. */
+    protected static function localizedInput(string $name, string $label, bool $textarea = false): Forms\Components\Fieldset
+    {
+        $locales = ['ka' => 'ქართული', 'en' => 'English', 'ru' => 'Русский', 'ua' => 'Українська'];
+
+        return Forms\Components\Fieldset::make($label)
+            ->schema(collect($locales)->map(function ($langLabel, $code) use ($name, $textarea) {
+                $key = "{$name}.{$code}";
+                return $textarea
+                    ? Forms\Components\Textarea::make($key)->label($langLabel)->rows(6)
+                    : Forms\Components\TextInput::make($key)->label($langLabel);
+            })->values()->all())
+            ->columns(2);
+    }
+
+    protected static function imageUpload(string $statePath, string $label): Forms\Components\FileUpload
+    {
+        return Forms\Components\FileUpload::make($statePath)
+            ->label($label)
+            ->image()
+            ->maxSize(5120)
+            ->acceptedFileTypes(['image/jpeg', 'image/png', 'image/webp', 'image/gif'])
+            ->disk('public')
+            ->directory('media')
+            ->visibility('public')
+            ->fetchFileInformation(false);
+    }
+
+    /** Convert stored paths to the uuid-keyed array shape Filament FileUpload expects. */
+    public static function fileUploadState(mixed $path): array
+    {
+        if (is_array($path)) {
+            return $path;
+        }
+
+        $diskPath = is_string($path) ? static::diskPath($path) : null;
+
+        return $diskPath ? [(string) Str::uuid() => $diskPath] : [];
+    }
+
+    /** Convert stored `/storage/...` paths to disk-relative paths for FileUpload. */
+    public static function blocksForForm(array $blocks): array
+    {
+        return array_map(function ($block) {
+            $data = $block['data'] ?? [];
+
+            if (array_key_exists('image', $data)) {
+                $data['image'] = static::fileUploadState($data['image']);
+            }
+
+            if (isset($data['images']) && is_array($data['images'])) {
+                $data['images'] = array_map(function ($item) {
+                    if (array_key_exists('image', $item)) {
+                        $item['image'] = static::fileUploadState($item['image']);
+                    }
+                    return $item;
+                }, $data['images']);
+            }
+
+            $block['data'] = $data;
+
+            return $block;
+        }, $blocks);
+    }
+
+    /** Normalize stored/API paths to a public-disk relative path for FileUpload. */
+    public static function diskPath(?string $path): ?string
+    {
+        if (!$path) {
+            return null;
+        }
+        if (str_starts_with($path, '/storage/')) {
+            return ltrim(substr($path, strlen('/storage/')), '/');
+        }
+        if (str_starts_with($path, 'storage/')) {
+            return substr($path, strlen('storage/'));
+        }
+        return ltrim($path, '/');
+    }
+
+    /** Normalize all image paths inside content blocks (for DB + API). */
+    public static function normalizeBlockPaths(array $blocks): array
+    {
+        return array_map(function ($block) {
+            $data = $block['data'] ?? [];
+            if (array_key_exists('image', $data)) {
+                $data['image'] = static::publicUrl(static::extractFilePath($data['image']));
+            }
+            if (isset($data['images']) && is_array($data['images'])) {
+                $data['images'] = array_map(function ($item) {
+                    if (array_key_exists('image', $item)) {
+                        $item['image'] = static::publicUrl(static::extractFilePath($item['image']));
+                    }
+                    return $item;
+                }, $data['images']);
+            }
+            $block['data'] = $data;
+            return $block;
+        }, $blocks);
+    }
+
+    /** Pull a disk/API path out of a FileUpload value (string or uuid-keyed array). */
+    public static function extractFilePath(mixed $value): ?string
+    {
+        if (is_array($value)) {
+            $value = reset($value) ?: null;
+        }
+
+        return is_string($value) && $value !== '' ? $value : null;
+    }
+
+    /** Stored/API path: always `/storage/...` for frontend consumption. */
+    public static function publicUrl(?string $path): ?string
+    {
+        if (!$path) {
+            return null;
+        }
+        if (str_starts_with($path, 'http://') || str_starts_with($path, 'https://')) {
+            return $path;
+        }
+        if (str_starts_with($path, '/storage/') || str_starts_with($path, '/images/')) {
+            return $path;
+        }
+        $relative = static::diskPath($path);
+        return $relative ? '/storage/' . $relative : null;
+    }
+}

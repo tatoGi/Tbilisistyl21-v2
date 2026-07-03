@@ -16,4 +16,18 @@ class EditProduct extends EditRecord
             Actions\DeleteAction::make(),
         ];
     }
+
+    protected function mutateFormDataBeforeFill(array $data): array
+    {
+        $data['title'] = $this->record->getTranslations('title');
+        $data['description'] = $this->record->getTranslations('description');
+        $data['product_image'] = ProductResource::productImageForForm($this->record->image);
+
+        return $data;
+    }
+
+    protected function mutateFormDataBeforeSave(array $data): array
+    {
+        return ProductResource::mergeUploadedImage($data);
+    }
 }

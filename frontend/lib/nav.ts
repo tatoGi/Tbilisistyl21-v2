@@ -97,14 +97,23 @@ export async function getFeaturedNews(limit = 6): Promise<NewsCard[]> {
   try {
     const res = await api<{ data: ApiPost[] }>("/api/posts", { locale });
     const data = Array.isArray(res?.data) ? res.data : [];
-    return data.slice(0, limit).map((p) => ({
-      id: String(p.id),
-      title: t(p.title, locale),
-      slug: p.slug ?? "",
-      excerpt: null,
-      coverUrl: null,
-      publishedAt: p.created_at ?? null,
-    }));
+    return data.slice(0, limit).map((p) => {
+      const cover = p.cover;
+      const coverUrl =
+        typeof cover === "string" && cover
+          ? cover.startsWith("http") || cover.startsWith("/")
+            ? cover
+            : `/storage/${cover}`
+          : null;
+      return {
+        id: String(p.id),
+        title: t(p.title, locale),
+        slug: (p.slug ?? "").trim(),
+        excerpt: t(p.excerpt, locale) || null,
+        coverUrl,
+        publishedAt: p.created_at ?? null,
+      };
+    });
   } catch {
     return [];
   }

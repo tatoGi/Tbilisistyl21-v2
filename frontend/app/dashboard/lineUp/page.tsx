@@ -1,5 +1,5 @@
 import CmsPageView from "@/app/components/CmsPageView";
 
 export default function LineUpPage() {
-  return <CmsPageView routePath="/dashboard/lineUp" />;
+  return <CmsPageView slug="lineup" />;
 }

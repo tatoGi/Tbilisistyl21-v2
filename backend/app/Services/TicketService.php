@@ -15,7 +15,7 @@ class TicketService
         // Cache a plain array, not the Eloquent Collection: serialized models
         // contain NUL bytes that don't round-trip through the Postgres `text`
         // cache column (a cached Collection deserializes as an incomplete class).
-        return Cache::remember('tickets:active', 3600, function () {
+        return Cache::remember(Ticket::API_CACHE_KEY, 3600, function () {
             return Ticket::active()->get()->toArray();
         });
     }
@@ -33,6 +33,6 @@ class TicketService
 
     public function clearCache(): void
     {
-        Cache::forget('tickets:active');
+        Cache::forget(Ticket::API_CACHE_KEY);
     }
 }

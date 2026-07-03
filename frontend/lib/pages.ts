@@ -54,9 +54,20 @@ function toSummary(p: ApiPageSummary): PageSummary {
   };
 }
 
-/** The public URL for a page: its custom React route, or the CMS /{slug}. */
+/** Fixed React routes (shop UI, ticket checkout) — not plain CMS slug pages. */
+const FUNCTIONAL_ROUTE_PATHS = new Set(["/dashboard/shop", "/dashboard/tickets"]);
+
+/** Public URL: prefer CMS slug (`/main-stage`); functional pages keep their route. */
 export function pageHref(p: { routePath: string | null; slug: string }): string {
-  return p.routePath?.trim() || `/${p.slug}`;
+  const route = p.routePath?.trim();
+  if (route && FUNCTIONAL_ROUTE_PATHS.has(route)) {
+    return route;
+  }
+  const slug = p.slug?.trim();
+  if (slug) {
+    return `/${slug}`;
+  }
+  return route || "/";
 }
 
 /** Best label for a page in the current locale (nav label, then title). */

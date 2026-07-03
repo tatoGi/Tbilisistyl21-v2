@@ -2,6 +2,12 @@ import { api } from "./api";
 import type { Translatable } from "./types";
 
 export type SiteSettingsData = {
+  landing?: {
+    title?: Translatable;
+    subtitle?: Translatable;
+    buttonLabel?: Translatable;
+    image?: string | null;
+  };
   hero?: {
     badge?: Translatable;
     heading?: Translatable;
