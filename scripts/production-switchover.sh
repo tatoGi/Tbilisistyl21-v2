@@ -15,6 +15,9 @@ docker compose run --rm --entrypoint certbot certbot certonly \
   --email tato.laperashvili95@gmail.com --agree-tos --no-eff-email --non-interactive \
   || echo "WARN: certbot failed — check DNS propagation first"
 
+echo "==> Enable production nginx vhost"
+cp -f nginx/conf.d/production-domains.conf.disabled nginx/conf.d/production-domains.conf
+
 echo "==> Rebuild & restart"
 docker compose up -d --build
 
