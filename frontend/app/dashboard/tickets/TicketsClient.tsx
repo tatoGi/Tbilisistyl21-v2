@@ -36,14 +36,25 @@ export default function TicketsClient({ tickets }: { tickets: Ticket[] }) {
                 key={ticket.id}
                 className="group relative flex flex-col overflow-hidden rounded-2xl border border-white/10 bg-gradient-to-b from-white/[0.06] to-white/[0.02] shadow-xl shadow-black/30 transition duration-300 hover:-translate-y-0.5 hover:border-yellow-300/40 hover:shadow-2xl hover:shadow-black/50"
               >
-                <div className="relative aspect-[16/9] w-full overflow-hidden bg-white/[0.04]">
+                <div className="relative aspect-[16/9] w-full overflow-hidden bg-black/30">
                   {ticket.imageUrl ? (
-                    // eslint-disable-next-line @next/next/no-img-element
-                    <img
-                      src={ticket.imageUrl}
-                      alt={ticket.title}
-                      className="h-full w-full object-cover transition duration-500 group-hover:scale-105"
-                    />
+                    <>
+                      {/* Blurred zoomed copy fills the box so any aspect ratio
+                          looks intentional — the real cover is never cropped. */}
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      <img
+                        src={ticket.imageUrl}
+                        alt=""
+                        aria-hidden="true"
+                        className="absolute inset-0 h-full w-full scale-110 object-cover opacity-40 blur-2xl"
+                      />
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      <img
+                        src={ticket.imageUrl}
+                        alt={ticket.title}
+                        className="relative h-full w-full object-contain transition duration-500 group-hover:scale-105"
+                      />
+                    </>
                   ) : (
                     <div className="flex h-full w-full items-center justify-center text-[11px] font-bold uppercase tracking-[0.25em] text-white/25">
                       Tbilisi Style 21
