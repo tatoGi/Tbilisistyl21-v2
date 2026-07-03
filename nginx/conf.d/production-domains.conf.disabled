@@ -10,10 +10,11 @@ server {
     ssl_protocols TLSv1.2 TLSv1.3;
     ssl_ciphers HIGH:!aNULL:!MD5;
 
-    add_header X-Frame-Options "SAMEORIGIN" always;
-    add_header X-Content-Type-Options "nosniff" always;
-    add_header X-XSS-Protection "1; mode=block" always;
-    add_header Referrer-Policy "strict-origin-when-cross-origin" always;
+    include /etc/nginx/conf.d/security-headers.inc;
+
+    # HSTS — HTTPS only. Start conservative; raise max-age once you are confident
+    # HTTPS will stay up (1 year = 31536000). Consider hstspreload.org later.
+    add_header Strict-Transport-Security "max-age=31536000; includeSubDomains" always;
 
     include /etc/nginx/conf.d/app-locations.inc;
 }

@@ -61,13 +61,9 @@
         try_files $uri =404;
     }
 
-    location /pgadmin/ {
-        proxy_pass http://pgadmin:5050/;
-        proxy_set_header Host $host;
-        proxy_set_header X-Real-IP $remote_addr;
-        proxy_set_header X-Script-Name /pgadmin;
-        proxy_redirect off;
-    }
+    # pgAdmin is intentionally NOT exposed publicly. Reach it over an SSH tunnel:
+    #   ssh -L 5050:pgadmin:5050 root@<server>   →   http://localhost:5050
+    # (The pgadmin container still runs on the internal Docker network.)
 
     location /.well-known/acme-challenge/ {
         root /var/www/certbot;

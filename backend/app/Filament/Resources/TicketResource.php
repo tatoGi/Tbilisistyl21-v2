@@ -102,8 +102,12 @@ class TicketResource extends Resource
             ->columns([
                 Tables\Columns\ImageColumn::make('image')
                     ->label('')
-                    ->disk('public')
-                    ->getStateUsing(fn (?string $state): ?string => static::diskPath($state))
+                    // Root-relative /storage URL (no ->disk): same-origin, so it
+                    // works regardless of APP_URL (prod config:cache can leave it
+                    // as http://localhost, which would blank the image).
+                    // Use $record (not $state): $state inside getStateUsing calls
+                    // getState() → getStateUsing → … infinite recursion → 500.
+                    ->getStateUsing(fn (Ticket $record): ?string => static::publicUrl($record->image))
                     ->square(),
                 Tables\Columns\TextColumn::make('title')
                     ->label('Title')

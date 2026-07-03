@@ -99,8 +99,9 @@ class ProductResource extends Resource
             ->columns([
                 Tables\Columns\ImageColumn::make('image')
                     ->label('')
-                    ->disk('public')
-                    ->getStateUsing(fn (Product $record): ?string => $record->image?->path)
+                    // Root-relative /storage URL (no ->disk) so it stays same-origin
+                    // and does not depend on APP_URL (prod config:cache can blank it).
+                    ->getStateUsing(fn (Product $record): ?string => static::publicUrl($record->image?->path))
                     ->square(),
                 Tables\Columns\TextColumn::make('title')
                     ->formatStateUsing(fn ($state) => is_array($state) ? ($state['ka'] ?? $state['en'] ?? '—') : $state)

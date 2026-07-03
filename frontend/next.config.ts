@@ -34,6 +34,8 @@ function storageImagePatterns(): NonNullable<NextConfig['images']>['remotePatter
 
 const nextConfig: NextConfig = {
   output: 'standalone',
+  // Drop the `X-Powered-By: Next.js` header (avoid advertising the stack).
+  poweredByHeader: false,
   images: {
     remotePatterns: storageImagePatterns(),
   },

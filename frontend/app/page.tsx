@@ -21,18 +21,20 @@ export default async function Home() {
         className="object-cover object-[50%_35%]"
       />
 
-      <div className="absolute inset-0 bg-black/30" />
+      {/* Darker at the top (title) and bottom (button) for legibility, clear in
+          the middle so the figure reads through. */}
+      <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-black/15 to-black/55" />
 
-      <div className="absolute top-0 left-0 right-0 z-10 pt-8 md:pt-12 lg:pt-16 text-center">
-        <h1 className="font-heading text-[9vw] md:text-[5.5vw] lg:text-[4rem] xl:text-[4.75rem] font-extrabold uppercase tracking-tight whitespace-nowrap text-white drop-shadow-[0_2px_18px_rgba(0,0,0,0.55)]">
+      <div className="absolute inset-x-0 top-0 z-10 flex flex-col items-center px-4 pt-10 text-center md:pt-14 lg:pt-16">
+        <h1 className="font-heading text-[8.5vw] md:text-[5.5vw] lg:text-[4rem] xl:text-[4.75rem] font-extrabold uppercase tracking-tight whitespace-nowrap text-white drop-shadow-[0_2px_20px_rgba(0,0,0,0.7)]">
           {landing.title}
         </h1>
-        <p className="font-heading text-[3.4vw] md:text-[2vw] lg:text-[1.55rem] xl:text-[1.8rem] font-bold uppercase tracking-wide whitespace-nowrap text-white mt-1 md:mt-2 drop-shadow-[0_2px_12px_rgba(0,0,0,0.5)]">
+        <p className="font-heading text-[3.4vw] md:text-[2vw] lg:text-[1.55rem] xl:text-[1.8rem] font-bold uppercase tracking-wide whitespace-nowrap text-white mt-1 md:mt-2 drop-shadow-[0_2px_14px_rgba(0,0,0,0.65)]">
           {landing.subtitle}
         </p>
       </div>
 
-      <div className="absolute inset-x-0 top-[66%] z-10 flex justify-center px-4">
+      <div className="absolute inset-x-0 top-[58%] z-10 flex justify-center px-4">
         <Link
           href="/dashboard/festival"
           className="ts-ticket-pulse group inline-flex items-center gap-2 rounded-full bg-yellow-300 px-5 py-2.5 font-heading text-xs md:text-sm lg:text-base font-extrabold uppercase tracking-wide whitespace-nowrap text-black transition-all duration-300 hover:scale-105 hover:bg-white focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-yellow-300/60 sm:px-6 sm:py-3"
