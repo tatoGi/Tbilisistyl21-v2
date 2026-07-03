@@ -9,12 +9,15 @@ class AdminSeeder extends Seeder
 {
     public function run(): void
     {
-        $user = User::updateOrCreate(
-            ['email' => 'admin@tbilisistyle.ge'],
+        // firstOrCreate (not updateOrCreate): re-seeding must NEVER overwrite an
+        // existing admin's password. Set ADMIN_PASSWORD in .env for the real
+        // credential; the 'secret' fallback only seeds a brand-new local install.
+        $user = User::firstOrCreate(
+            ['email' => env('ADMIN_EMAIL', 'admin@tbilisistyle.ge')],
             [
                 'name' => 'Admin',
                 // Plain text — User model `hashed` cast handles bcrypt.
-                'password' => 'secret',
+                'password' => env('ADMIN_PASSWORD', 'secret'),
             ]
         );
 

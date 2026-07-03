@@ -35,6 +35,7 @@
     }
 
     location /livewire {
+        limit_req zone=admin_livewire burst=40 nodelay;
         proxy_pass http://laravel;
         include /etc/nginx/conf.d/proxy-laravel.conf;
     }
