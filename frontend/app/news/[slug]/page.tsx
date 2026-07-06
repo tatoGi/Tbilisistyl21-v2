@@ -24,7 +24,7 @@ export default async function NewsPostPage({ params }: PageProps) {
   const locale = await getCurrentLocale();
 
   return (
-    <main className="relative mx-auto min-h-screen w-full max-w-3xl px-5 pb-16 pt-28 text-white md:px-10">
+    <main className="relative mx-auto min-h-screen w-full max-w-6xl px-5 pb-16 pt-28 text-white md:px-10">
       <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(253,224,71,0.035)_0%,transparent_75%)]" />
 
       <article className="relative z-10">
