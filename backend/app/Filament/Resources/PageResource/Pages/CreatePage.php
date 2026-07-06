@@ -26,6 +26,6 @@ class CreatePage extends CreateRecord
             $data['content_blocks'] = PageResource::normalizeBlockPaths($data['content_blocks']);
         }
 
-        return $data;
+        return PageResource::normalizeSettings($data, null, $this->data ?? []);
     }
 }

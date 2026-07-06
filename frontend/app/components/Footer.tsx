@@ -3,22 +3,24 @@
 import Link from "next/link";
 import { useTranslations } from "next-intl";
 
-import type { SocialLinks, SiteContact } from "@/lib/nav";
+import type { NavLink, SocialLinks, SiteContact } from "@/lib/nav";
 import SocialLinksRow from "./SocialLinks";
 import PaymentCardBadges from "./PaymentCardBadges";
 
 export default function Footer({
   social,
   contact,
+  footerPages,
 }: {
   social: SocialLinks;
   contact: SiteContact;
+  footerPages: NavLink[];
 }) {
   const t = useTranslations();
 
   return (
     <footer className="relative z-10 border-t border-white/10 bg-black/95 px-6 py-12 text-white backdrop-blur-md">
-      <div className="mx-auto grid max-w-6xl gap-10 md:grid-cols-2 md:items-start">
+      <div className="mx-auto grid max-w-6xl gap-10 md:grid-cols-3 md:items-start">
         {/* Contact */}
         <div className="flex flex-col items-center gap-3 text-center md:items-start md:text-left">
           <p className="mb-1 text-[11px] font-bold uppercase tracking-[0.28em] text-yellow-300/80">
@@ -36,18 +38,6 @@ export default function Footer({
           >
             {t("contactUs.phone")}: {contact.phone}
           </a>
-          <Link
-            href="/contact-us"
-            className="mt-1 text-xs font-bold uppercase tracking-[0.2em] text-white/55 transition-colors hover:text-yellow-300"
-          >
-            {t("contactUs.title")} →
-          </Link>
-          <Link
-            href="/rules-and-terms"
-            className="text-xs font-bold uppercase tracking-[0.2em] text-white/55 transition-colors hover:text-yellow-300"
-          >
-            {t("nav.festivalRulesTerms")} →
-          </Link>
 
           <SocialLinksRow
             social={social}
@@ -55,6 +45,29 @@ export default function Footer({
             className="mt-4 items-center md:items-start"
           />
         </div>
+
+        {/* CMS footer links */}
+        {footerPages.length > 0 ? (
+          <nav
+            aria-label="Footer"
+            className="flex flex-col items-center gap-2.5 text-center md:items-start md:text-left"
+          >
+            <p className="mb-1 text-[11px] font-bold uppercase tracking-[0.28em] text-yellow-300/80">
+              Tbilisi Style 21
+            </p>
+            {footerPages.map((link) => (
+              <Link
+                key={link.href}
+                href={link.href}
+                className="text-xs font-bold uppercase tracking-[0.18em] text-white/65 transition-colors hover:text-yellow-300"
+              >
+                {link.label}
+              </Link>
+            ))}
+          </nav>
+        ) : (
+          <div />
+        )}
 
         {/* Quick actions */}
         <div className="flex flex-col items-center gap-3 md:items-end">

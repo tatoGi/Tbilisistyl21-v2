@@ -40,15 +40,9 @@ class TicketResource extends Resource
                                             ->required($code === 'ka')
                                     )->values()->all())
                                     ->columns(2),
-                                Forms\Components\Fieldset::make('Description')
-                                    ->schema(collect($locales)->map(
-                                        fn ($label, $code) => Forms\Components\Textarea::make("description.{$code}")
-                                            ->label($label)
-                                            ->rows(4)
-                                    )->values()->all())
-                                    ->columns(2),
+                                static::localizedInput('description', 'Description', rich: true),
                                 static::imageUpload('image', 'Cover image')
-                                    ->helperText('Shown on the ticket card on the frontend.'),
+                                    ->helperText('Same upload as page images (media library). Optional — hidden on the site when empty.'),
                             ]),
                         Forms\Components\Section::make('Event & pricing')
                             ->schema([

@@ -3,9 +3,12 @@
 namespace App\Filament\Resources\PageResource\Pages;
 
 use App\Filament\Resources\PageResource;
+use App\Models\Page;
 use Filament\Actions;
 use Filament\Resources\Pages\EditRecord;
 use Filament\Resources\Pages\EditRecord\Concerns\Translatable;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Arr;
 
 class EditPage extends EditRecord
 {
@@ -28,7 +31,10 @@ class EditPage extends EditRecord
             $data['content_blocks'] = PageResource::blocksForForm($data['content_blocks']);
         }
 
-        return $data;
+        $record = $this->getRecord();
+        $existing = $record instanceof Page ? $record : null;
+
+        return PageResource::normalizeSettings($data, $existing);
     }
 
     protected function mutateFormDataBeforeSave(array $data): array
@@ -37,6 +43,30 @@ class EditPage extends EditRecord
             $data['content_blocks'] = PageResource::normalizeBlockPaths($data['content_blocks']);
         }
 
-        return $data;
+        $record = $this->getRecord();
+        $existing = $record instanceof Page ? $record : null;
+
+        // Merge Livewire state — Translatable saves can omit sidebar toggles from $data.
+        return PageResource::normalizeSettings($data, $existing, $this->data ?? []);
+    }
+
+    protected function handleRecordUpdate(Model $record, array $data): Model
+    {
+        $record = parent::handleRecordUpdate($record, $data);
+
+        if (! $record instanceof Page) {
+            return $record;
+        }
+
+        $settings = PageResource::normalizeSettings(
+            $data,
+            $record,
+            array_merge($this->data ?? [], $data),
+        );
+
+        $record->fill(Arr::only($settings, PageResource::persistedSettingsKeys()));
+        $record->saveQuietly();
+
+        return $record;
     }
 }

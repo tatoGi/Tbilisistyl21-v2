@@ -30,6 +30,55 @@ class PageResource extends Resource
         return ['ka', 'en', 'ru', 'ua'];
     }
 
+    /**
+     * Normalize nav/footer toggles and order fields.
+     * Filament Translatable saves can drop sidebar values from $data — merge from $source.
+     */
+    public static function normalizeSettings(array $data, ?Page $existing = null, ?array $source = null): array
+    {
+        $merged = $source ? array_merge($source, $data) : $data;
+
+        $bool = function (string $key) use ($merged, $existing): bool {
+            if (array_key_exists($key, $merged) && $merged[$key] !== null) {
+                return (bool) $merged[$key];
+            }
+
+            return (bool) ($existing?->{$key} ?? false);
+        };
+
+        $int = function (string $key) use ($merged, $existing): int {
+            if (array_key_exists($key, $merged) && $merged[$key] !== null && $merged[$key] !== '') {
+                return (int) $merged[$key];
+            }
+
+            return (int) ($existing?->{$key} ?? 100);
+        };
+
+        $data['show_in_nav'] = $bool('show_in_nav');
+        $data['show_in_footer'] = $bool('show_in_footer');
+        $data['featured_on_home'] = $bool('featured_on_home');
+        $data['nav_order'] = $int('nav_order');
+        $data['footer_order'] = $int('footer_order');
+
+        return $data;
+    }
+
+    /** Keys saved on every locale update (not Spatie-translatable). */
+    public static function persistedSettingsKeys(): array
+    {
+        return [
+            'show_in_nav',
+            'show_in_footer',
+            'featured_on_home',
+            'nav_order',
+            'footer_order',
+            'slug',
+            'route_path',
+            'is_published',
+            'content_blocks',
+        ];
+    }
+
     public static function form(Form $form): Form
     {
         return $form
@@ -75,15 +124,28 @@ class PageResource extends Resource
                             ->schema([
                                 Forms\Components\Toggle::make('show_in_nav')
                                     ->label('Show in site menu')
-                                    ->default(false),
+                                    ->default(false)
+                                    ->dehydrated(),
                                 Forms\Components\TextInput::make('nav_order')
                                     ->label('Menu order')
                                     ->helperText('Lower numbers appear first.')
                                     ->numeric()
-                                    ->default(100),
+                                    ->default(100)
+                                    ->dehydrated(),
+                                Forms\Components\Toggle::make('show_in_footer')
+                                    ->label('Show in site footer')
+                                    ->default(false)
+                                    ->dehydrated(),
+                                Forms\Components\TextInput::make('footer_order')
+                                    ->label('Footer order')
+                                    ->helperText('Lower numbers appear first in the footer links.')
+                                    ->numeric()
+                                    ->default(100)
+                                    ->dehydrated(),
                                 Forms\Components\Toggle::make('featured_on_home')
                                     ->label('Feature on homepage')
-                                    ->default(false),
+                                    ->default(false)
+                                    ->dehydrated(),
                             ]),
                     ])
                     ->columnSpan(['lg' => 1]),
@@ -109,6 +171,9 @@ class PageResource extends Resource
                     ->color('gray'),
                 Tables\Columns\IconColumn::make('show_in_nav')
                     ->label('In menu')
+                    ->boolean(),
+                Tables\Columns\IconColumn::make('show_in_footer')
+                    ->label('In footer')
                     ->boolean(),
                 Tables\Columns\TextColumn::make('nav_order')
                     ->label('Order')

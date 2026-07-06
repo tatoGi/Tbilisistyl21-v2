@@ -4,7 +4,7 @@ import { cookies } from "next/headers";
 import { NextIntlClientProvider } from "next-intl";
 import { getMessages } from "next-intl/server";
 import { defaultLocale, isLocale, localeCookieName } from "@/i18n/config";
-import { getNavPages, getSocialLinks, getSiteContact } from "@/lib/nav";
+import { getNavPages, getFooterPages, getSocialLinks, getSiteContact } from "@/lib/nav";
 import { getFestivalMusic } from "@/lib/festival-landing";
 import { listMusicTracks } from "@/lib/music-tracks";
 import SiteChrome from "./components/SiteChrome";
@@ -52,8 +52,9 @@ export default async function RootLayout({
   const requestedLocale = store.get(localeCookieName)?.value;
   const locale = isLocale(requestedLocale) ? requestedLocale : defaultLocale;
   const messages = await getMessages();
-  const [pages, social, contact, music, musicTracks] = await Promise.all([
+  const [pages, footerPages, social, contact, music, musicTracks] = await Promise.all([
     getNavPages(),
+    getFooterPages(),
     getSocialLinks(),
     getSiteContact(),
     getFestivalMusic(),
@@ -77,6 +78,7 @@ export default async function RootLayout({
         <NextIntlClientProvider locale={locale} messages={messages}>
           <SiteChrome
             pages={pages}
+            footerPages={footerPages}
             social={social}
             contact={contact}
             music={music}

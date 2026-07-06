@@ -14,7 +14,9 @@ export type PageSummary = {
   slug: string;
   routePath: string | null;
   showInNav: boolean;
+  showInFooter: boolean;
   navOrder: number;
+  footerOrder: number;
   featuredOnHome: boolean;
   title: Translatable;
   navLabel: Translatable;
@@ -30,7 +32,9 @@ type ApiPageSummary = {
   slug: string;
   route_path: string | null;
   show_in_nav: boolean;
+  show_in_footer: boolean;
   nav_order: number;
+  footer_order: number;
   featured_on_home: boolean;
   title: Translatable;
   nav_label: Translatable;
@@ -47,7 +51,9 @@ function toSummary(p: ApiPageSummary): PageSummary {
     slug: p.slug,
     routePath: p.route_path ?? null,
     showInNav: Boolean(p.show_in_nav),
+    showInFooter: Boolean(p.show_in_footer),
     navOrder: Number(p.nav_order ?? 0),
+    footerOrder: Number(p.footer_order ?? 0),
     featuredOnHome: Boolean(p.featured_on_home),
     title: p.title ?? {},
     navLabel: p.nav_label ?? {},
@@ -75,7 +81,7 @@ export function pageLabel(p: { navLabel: Translatable; title: Translatable }, lo
   return t(p.navLabel, locale) || t(p.title, locale);
 }
 
-async function listPages(params: "nav" | "featured" | "all"): Promise<PageSummary[]> {
+async function listPages(params: "nav" | "featured" | "footer" | "all"): Promise<PageSummary[]> {
   const query = params === "all" ? "" : `?${params}=1`;
   try {
     const res = await api<{ data: ApiPageSummary[] }>(`/api/pages${query}`, { fresh: true });
@@ -92,6 +98,10 @@ export function listNavPages(): Promise<PageSummary[]> {
 
 export function listFeaturedPages(): Promise<PageSummary[]> {
   return listPages("featured");
+}
+
+export function listFooterPages(): Promise<PageSummary[]> {
+  return listPages("footer");
 }
 
 function toDetail(p: ApiPageDetail): PageDetail {

@@ -11,7 +11,7 @@ class Partner extends Model
 {
     use HasUuids, HasTranslations;
 
-    public array $translatable = ['description'];
+    public array $translatable = ['name', 'description'];
 
     protected $fillable = ['name', 'description', 'logo_id', 'url', 'order'];
 

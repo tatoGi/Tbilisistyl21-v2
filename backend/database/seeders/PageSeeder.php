@@ -30,7 +30,13 @@ class PageSeeder extends Seeder
                     'nav_label' => $entry['label'],
                     'route_path' => $entry['route'],
                     'show_in_nav' => true,
+                    'show_in_footer' => in_array($entry['slug'], ['contact-us', 'rules-and-terms'], true),
                     'nav_order' => $order,
+                    'footer_order' => match ($entry['slug']) {
+                        'contact-us' => 10,
+                        'rules-and-terms' => 20,
+                        default => 100,
+                    },
                     'featured_on_home' => $entry['featured'] ?? false,
                     'is_published' => true,
                     'content_blocks' => $this->buildBlocks($entry['slug']),

@@ -97,7 +97,9 @@ class SiteSettings extends Page implements HasForms
                             ->columns(2),
                         Forms\Components\Fieldset::make('Subheading')
                             ->schema(collect($locales)->map(
-                                fn ($label, $code) => Forms\Components\Textarea::make("hero.subheading.{$code}")->label($label)->rows(2)
+                                fn ($label, $code) => Forms\Components\RichEditor::make("hero.subheading.{$code}")
+                                    ->label($label)
+                                    ->toolbarButtons(['bold', 'italic', 'strike', 'h2', 'h3', 'bulletList', 'orderedList', 'blockquote', 'link', 'undo', 'redo'])
                             )->values()->all())
                             ->columns(2),
                         Forms\Components\FileUpload::make('hero.image')

@@ -22,11 +22,16 @@ class PageController extends Controller
             $query->where('show_in_nav', true);
         }
 
+        if ($request->boolean('footer')) {
+            $query->where('show_in_footer', true);
+        }
+
         if ($request->boolean('featured')) {
             $query->where('featured_on_home', true);
         }
 
-        $pages = $query->orderBy('nav_order')->get();
+        $orderBy = $request->boolean('footer') ? 'footer_order' : 'nav_order';
+        $pages = $query->orderBy($orderBy)->get();
 
         return response()->json([
             'data' => $pages->map(fn (Page $page) => $this->summary($page))->all(),
@@ -69,7 +74,9 @@ class PageController extends Controller
             'slug' => $page->slug,
             'route_path' => $page->route_path,
             'show_in_nav' => (bool) $page->show_in_nav,
+            'show_in_footer' => (bool) $page->show_in_footer,
             'nav_order' => (int) $page->nav_order,
+            'footer_order' => (int) $page->footer_order,
             'featured_on_home' => (bool) $page->featured_on_home,
             'title' => $page->getTranslations('title'),
             'nav_label' => $page->getTranslations('nav_label'),

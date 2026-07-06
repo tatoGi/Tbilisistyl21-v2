@@ -283,3 +283,69 @@ h6 {
     }
   }
 }
+
+/* ───────────── Rich text (Filament RichEditor HTML output) ─────────────
+   Scoped typography for admin-authored HTML rendered via dangerouslySetInnerHTML
+   in RenderBlocks (richText content, hero subheading). Tuned to the dark theme
+   so we don't need the @tailwindcss/typography plugin. */
+.rich-text > :first-child {
+  margin-top: 0;
+}
+.rich-text > :last-child {
+  margin-bottom: 0;
+}
+.rich-text p {
+  margin: 0 0 1em;
+}
+.rich-text h2 {
+  font-family: var(--font-heading, inherit);
+  font-size: 1.6em;
+  font-weight: 800;
+  line-height: 1.2;
+  margin: 1.4em 0 0.5em;
+  color: #fff;
+}
+.rich-text h3 {
+  font-family: var(--font-heading, inherit);
+  font-size: 1.25em;
+  font-weight: 700;
+  line-height: 1.25;
+  margin: 1.2em 0 0.5em;
+  color: #fff;
+}
+.rich-text strong {
+  font-weight: 700;
+  color: #fff;
+}
+.rich-text em {
+  font-style: italic;
+}
+.rich-text a {
+  color: #fde047; /* yellow-300 */
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+.rich-text a:hover {
+  color: #fff;
+}
+.rich-text ul,
+.rich-text ol {
+  margin: 0 0 1em;
+  padding-left: 1.5em;
+}
+.rich-text ul {
+  list-style: disc;
+}
+.rich-text ol {
+  list-style: decimal;
+}
+.rich-text li {
+  margin: 0.35em 0;
+}
+.rich-text blockquote {
+  margin: 1em 0;
+  padding: 0.25em 0 0.25em 1em;
+  border-left: 3px solid rgba(253, 224, 71, 0.5); /* yellow-300/50 */
+  color: rgba(255, 255, 255, 0.7);
+  font-style: italic;
+}

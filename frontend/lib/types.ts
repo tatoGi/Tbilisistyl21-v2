@@ -67,7 +67,9 @@ export interface Page {
   slug: string;
   route_path: string | null;
   show_in_nav: boolean;
+  show_in_footer: boolean;
   nav_order: number;
+  footer_order: number;
   featured_on_home: boolean;
   layout: string;
   content_blocks: unknown[];
@@ -88,7 +90,7 @@ export interface Post {
 
 export interface Partner {
   id: string;
-  name: string;
+  name: Translatable;
   description: Translatable;
   logo_id: string | null;
   logo: Media | null;

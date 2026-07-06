@@ -19,22 +19,23 @@ trait HasContentBlocks
      */
     protected static function contentBlocksBuilder(): BlockBuilder
     {
+        // NOTE: Do NOT add ->afterStateHydrated() here. Filament's Builder relies on
+        // its own afterStateHydrated callback to key each item by a random UUID, which
+        // its drag-and-drop reorder action needs. afterStateHydrated holds a single
+        // closure, so overriding it drops the UUID keying and corrupts reorder. Image
+        // paths are converted for the form by mutateFormDataBeforeFill (blocksForForm)
+        // in EditPage/EditPost instead.
         return BlockBuilder::make('content_blocks')
             ->label('')
             ->blockNumbers(false)
             ->collapsible()
             ->cloneable()
-            ->afterStateHydrated(function (BlockBuilder $component, ?array $state): void {
-                if (is_array($state) && $state !== []) {
-                    $component->state(static::blocksForForm($state));
-                }
-            })
             ->blocks([
                 BlockBuilder\Block::make('hero')
                     ->icon('heroicon-o-photo')
                     ->schema([
                         static::localizedInput('heading', 'Heading'),
-                        static::localizedInput('subheading', 'Subheading', textarea: true),
+                        static::localizedInput('subheading', 'Subheading', rich: true),
                         static::localizedInput('ctaLabel', 'Button label'),
                         Forms\Components\TextInput::make('ctaHref')->label('Button link'),
                         static::imageUpload('image', 'Background image'),
@@ -44,7 +45,7 @@ trait HasContentBlocks
                     ->label('Text')
                     ->icon('heroicon-o-bars-3-bottom-left')
                     ->schema([
-                        static::localizedInput('content', 'Content', textarea: true),
+                        static::localizedInput('content', 'Content', rich: true),
                     ]),
 
                 BlockBuilder\Block::make('image')
@@ -99,14 +100,30 @@ trait HasContentBlocks
             ]);
     }
 
-    /** A 4-language ({ka,en,ru,ua}) input group inside a block's `data` payload. */
-    protected static function localizedInput(string $name, string $label, bool $textarea = false): Forms\Components\Fieldset
+    /** Toolbar for the visual rich-text editor. Output is stored as HTML and
+     *  rendered on the frontend via the `.rich-text` styles. */
+    private const RICH_TOOLBAR = [
+        'bold', 'italic', 'strike', 'h2', 'h3',
+        'bulletList', 'orderedList', 'blockquote', 'link', 'undo', 'redo',
+    ];
+
+    /**
+     * A 4-language ({ka,en,ru,ua}) input group inside a block's `data` payload.
+     * `rich` renders a visual HTML editor; `textarea` a plain multi-line box;
+     * otherwise a single-line input.
+     */
+    protected static function localizedInput(string $name, string $label, bool $textarea = false, bool $rich = false): Forms\Components\Fieldset
     {
         $locales = ['ka' => 'ქართული', 'en' => 'English', 'ru' => 'Русский', 'ua' => 'Українська'];
 
         return Forms\Components\Fieldset::make($label)
-            ->schema(collect($locales)->map(function ($langLabel, $code) use ($name, $textarea) {
+            ->schema(collect($locales)->map(function ($langLabel, $code) use ($name, $textarea, $rich) {
                 $key = "{$name}.{$code}";
+                if ($rich) {
+                    return Forms\Components\RichEditor::make($key)
+                        ->label($langLabel)
+                        ->toolbarButtons(self::RICH_TOOLBAR);
+                }
                 return $textarea
                     ? Forms\Components\Textarea::make($key)->label($langLabel)->rows(6)
                     : Forms\Components\TextInput::make($key)->label($langLabel);

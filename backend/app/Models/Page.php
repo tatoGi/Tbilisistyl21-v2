@@ -17,7 +17,8 @@ class Page extends Model
 
     protected $fillable = [
         'title', 'nav_label', 'slug', 'route_path', 'show_in_nav',
-        'nav_order', 'featured_on_home', 'layout', 'content_blocks', 'is_published',
+        'show_in_footer', 'nav_order', 'footer_order', 'featured_on_home',
+        'layout', 'content_blocks', 'is_published',
     ];
 
     protected function casts(): array
@@ -25,6 +26,7 @@ class Page extends Model
         return [
             'content_blocks' => 'array',
             'show_in_nav' => 'boolean',
+            'show_in_footer' => 'boolean',
             'featured_on_home' => 'boolean',
             'is_published' => 'boolean',
         ];
@@ -38,6 +40,23 @@ class Page extends Model
     public function scopeInNav(Builder $query): Builder
     {
         return $query->where('show_in_nav', true)->orderBy('nav_order');
+    }
+
+    public function scopeInFooter(Builder $query): Builder
+    {
+        return $query->where('show_in_footer', true)->orderBy('footer_order');
+    }
+
+    protected static function booted(): void
+    {
+        static::saving(function (Page $page) {
+            if ($page->show_in_footer === null) {
+                $page->show_in_footer = false;
+            }
+            if ($page->footer_order === null) {
+                $page->footer_order = 100;
+            }
+        });
     }
 
     public function getActivitylogOptions(): LogOptions

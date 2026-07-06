@@ -30,6 +30,7 @@ function isBareRoute(pathname: string | null): boolean {
  */
 export default function SiteChrome({
   pages,
+  footerPages,
   social,
   contact,
   music,
@@ -37,6 +38,7 @@ export default function SiteChrome({
   children,
 }: {
   pages: NavLink[];
+  footerPages: NavLink[];
   social: SocialLinks;
   contact: SiteContact;
   music: SiteMusic | null;
@@ -53,7 +55,7 @@ export default function SiteChrome({
     <div className="relative flex min-h-screen flex-col bg-black text-white">
       <FestivalMenu pages={pages} social={social} />
       <div className="flex-1">{children}</div>
-      <Footer social={social} contact={contact} />
+      <Footer social={social} contact={contact} footerPages={footerPages} />
       <TicketCta />
       {/* Site-wide background music: the mini track-list player lives in the
           persistent layout so playback continues across page navigation. */}

@@ -1,6 +1,8 @@
+import type { ReactNode } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { t } from "@/lib/utils";
+import { sanitizeRichHtml } from "@/lib/sanitize";
 import type { PageBlock } from "@/lib/pages";
 import type { SiteContact } from "@/lib/nav";
 
@@ -23,12 +25,79 @@ type RenderBlocksProps = {
 export function RenderBlocks({ blocks, locale, contact }: RenderBlocksProps) {
   if (!blocks?.length) return null;
 
+  const nodes: ReactNode[] = [];
+  let i = 0;
+
+  while (i < blocks.length) {
+    const block = blocks[i];
+    const next = blocks[i + 1];
+
+    if (block.type === "image" && next?.type === "richText") {
+      nodes.push(
+        <ImageTextRow key={i} imageBlock={block} textBlock={next} locale={locale} />,
+      );
+      i += 2;
+      continue;
+    }
+
+    nodes.push(
+      <BlockRenderer key={i} block={block} locale={locale} contact={contact} />,
+    );
+    i += 1;
+  }
+
   return (
-    <div className="mx-auto flex max-w-4xl flex-col gap-12 px-6">
-      {blocks.map((block, i) => (
-        <BlockRenderer key={i} block={block} locale={locale} contact={contact} />
-      ))}
+    <div className="mx-auto flex max-w-[100rem] flex-col gap-12 px-6">
+      {nodes}
     </div>
+  );
+}
+
+function ImageTextRow({
+  imageBlock,
+  textBlock,
+  locale,
+}: {
+  imageBlock: PageBlock;
+  textBlock: PageBlock;
+  locale: string;
+}) {
+  const imageData = imageBlock.data ?? {};
+  const textData = textBlock.data ?? {};
+  const src = imageSrc(imageData.image);
+  const caption = t(imageData.caption as Localized, locale);
+  const content = t(textData.content as Localized, locale);
+
+  if (!src && !content) return null;
+
+  return (
+    <section className="grid grid-cols-1 items-start gap-10 lg:grid-cols-2 lg:gap-14">
+      {src ? (
+        <figure className="w-full min-w-0 max-w-none">
+          <div className="relative aspect-[4/5] w-full overflow-hidden rounded-2xl border border-white/10">
+            <Image
+              src={src}
+              alt={caption || ""}
+              fill
+              className="object-cover object-center"
+              sizes="(max-width: 1024px) 100vw, 640px"
+            />
+          </div>
+          {caption ? (
+            <figcaption className="mt-2 text-center text-sm text-white/50 lg:text-left">
+              {caption}
+            </figcaption>
+          ) : null}
+        </figure>
+      ) : null}
+
+      {content ? (
+        <div
+          className="rich-text min-w-0 w-full text-[1.05rem] leading-8 text-white/80"
+          dangerouslySetInnerHTML={{ __html: sanitizeRichHtml(content) }}
+        />
+      ) : null}
+    </section>
   );
 }
 
@@ -62,7 +131,10 @@ function BlockRenderer({
               </h2>
             ) : null}
             {subheading ? (
-              <p className="mx-auto mt-4 max-w-2xl text-white/70">{subheading}</p>
+              <div
+                className="rich-text mx-auto mt-4 max-w-2xl text-white/70"
+                dangerouslySetInnerHTML={{ __html: sanitizeRichHtml(subheading) }}
+              />
             ) : null}
             {ctaLabel && ctaHref ? (
               <Link
@@ -78,12 +150,15 @@ function BlockRenderer({
     }
 
     case "richText": {
+      // Admin-authored HTML from the Filament rich-text editor. Rendered as HTML
+      // and styled by the `.rich-text` rules in globals.css.
       const content = t(data.content as Localized, locale);
       if (!content) return null;
       return (
-        <div className="whitespace-pre-line text-[1.05rem] leading-8 text-white/80">
-          {content}
-        </div>
+        <div
+          className="rich-text text-[1.05rem] leading-8 text-white/80"
+          dangerouslySetInnerHTML={{ __html: sanitizeRichHtml(content) }}
+        />
       );
     }
 

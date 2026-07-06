@@ -49,6 +49,9 @@ services:
       # Keep vendor/ on the container's fast filesystem instead of the slow
       # Windows bind mount. Initialised from the image build above.
       - vendor-dev:/var/www/html/vendor
+      # Livewire temp uploads on the container FS — Windows bind mounts break
+      # Flysystem file_size metadata (UnableToRetrieveMetadata in admin uploads).
+      - livewire-tmp-dev:/var/www/html/storage/app/private/livewire-tmp
     environment:
       APP_ENV: local
       APP_DEBUG: "true"
@@ -70,3 +73,4 @@ volumes:
   pgdata-dev:
   pgadmin-data:
   vendor-dev:
+  livewire-tmp-dev:

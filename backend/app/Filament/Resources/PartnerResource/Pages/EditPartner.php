@@ -16,4 +16,18 @@ class EditPartner extends EditRecord
             Actions\DeleteAction::make(),
         ];
     }
+
+    protected function mutateFormDataBeforeFill(array $data): array
+    {
+        $data['name'] = $this->record->getTranslations('name');
+        $data['description'] = $this->record->getTranslations('description');
+        $data['logo_upload'] = PartnerResource::logoForForm($this->record->logo);
+
+        return $data;
+    }
+
+    protected function mutateFormDataBeforeSave(array $data): array
+    {
+        return PartnerResource::mergeUploadedLogo($data);
+    }
 }

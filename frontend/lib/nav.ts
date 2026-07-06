@@ -1,7 +1,7 @@
 import { api } from "./api";
 import { t, mediaUrl } from "./utils";
 import { getCurrentLocale } from "./locale";
-import { listNavPages, listFeaturedPages, pageHref, pageLabel } from "./pages";
+import { listNavPages, listFeaturedPages, listFooterPages, pageHref, pageLabel } from "./pages";
 import { getSiteSettings } from "./site-settings";
 import type { Partner as ApiPartner, Post as ApiPost, Media } from "./types";
 
@@ -39,6 +39,13 @@ export type NewsCard = {
 export async function getNavPages(): Promise<NavLink[]> {
   const locale = await getCurrentLocale();
   const pages = await listNavPages();
+  return pages.map((p) => ({ label: pageLabel(p, locale), href: pageHref(p) }));
+}
+
+/** Site footer links from the admin (Pages → Show in site footer, Footer order). */
+export async function getFooterPages(): Promise<NavLink[]> {
+  const locale = await getCurrentLocale();
+  const pages = await listFooterPages();
   return pages.map((p) => ({ label: pageLabel(p, locale), href: pageHref(p) }));
 }
 
@@ -82,7 +89,7 @@ export async function getFeaturedPartners(): Promise<PartnerCard[]> {
     const data = Array.isArray(res?.data) ? res.data : [];
     return data.map((p) => ({
       id: String(p.id),
-      name: p.name ?? "",
+      name: t(p.name, locale),
       description: t(p.description, locale) || null,
       logoUrl: logoUrlOf(p.logo ?? null),
       website: (p.url ?? "").trim() || null,
