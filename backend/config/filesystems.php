@@ -41,7 +41,14 @@ return [
         'public' => [
             'driver' => 'local',
             'root' => storage_path('app/public'),
-            'url' => rtrim(env('APP_URL', 'http://localhost'), '/').'/storage',
+            // Public URL for stored media. Defaults to an absolute APP_URL-based
+            // path (correct for local dev, where the API and site are on
+            // different origins). In production the frontend, admin and /storage
+            // are all served from one origin behind nginx, so set
+            // STORAGE_URL=/storage to emit host-relative URLs — this keeps images
+            // same-origin on both the apex and www hosts and satisfies the
+            // strict `img-src 'self'` CSP (fixes broken images in the admin).
+            'url' => env('STORAGE_URL', rtrim(env('APP_URL', 'http://localhost'), '/').'/storage'),
             'visibility' => 'public',
             'throw' => false,
             'report' => false,
