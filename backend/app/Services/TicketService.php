@@ -16,13 +16,18 @@ class TicketService
         // contain NUL bytes that don't round-trip through the Postgres `text`
         // cache column (a cached Collection deserializes as an incomplete class).
         return Cache::remember(Ticket::API_CACHE_KEY, 3600, function () {
-            return Ticket::active()->get()->toArray();
+            return Ticket::active()
+                ->withCount(['soldTickets as sold' => fn ($q) => $q->where('status', 'paid')])
+                ->get()
+                ->toArray();
         });
     }
 
     public function findActive(string $id): ?Ticket
     {
-        return Ticket::active()->find($id);
+        return Ticket::active()
+            ->withCount(['soldTickets as sold' => fn ($q) => $q->where('status', 'paid')])
+            ->find($id);
     }
 
     /** @deprecated Use findActive() for public API */

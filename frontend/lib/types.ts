@@ -18,6 +18,11 @@ export interface Ticket {
   sale_url: string | null;
   created_at: string;
   updated_at: string;
+  // Additive redesign fields (nullable — absent on legacy rows).
+  category?: Translatable | null;
+  features?: Translatable | null;
+  is_featured?: boolean;
+  sold?: number; // paid SoldTicket count (from withCount)
 }
 
 export interface Product {

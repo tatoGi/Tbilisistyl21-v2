@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Facades\Cache;
 use Spatie\Translatable\HasTranslations;
 
@@ -42,5 +43,11 @@ class Ticket extends Model
     public function scopeActive(Builder $query): Builder
     {
         return $query->where('status', 'active');
+    }
+
+    /** Sold tickets that consumed capacity (paid). Used for availability %. */
+    public function soldTickets(): HasMany
+    {
+        return $this->hasMany(SoldTicket::class, 'original_ticket_id');
     }
 }

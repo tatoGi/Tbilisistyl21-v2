@@ -54,7 +54,7 @@ class TicketResource extends Resource
                                 Forms\Components\TextInput::make('quantity')
                                     ->numeric()
                                     ->required()
-                                    ->helperText('Remaining inventory shown as “X available” on the site.'),
+                                    ->helperText('Total capacity. The site shows “remaining available” = quantity − sold.'),
                                 Forms\Components\DatePicker::make('event_date')
                                     ->label('Event date')
                                     ->required(),
@@ -63,6 +63,29 @@ class TicketResource extends Resource
                                     ->placeholder('e.g. Tbilisi'),
                             ])
                             ->columns(2),
+                        Forms\Components\Section::make('Tier card (redesign)')
+                            ->description('Optional — enriches the redesigned ticket card. Existing tickets work without these (the description is shown instead of a feature list).')
+                            ->collapsed()
+                            ->schema([
+                                Forms\Components\Fieldset::make('Category label')
+                                    ->schema(collect($locales)->map(
+                                        fn ($label, $code) => Forms\Components\TextInput::make("category.{$code}")
+                                            ->label($label)
+                                            ->placeholder('e.g. STANDARD / JOKER PASS')
+                                    )->values()->all())
+                                    ->columns(2),
+                                Forms\Components\Fieldset::make('Included features (one per line)')
+                                    ->schema(collect($locales)->map(
+                                        fn ($label, $code) => Forms\Components\Textarea::make("features.{$code}")
+                                            ->label($label)
+                                            ->rows(4)
+                                            ->placeholder("წვდომა მთელ ტერიტორიაზე\nმთავარი სცენა\nღია ბარი")
+                                    )->values()->all())
+                                    ->columns(2),
+                                Forms\Components\Toggle::make('is_featured')
+                                    ->label('Highlight as “Popular”')
+                                    ->helperText('Adds the POPULAR ribbon and gold highlight to this card.'),
+                            ]),
                     ])
                     ->columnSpan(['lg' => 2]),
 

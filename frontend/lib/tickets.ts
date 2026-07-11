@@ -18,6 +18,12 @@ export type Ticket = {
   status: TicketStatus;
   createdAt: string;
   updatedAt: string;
+  // Redesign tier-card fields (graceful fallbacks when unset).
+  category: string;
+  features: string[];
+  isFeatured: boolean;
+  remaining: number;
+  percentLeft: number;
 };
 
 function imageUrlOf(image: unknown): string | null {
@@ -28,6 +34,19 @@ function imageUrlOf(image: unknown): string | null {
 }
 
 function mapTicket(t0: ApiTicket, locale: string): Ticket {
+  const quantity = Number(t0.quantity ?? 0);
+  const sold = Math.max(0, Number(t0.sold ?? 0));
+  const remaining = Math.max(0, quantity - sold);
+  // percentLeft is meaningful only when a capacity is set; guard divide-by-zero.
+  const percentLeft = quantity > 0 ? Math.round((remaining / quantity) * 100) : 0;
+
+  // features: admin enters newline-separated lines per locale; fall back to []
+  const featuresText = t0.features ? t(t0.features, locale) : "";
+  const features = featuresText
+    .split("\n")
+    .map((f) => f.trim())
+    .filter(Boolean);
+
   return {
     id: String(t0.id),
     title: t(t0.title, locale),
@@ -36,11 +55,16 @@ function mapTicket(t0: ApiTicket, locale: string): Ticket {
     priceGel: Number(t0.price_gel ?? 0),
     eventDate: t0.event_date ?? "",
     location: t0.location ?? "",
-    quantity: Number(t0.quantity ?? 0),
+    quantity,
     saleUrl: t0.sale_url ?? "",
     status: (t0.status as TicketStatus) ?? "draft",
     createdAt: t0.created_at ?? "",
     updatedAt: t0.updated_at ?? "",
+    category: t0.category ? t(t0.category, locale) : "",
+    features,
+    isFeatured: Boolean(t0.is_featured),
+    remaining,
+    percentLeft,
   };
 }
 

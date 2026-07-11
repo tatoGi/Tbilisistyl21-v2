@@ -4,23 +4,6 @@ import { useState } from "react"
 import BuyTicketModal from "./BuyTicketModal"
 import { sanitizeRichHtml } from "@/lib/sanitize"
 
-function TicketDescription({ content }: { content: string }) {
-  const isHtml = /<[a-z][\s\S]*>/i.test(content)
-  if (isHtml) {
-    return (
-      <div
-        className="rich-text relative text-sm leading-relaxed text-white/70"
-        dangerouslySetInnerHTML={{ __html: sanitizeRichHtml(content) }}
-      />
-    )
-  }
-  return (
-    <p className="relative whitespace-pre-line text-sm leading-relaxed text-white/70">
-      {content}
-    </p>
-  )
-}
-
 function formatEventDate(value?: string) {
   if (!value) return "Date TBA"
   const raw = value.includes("T") ? value.split("T")[0] : value
@@ -33,19 +16,6 @@ function formatEventDate(value?: string) {
   })
 }
 
-function PriceBadge({ price, className = "" }: { price: number; className?: string }) {
-  return (
-    <span
-      className={`inline-flex items-baseline gap-1 rounded-2xl border border-yellow-300/25 bg-black/50 px-4 py-2 shadow-lg shadow-yellow-300/10 backdrop-blur-md ${className}`}
-    >
-      <span className="font-heading text-xl font-black leading-none text-yellow-300 sm:text-2xl">
-        {price}
-      </span>
-      <span className="text-xs font-bold text-yellow-300/80">₾</span>
-    </span>
-  )
-}
-
 interface Ticket {
   id: string
   title: string
@@ -56,6 +26,28 @@ interface Ticket {
   description?: string
   status: string
   quantity: number
+  category: string
+  features: string[]
+  isFeatured: boolean
+  remaining: number
+  percentLeft: number
+}
+
+function DescriptionFallback({ content }: { content: string }) {
+  const isHtml = /<[a-z][\s\S]*>/i.test(content)
+  if (isHtml) {
+    return (
+      <div
+        className="rich-text text-sm leading-relaxed text-[color:var(--ts-body)]"
+        dangerouslySetInnerHTML={{ __html: sanitizeRichHtml(content) }}
+      />
+    )
+  }
+  return (
+    <p className="whitespace-pre-line text-sm leading-relaxed text-[color:var(--ts-body)]">
+      {content}
+    </p>
+  )
 }
 
 export default function TicketsClient({ tickets }: { tickets: Ticket[] }) {
@@ -69,175 +61,120 @@ export default function TicketsClient({ tickets }: { tickets: Ticket[] }) {
 
   return (
     <>
-      <div className="mt-12 grid gap-8 md:grid-cols-2 md:items-stretch">
+      <div className="mt-12 grid gap-6 md:grid-cols-2 lg:grid-cols-3 lg:items-stretch">
         {tickets.length ? (
           tickets.map((ticket) => {
-            const soldOut = ticket.status === "sold_out" || ticket.quantity <= 0
-            const low = !soldOut && ticket.quantity <= 20
-            const hasImage = Boolean(ticket.imageUrl)
+            const soldOut = ticket.status === "sold_out" || ticket.remaining <= 0
+            const featured = ticket.isFeatured && !soldOut
 
             return (
               <article
                 key={ticket.id}
-                className={`group relative flex h-full flex-col overflow-hidden rounded-3xl border bg-[#080808] shadow-[0_20px_50px_-20px_rgba(0,0,0,0.8)] transition duration-500 hover:-translate-y-1 hover:shadow-[0_28px_60px_-20px_rgba(253,224,71,0.12)] ${
-                  soldOut
-                    ? "border-white/5 opacity-90"
-                    : "border-white/10 hover:border-yellow-300/35"
-                }`}
+                className={`relative flex h-full flex-col rounded-[20px] border p-8 transition duration-300 ${
+                  featured
+                    ? "border-[#e8b84b]/40 bg-[linear-gradient(160deg,rgba(232,184,75,0.14),rgba(255,255,255,0.02))] shadow-[0_20px_60px_rgba(232,184,75,0.12)]"
+                    : "border-white/10 bg-[linear-gradient(160deg,rgba(255,255,255,0.03),rgba(255,255,255,0.01))] hover:border-[#e8b84b]/25"
+                } ${soldOut ? "opacity-70" : ""}`}
               >
-                {/* Ambient glow */}
-                <div className="pointer-events-none absolute -left-24 -top-24 h-56 w-56 rounded-full bg-yellow-300/[0.07] blur-3xl transition duration-700 group-hover:bg-yellow-300/[0.12]" />
-                <div className="pointer-events-none absolute -bottom-24 -right-24 h-48 w-48 rounded-full bg-yellow-300/[0.04] blur-3xl" />
-
-                {soldOut ? (
-                  <div className="pointer-events-none absolute inset-0 z-20 bg-black/25" />
+                {featured ? (
+                  <div className="absolute right-7 top-[-1px] rounded-b-lg bg-[#e8b84b] px-3.5 py-1.5 text-[11px] font-extrabold uppercase tracking-[0.08em] text-[#1a1206]">
+                    POPULAR
+                  </div>
                 ) : null}
 
-                {hasImage ? (
-                  <div className="relative w-full overflow-hidden border-b border-white/5 bg-black/40">
-                    {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img
-                      src={ticket.imageUrl!}
-                      alt=""
-                      aria-hidden="true"
-                      className="absolute inset-0 h-full w-full scale-110 object-cover opacity-35 blur-2xl"
-                    />
-                    <div className="relative z-10 flex min-h-[12rem] items-center justify-center px-5 py-6 sm:min-h-[14rem]">
-                      {/* eslint-disable-next-line @next/next/no-img-element */}
-                      <img
-                        src={ticket.imageUrl!}
-                        alt={ticket.title}
-                        className="max-h-56 w-full object-contain object-center drop-shadow-[0_12px_32px_rgba(0,0,0,0.65)] transition duration-700 group-hover:scale-[1.03]"
-                      />
-                    </div>
-                    <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-[#080808] via-black/20 to-transparent" />
-                    <div className="absolute left-5 top-5 z-20">
-                      <span className="inline-block rounded-full border border-white/10 bg-black/40 px-3 py-1 text-[10px] font-bold uppercase tracking-[0.22em] text-white/60 backdrop-blur-sm">
-                        Tbilisi Style 21
-                      </span>
-                    </div>
-                    <div className="absolute right-5 top-5 z-20">
-                      <PriceBadge price={ticket.priceGel} />
-                    </div>
-                  </div>
-                ) : (
-                  <div className="relative overflow-hidden border-b border-white/5 px-6 py-7">
-                    <div className="absolute inset-0 bg-gradient-to-br from-yellow-300/[0.14] via-[#0c0c0c] to-black" />
-                    <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_0%,rgba(253,224,71,0.18),transparent_50%)]" />
-                    <div className="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-yellow-300/40 to-transparent" />
-                    <div className="relative flex items-start justify-between gap-4">
-                      <span className="inline-block rounded-full border border-yellow-300/20 bg-black/30 px-3 py-1 text-[10px] font-bold uppercase tracking-[0.22em] text-yellow-300/80">
-                        Festival Pass
-                      </span>
-                      <PriceBadge price={ticket.priceGel} />
-                    </div>
-                  </div>
-                )}
+                {/* Category tag */}
+                <div
+                  className={`mb-6 self-start rounded-full px-3 py-1.5 text-[11px] font-bold uppercase tracking-[0.14em] ${
+                    featured
+                      ? "bg-[#e8b84b] text-[#1a1206]"
+                      : "bg-white/[0.06] text-[color:var(--ts-muted)]"
+                  }`}
+                >
+                  {ticket.category || "Festival Pass"}
+                </div>
 
-                <div className="relative flex flex-1 flex-col gap-5 p-6 sm:p-7">
-                  <div className="relative min-w-0 space-y-3">
-                    <h2 className="font-heading text-[clamp(1.35rem,3vw,1.75rem)] font-black uppercase leading-tight tracking-wide text-white transition duration-300 group-hover:text-yellow-300">
-                      {ticket.title}
-                    </h2>
+                {/* Title */}
+                <h2 className="font-unbounded mb-2.5 text-[22px] font-bold leading-snug text-[color:var(--ts-head)]">
+                  {ticket.title}
+                </h2>
 
-                    <div className="flex flex-col gap-2.5 sm:flex-row sm:flex-wrap sm:items-center">
-                      <span className="inline-flex items-center gap-2 rounded-xl border border-yellow-300/20 bg-yellow-300/[0.08] px-4 py-2.5 text-sm font-semibold text-white">
-                        <svg
-                          xmlns="http://www.w3.org/2000/svg"
-                          viewBox="0 0 24 24"
-                          fill="none"
-                          stroke="currentColor"
-                          strokeWidth={2}
-                          className="h-4 w-4 shrink-0 text-yellow-300"
-                          aria-hidden
-                        >
-                          <rect x="3" y="4" width="18" height="18" rx="2" />
-                          <path d="M16 2v4M8 2v4M3 10h18" />
-                        </svg>
-                        <span className="tracking-wide">{formatEventDate(ticket.eventDate)}</span>
-                      </span>
-                      <span className="inline-flex items-center gap-2 rounded-xl border border-white/15 bg-white/[0.06] px-4 py-2.5 text-sm font-semibold text-white/90">
-                        <svg
-                          xmlns="http://www.w3.org/2000/svg"
-                          viewBox="0 0 24 24"
-                          fill="none"
-                          stroke="currentColor"
-                          strokeWidth={2}
-                          className="h-4 w-4 shrink-0 text-yellow-300"
-                          aria-hidden
-                        >
-                          <path d="M12 21s7-4.5 7-11a7 7 0 1 0-14 0c0 6.5 7 11 7 11z" />
-                          <circle cx="12" cy="10" r="2.5" />
-                        </svg>
-                        <span className="tracking-wide">{ticket.location || "Location TBA"}</span>
-                      </span>
-                    </div>
-                  </div>
+                {/* Date */}
+                <div className="mb-6 flex items-center gap-2">
+                  <span className="h-1.5 w-1.5 rounded-full bg-[color:var(--ts-muted)]" />
+                  <span className="text-[13px] text-[color:var(--ts-muted)]">
+                    {formatEventDate(ticket.eventDate)}
+                    {ticket.location ? ` · ${ticket.location}` : ""}
+                  </span>
+                </div>
 
-                  {ticket.description ? (
-                    <div className="relative rounded-2xl border border-white/5 bg-white/[0.02] px-4 py-4">
-                      <TicketDescription content={ticket.description} />
-                    </div>
+                {/* Price */}
+                <div className="mb-7 flex items-baseline gap-1.5">
+                  <span className="font-unbounded text-[42px] font-extrabold leading-none text-[color:var(--ts-head)]">
+                    {ticket.priceGel}
+                  </span>
+                  <span className="text-base text-[color:var(--ts-muted)]">₾</span>
+                </div>
+
+                {/* Features checklist (falls back to the ticket description) */}
+                <div className="mb-7 flex flex-1 flex-col gap-3">
+                  {ticket.features.length ? (
+                    ticket.features.map((f, i) => (
+                      <div key={i} className="flex items-start gap-2.5 text-sm leading-relaxed text-[color:var(--ts-body)]">
+                        <span className="mt-0.5 text-[#e8b84b]">✓</span>
+                        <span>{f}</span>
+                      </div>
+                    ))
+                  ) : ticket.description ? (
+                    <DescriptionFallback content={ticket.description} />
                   ) : null}
+                </div>
 
-                  <div className="relative mt-auto flex flex-wrap items-center justify-between gap-4 border-t border-white/10 pt-5">
-                    <span
-                      className={`inline-flex items-center gap-2 rounded-full border px-3 py-1.5 text-[11px] font-bold uppercase tracking-[0.12em] ${
-                        soldOut
-                          ? "border-red-400/20 bg-red-400/10 text-red-300"
-                          : low
-                            ? "border-amber-400/20 bg-amber-400/10 text-amber-300"
-                            : "border-emerald-400/20 bg-emerald-400/10 text-emerald-300"
-                      }`}
-                    >
-                      <span
-                        className={`h-2 w-2 rounded-full ${
-                          soldOut ? "bg-red-400" : low ? "animate-pulse bg-amber-400" : "bg-emerald-400"
-                        }`}
-                      />
-                      {soldOut ? "Sold out" : low ? `Only ${ticket.quantity} left` : `${ticket.quantity} available`}
+                {/* Availability */}
+                <div className="mb-5">
+                  <div className="mb-1.5 flex justify-between text-xs text-[color:var(--ts-muted)]">
+                    <span>
+                      {soldOut ? "ამოიწურა" : `${ticket.remaining} ხელმისაწვდომი`}
                     </span>
-
-                    {!soldOut ? (
-                      <button
-                        type="button"
-                        onClick={() =>
-                          setSelectedTicket({
-                            id: ticket.id,
-                            title: ticket.title,
-                            priceGel: ticket.priceGel,
-                            eventDate: ticket.eventDate,
-                            location: ticket.location,
-                          })
-                        }
-                        className="ts-ticket-pulse group/btn relative inline-flex items-center gap-2 overflow-hidden rounded-full bg-yellow-300 px-7 py-3.5 text-xs font-black uppercase tracking-[0.14em] text-black shadow-[0_8px_30px_-8px_rgba(253,224,71,0.7)] transition duration-300 hover:scale-[1.03] hover:bg-white hover:shadow-[0_12px_36px_-8px_rgba(255,255,255,0.35)]"
-                      >
-                        <span>Buy Ticket</span>
-                        <svg
-                          xmlns="http://www.w3.org/2000/svg"
-                          viewBox="0 0 24 24"
-                          fill="none"
-                          stroke="currentColor"
-                          strokeWidth={2.5}
-                          className="h-4 w-4 transition duration-300 group-hover/btn:translate-x-0.5"
-                          aria-hidden
-                        >
-                          <path d="M5 12h14" />
-                          <path d="m13 6 6 6-6 6" />
-                        </svg>
-                      </button>
-                    ) : (
-                      <span className="text-[11px] font-bold uppercase tracking-[0.14em] text-white/30">
-                        Unavailable
-                      </span>
-                    )}
+                    <span>{ticket.percentLeft}%</span>
+                  </div>
+                  <div className="h-1 overflow-hidden rounded-full bg-white/[0.08]">
+                    <div
+                      className="h-full rounded-full bg-[#e8b84b]"
+                      style={{ width: `${ticket.percentLeft}%` }}
+                    />
                   </div>
                 </div>
+
+                {/* CTA */}
+                {soldOut ? (
+                  <span className="flex w-full cursor-not-allowed items-center justify-center rounded-full bg-white/10 py-4 text-xs font-black uppercase tracking-[0.14em] text-white/40">
+                    ამოიწურა
+                  </span>
+                ) : (
+                  <button
+                    type="button"
+                    onClick={() =>
+                      setSelectedTicket({
+                        id: ticket.id,
+                        title: ticket.title,
+                        priceGel: ticket.priceGel,
+                        eventDate: ticket.eventDate,
+                        location: ticket.location,
+                      })
+                    }
+                    className="group/btn flex w-full items-center justify-center gap-2 rounded-full bg-[#e8b84b] py-4 text-sm font-bold text-[#1a1206] transition duration-300 hover:bg-white"
+                  >
+                    <span>ბილეთის ყიდვა</span>
+                    <span aria-hidden className="transition-transform duration-300 group-hover/btn:translate-x-0.5">
+                      →
+                    </span>
+                  </button>
+                )}
               </article>
             )
           })
         ) : (
-          <p className="rounded-3xl border border-dashed border-white/15 bg-white/[0.02] p-10 text-center text-white/50 md:col-span-2">
+          <p className="rounded-[20px] border border-dashed border-white/15 bg-white/[0.02] p-10 text-center text-white/50 md:col-span-2 lg:col-span-3">
             Tickets are not available yet.
           </p>
         )}
