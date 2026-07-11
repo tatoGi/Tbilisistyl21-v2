@@ -14,11 +14,12 @@ class Ticket extends Model
 
     public const API_CACHE_KEY = 'tickets:active';
 
-    public array $translatable = ['title', 'description'];
+    public array $translatable = ['title', 'description', 'category', 'features'];
 
     protected $fillable = [
         'title', 'description', 'image', 'price_gel', 'quantity',
         'event_date', 'location', 'status', 'sale_url',
+        'category', 'features', 'is_featured',
     ];
 
     protected function casts(): array
@@ -26,6 +27,7 @@ class Ticket extends Model
         return [
             'event_date' => 'date',
             'price_gel' => 'decimal:2',
+            'is_featured' => 'boolean',
         ];
     }
 
