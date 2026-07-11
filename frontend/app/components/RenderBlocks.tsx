@@ -406,6 +406,57 @@ function BlockRenderer({
       );
     }
 
+    case "eventInfo": {
+      const label = t(data.label as Localized, locale);
+      const note = t(data.note as Localized, locale);
+      const rawRows = Array.isArray(data.rows) ? (data.rows as Record<string, unknown>[]) : [];
+      const rows = rawRows
+        .map((r) => ({ k: t(r.k as Localized, locale), v: t(r.v as Localized, locale) }))
+        .filter((r) => r.k || r.v);
+      if (!label && !note && !rows.length) return null;
+      return (
+        <section className="mx-auto w-full max-w-md rounded-[20px] border border-white/10 bg-[linear-gradient(160deg,rgba(232,184,75,0.1),rgba(255,255,255,0.02))] p-8">
+          {label ? (
+            <div className="font-unbounded mb-5 text-xs uppercase tracking-[0.18em] text-[#e8b84b]">
+              {label}
+            </div>
+          ) : null}
+          <div className="flex flex-col gap-[18px]">
+            {rows.map((r, i) => (
+              <div key={i} className="flex justify-between gap-4 text-[15px]">
+                <span className="text-[color:var(--ts-muted)]">{r.k}</span>
+                <span className="font-semibold text-[color:var(--ts-tile)]">{r.v}</span>
+              </div>
+            ))}
+          </div>
+          {note ? (
+            <>
+              <div className="my-6 h-px bg-white/10" />
+              <div className="text-[13px] leading-relaxed text-[color:var(--ts-body)]">{note}</div>
+            </>
+          ) : null}
+        </section>
+      );
+    }
+
+    case "tags": {
+      const rawItems = Array.isArray(data.items) ? (data.items as Record<string, unknown>[]) : [];
+      const items = rawItems.map((it) => t(it.label as Localized, locale)).filter(Boolean);
+      if (!items.length) return null;
+      return (
+        <div className="mx-auto flex w-full max-w-2xl flex-wrap gap-3">
+          {items.map((label, i) => (
+            <span
+              key={i}
+              className="rounded-full border border-white/[0.12] px-[18px] py-2 text-[13px] text-[color:var(--ts-body)]"
+            >
+              {label}
+            </span>
+          ))}
+        </div>
+      );
+    }
+
     default:
       return null;
   }

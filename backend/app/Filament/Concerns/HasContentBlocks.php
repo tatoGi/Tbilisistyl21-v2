@@ -97,6 +97,34 @@ trait HasContentBlocks
                         static::localizedInput('label', 'Button label'),
                         Forms\Components\TextInput::make('href')->label('Button link')->required(),
                     ]),
+
+                BlockBuilder\Block::make('eventInfo')
+                    ->label('Event info card')
+                    ->icon('heroicon-o-calendar-days')
+                    ->schema([
+                        static::localizedInput('label', 'Card label'),
+                        Forms\Components\Repeater::make('rows')
+                            ->label('Rows (label / value)')
+                            ->schema([
+                                static::localizedInput('k', 'Label'),
+                                static::localizedInput('v', 'Value'),
+                            ])
+                            ->columns(2)
+                            ->defaultItems(3),
+                        static::localizedInput('note', 'Note', textarea: true),
+                    ]),
+
+                BlockBuilder\Block::make('tags')
+                    ->label('Tag pills')
+                    ->icon('heroicon-o-hashtag')
+                    ->schema([
+                        Forms\Components\Repeater::make('items')
+                            ->label('Tags')
+                            ->schema([
+                                static::localizedInput('label', 'Tag'),
+                            ])
+                            ->defaultItems(3),
+                    ]),
             ]);
     }
 
