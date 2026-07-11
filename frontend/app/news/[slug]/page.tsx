@@ -24,24 +24,24 @@ export default async function NewsPostPage({ params }: PageProps) {
   const locale = await getCurrentLocale();
 
   return (
-    <main className="relative mx-auto min-h-screen w-full max-w-6xl px-5 pb-16 pt-28 text-white md:px-10">
-      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(253,224,71,0.035)_0%,transparent_75%)]" />
+    <main className="relative min-h-screen w-full overflow-hidden bg-[#0b0906] text-[color:var(--ts-body)]">
+      <div className="pointer-events-none absolute left-1/2 top-[-200px] z-0 h-[600px] w-[1200px] max-w-full -translate-x-1/2 rounded-full bg-[radial-gradient(ellipse_at_center,rgba(232,184,75,0.22)_0%,transparent_70%)] opacity-35" />
 
-      <article className="relative z-10">
+      <article className="relative z-10 mx-auto w-full max-w-3xl px-5 pb-20 pt-28 md:px-8">
         <Link
           href="/news"
-          className="text-xs font-bold uppercase tracking-[0.2em] text-yellow-300 transition hover:text-yellow-200"
+          className="text-xs font-bold uppercase tracking-[0.22em] text-[#e8b84b] transition hover:text-white"
         >
           ← News
         </Link>
 
         {post.publishedAt ? (
-          <p className="mt-6 text-xs uppercase tracking-widest text-white/50">
+          <p className="mt-6 text-xs uppercase tracking-widest text-[color:var(--ts-muted)]">
             {formatNewsDate(post.publishedAt)}
           </p>
         ) : null}
 
-        <h1 className="font-heading mt-2 text-[clamp(1.8rem,5vw,3rem)] font-extrabold uppercase tracking-tight">
+        <h1 className="font-unbounded mt-3 text-[clamp(1.9rem,5vw,3.2rem)] font-extrabold tracking-[-0.01em] text-[color:var(--ts-head)]">
           {post.title}
         </h1>
 
