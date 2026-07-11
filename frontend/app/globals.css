@@ -14,7 +14,33 @@
   --font-heading: var(--font-bebas), var(--font-oswald), var(--font-display), Arial,
     sans-serif;
   --font-bitcount: "Bitcount Single", var(--font-display), system-ui, sans-serif;
+  /* Redesign display face (Unbounded → Noto Georgian fallback) */
+  --font-unbounded: var(--font-unbounded), var(--font-display), sans-serif;
+  /* Redesign palette → Tailwind utilities (bg-ts-*, text-ts-*, border-ts-*) */
+  --color-ts-bg: #0b0906;
+  --color-ts-gold: #e8b84b;
+  --color-ts-pink: #ff3fa4;
+  --color-ts-head: #f8f4ec;
+  --color-ts-body: #cdc2b2;
+  --color-ts-muted: #a89a86;
+  --color-ts-tile: #f5f0e6;
+  --color-ts-on-gold: #1a1206;
 }
+
+/* Redesign design tokens (raw vars for arbitrary-value use in components). */
+:root {
+  --ts-bg: #0b0906;
+  --ts-gold: #e8b84b;
+  --ts-pink: #ff3fa4;
+  --ts-head: #f8f4ec;
+  --ts-body: #cdc2b2;
+  --ts-muted: #a89a86;
+  --ts-tile: #f5f0e6;
+  --ts-on-gold: #1a1206;
+  --ts-border: rgba(255, 255, 255, 0.08);
+  --ts-border-strong: rgba(255, 255, 255, 0.12);
+}
+.font-unbounded { font-family: var(--font-unbounded), var(--font-display), sans-serif; }
 
 @media (prefers-color-scheme: dark) {
   :root {

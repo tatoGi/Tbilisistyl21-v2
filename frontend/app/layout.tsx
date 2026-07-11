@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Bebas_Neue, Noto_Sans_Georgian, Oswald } from "next/font/google";
+import { Bebas_Neue, Noto_Sans_Georgian, Oswald, Unbounded } from "next/font/google";
 import { cookies } from "next/headers";
 import { NextIntlClientProvider } from "next-intl";
 import { getMessages } from "next-intl/server";
@@ -29,6 +29,14 @@ const oswald = Oswald({
   variable: "--font-oswald",
   subsets: ["latin", "cyrillic"],
   weight: ["500", "600", "700"],
+});
+
+/** Redesign display face — wordmark, eyebrows, stat/price numbers (Latin). */
+const unbounded = Unbounded({
+  variable: "--font-unbounded",
+  subsets: ["latin"],
+  weight: ["500", "700", "800"],
+  display: "swap",
 });
 
 export const metadata: Metadata = {
@@ -64,7 +72,7 @@ export default async function RootLayout({
   return (
     <html
       lang={locale}
-      className={`${notoSansGeorgian.variable} ${bebasNeue.variable} ${oswald.variable} h-full antialiased`}
+      className={`${notoSansGeorgian.variable} ${bebasNeue.variable} ${oswald.variable} ${unbounded.variable} h-full antialiased`}
     >
       <head>
         <link rel="preconnect" href="https://fonts.googleapis.com" />
