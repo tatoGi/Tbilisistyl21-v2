@@ -2,33 +2,31 @@ import Link from 'next/link'
 
 export default function FailedPage() {
   return (
-    <div className="min-h-screen bg-black text-white flex items-center justify-center px-4 relative overflow-hidden">
-      <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(255,0,85,0.18),transparent_40%)]" />
+    <div className="min-h-screen bg-[#0b0906] text-[color:var(--ts-body)] flex items-center justify-center px-4 relative overflow-hidden">
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(255,63,164,0.16),transparent_45%)]" />
 
-      <div className="mt-[100px] relative z-10 w-full max-w-lg border border-white/10 bg-white/5 backdrop-blur-2xl rounded-[32px] p-10 shadow-[0_0_60px_rgba(255,0,85,0.15)] text-center">
-        <div className="w-28 h-28 rounded-full border border-rose-500/30 bg-rose-500/10 flex items-center justify-center mx-auto mb-8 shadow-[0_0_40px_rgba(244,63,94,0.35)]">
-          <span className="text-6xl text-rose-500">✕</span>
+      <div className="mt-[100px] relative z-10 w-full max-w-lg border border-white/10 bg-white/[0.03] backdrop-blur-2xl rounded-[24px] p-10 shadow-[0_20px_60px_rgba(255,63,164,0.12)] text-center">
+        <div className="w-24 h-24 rounded-full border border-[#ff3fa4]/40 bg-[#ff3fa4]/10 flex items-center justify-center mx-auto mb-8">
+          <span className="text-5xl text-[#ff3fa4]">✕</span>
         </div>
 
-        <p className="uppercase tracking-[6px] text-rose-500 text-sm mb-4 font-semibold">
-          TBILISI STYLE
+        <p className="font-unbounded uppercase tracking-[0.22em] text-[#ff3fa4] text-[13px] mb-4 font-bold">
+          TBILISI STYLE 21
         </p>
 
-        <h1 className="text-4xl md:text-5xl font-black mb-4 leading-tight">
-          PAYMENT
-          <br />
-          FAILED
+        <h1 className="font-unbounded text-[clamp(2rem,5vw,2.75rem)] font-extrabold mb-4 leading-tight text-[color:var(--ts-head)]">
+          გადახდა ვერ განხორციელდა
         </h1>
 
-        <p className="text-gray-400 text-lg mb-10 leading-8">
-          Something went wrong while processing your payment.
+        <p className="text-[color:var(--ts-body)] text-base mb-10 leading-8">
+          სამწუხაროდ, გადახდის დამუშავებისას რაღაც ვერ მოხერხდა. სცადე ხელახლა.
         </p>
 
         <Link
           href="/dashboard/tickets"
-          className="w-full inline-flex items-center justify-center bg-rose-500 text-white font-bold py-4 rounded-2xl hover:scale-[1.02] transition duration-300 shadow-[0_0_30px_rgba(244,63,94,0.35)]"
+          className="w-full inline-flex items-center justify-center bg-[#ff3fa4] text-[#1a0512] font-bold py-4 rounded-full hover:brightness-110 transition duration-300"
         >
-          TRY AGAIN
+          ხელახლა ცდა
         </Link>
       </div>
     </div>
