@@ -22,7 +22,7 @@ export default function ProductsClient({ products }: { products: Product[] }) {
             return (
               <article
                 key={product.id}
-                className="group flex flex-col overflow-hidden border border-white/10 bg-white/[0.03]"
+                className="group flex flex-col overflow-hidden rounded-[20px] border border-white/10 bg-white/[0.03] transition duration-300 hover:-translate-y-1 hover:border-[#e8b84b]/30"
               >
                 <div className="relative aspect-square w-full overflow-hidden bg-white/[0.04]">
                   {product.imageUrl ? (
@@ -38,7 +38,7 @@ export default function ProductsClient({ products }: { products: Product[] }) {
                     </div>
                   )}
                   {product.isVip ? (
-                    <span className="absolute left-3 top-3 bg-yellow-300 px-2.5 py-1 text-[11px] font-black uppercase tracking-wider text-black shadow">
+                    <span className="absolute left-3 top-3 rounded-full bg-[#e8b84b] px-2.5 py-1 text-[11px] font-black uppercase tracking-wider text-[#1a1206] shadow">
                       VIP
                     </span>
                   ) : null}
@@ -61,7 +61,7 @@ export default function ProductsClient({ products }: { products: Product[] }) {
                         {product.title}
                       </h2>
                     </div>
-                    <span className="shrink-0 bg-yellow-300 px-3 py-1.5 text-sm font-black text-black">
+                    <span className="font-unbounded shrink-0 rounded-full bg-[#e8b84b] px-3 py-1.5 text-sm font-black text-[#1a1206]">
                       {product.priceGel} ₾
                     </span>
                   </div>
@@ -93,14 +93,14 @@ export default function ProductsClient({ products }: { products: Product[] }) {
                     {soldOut ? (
                       <button
                         disabled
-                        className="w-full cursor-not-allowed bg-white/10 py-3 text-xs font-black uppercase tracking-wider text-white/40"
+                        className="w-full cursor-not-allowed rounded-full bg-white/10 py-3 text-xs font-black uppercase tracking-wider text-white/40"
                       >
                         Sold out
                       </button>
                     ) : (
                       <button
                         onClick={() => setSelected(product)}
-                        className="w-full bg-yellow-300 py-3 text-xs font-black uppercase tracking-wider text-black transition hover:bg-white"
+                        className="w-full rounded-full bg-[#e8b84b] py-3 text-xs font-black uppercase tracking-wider text-[#1a1206] transition hover:bg-white"
                       >
                         Buy now
                       </button>
