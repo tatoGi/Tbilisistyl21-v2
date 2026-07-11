@@ -8,6 +8,7 @@ use App\Models\Ticket;
 use App\Services\PaymentService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Bus;
+use Illuminate\Support\Facades\Http;
 use Tests\TestCase;
 
 class PaymentFlowTest extends TestCase
@@ -270,5 +271,106 @@ class PaymentFlowTest extends TestCase
         $response = $this->get('/api/payments/redirect?token=invalid_garbage');
         $response->assertRedirect();
         $this->assertStringContainsString('fail', $response->headers->get('Location'));
+    }
+
+    public function test_create_order_sends_order_nested_payload(): void
+    {
+        config([
+            'services.quipu.api_url' => 'https://pg.test/orders',
+            'services.quipu.type_rid' => 'RID123',
+        ]);
+
+        Http::fake([
+            'pg.test/*' => Http::response([
+                'order' => [
+                    'id' => 555,
+                    'password' => 'pw',
+                    'hppUrl' => 'https://pg.test/hpp',
+                    'status' => 'Created',
+                ],
+            ], 200),
+        ]);
+
+        $order = app(PaymentService::class)->createOrder([
+            'amount' => '50',
+            'description' => 'Test ticket',
+            'hppRedirectUrl' => 'https://app.test/api/payments/callback?ref=X&sig=Y',
+        ]);
+
+        // Returns the unwrapped inner `order` object.
+        $this->assertEquals(555, $order['id']);
+        $this->assertEquals('https://pg.test/hpp', $order['hppUrl']);
+
+        // The gateway rejects a flat payload with "Unrecognized field amount";
+        // everything must be nested under `order`.
+        Http::assertSent(function ($request) {
+            $body = $request->data();
+
+            return $request->url() === 'https://pg.test/orders'
+                && !array_key_exists('amount', $body)
+                && isset($body['order'])
+                && $body['order']['amount'] === '50'
+                && $body['order']['typeRid'] === 'RID123'
+                && $body['order']['currency'] === 'GEL';
+        });
+    }
+
+    public function test_get_order_details_unwraps_order_object(): void
+    {
+        config(['services.quipu.api_url' => 'https://pg.test/orders']);
+
+        Http::fake([
+            'pg.test/*' => Http::response([
+                'order' => ['id' => 999, 'status' => 'Paid', 'amount' => 50],
+            ], 200),
+        ]);
+
+        $details = app(PaymentService::class)->getOrderDetails(999, 'secret');
+
+        $this->assertEquals('Paid', $details['status']);
+        $this->assertEquals(50, $details['amount']);
+
+        Http::assertSent(function ($request) {
+            return str_contains($request->url(), 'password=secret')
+                && str_contains($request->url(), 'tokenDetailLevel=1');
+        });
+    }
+
+    public function test_verify_paid_amount_accepts_gel_or_tetri(): void
+    {
+        $service = app(PaymentService::class);
+
+        $this->assertTrue($service->verifyPaidAmount(50.0, ['amount' => 50]));
+        $this->assertTrue($service->verifyPaidAmount(50.0, ['amount' => 5000]));
+        $this->assertFalse($service->verifyPaidAmount(50.0, ['amount' => 100]));
+        $this->assertFalse($service->verifyPaidAmount(50.0, []));
+    }
+
+    public function test_redirect_endpoint_forwards_to_gateway_hpp(): void
+    {
+        SoldTicket::create([
+            'id' => 'RDR00001',
+            'personal_number' => '12345678901',
+            'email' => 'test@test.com',
+            'name' => 'John',
+            'surname' => 'Doe',
+            'amount' => 50,
+            'status' => 'pending',
+            'event_name' => 'Test',
+            'event_date' => '2026-08-01',
+            'location' => 'Tbilisi',
+            'pg_order_id' => 777,
+            'pg_hpp_url' => 'https://pg.test/hpp',
+            'pg_password' => 'secretpw',
+        ]);
+
+        $token = app(PaymentService::class)->createRedirectToken(777, 'soldTickets');
+
+        $response = $this->get("/api/payments/redirect?token={$token}");
+
+        $location = $response->headers->get('Location');
+        $this->assertStringStartsWith('https://pg.test/hpp', $location);
+        $this->assertStringContainsString('id=777', $location);
+        $this->assertStringContainsString('password=secretpw', $location);
     }
 }

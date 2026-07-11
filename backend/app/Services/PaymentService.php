@@ -6,29 +6,73 @@ use Illuminate\Support\Facades\Http;
 
 class PaymentService
 {
-    public function createOrder(array $body): array
+    /**
+     * Create an order on the Quipu/CompassPlus gateway.
+     *
+     * The gateway expects every field wrapped in an `order` object — a flat
+     * payload is rejected with `Unrecognized field "amount"`. Callers pass the
+     * order-specific fields (amount, description, hppRedirectUrl, …); the
+     * shared, gateway-required fields are merged in here.
+     *
+     * Returns the inner `order` object of the response
+     * (`id`, `password`, `hppUrl`, `status`).
+     */
+    public function createOrder(array $order): array
     {
-        $response = Http::withOptions($this->tlsOptions())
-            ->post(config('services.quipu.api_url'), array_merge($body, [
+        $payload = [
+            'order' => array_merge([
                 'typeRid' => config('services.quipu.type_rid'),
-            ]));
+                'currency' => 'GEL',
+                'language' => config('services.quipu.hpp_language', 'ka'),
+                'initiationEnvKind' => 'Browser',
+            ], $order),
+        ];
+
+        $response = Http::withOptions($this->tlsOptions())
+            ->post(config('services.quipu.api_url'), $payload);
 
         $response->throw();
 
-        return $response->json();
+        return $response->json('order') ?? [];
     }
 
+    /**
+     * Default browser `consumerDevice` block required by the 3DS2 flow. Only the
+     * IP and user agent are request-specific; the rest are static hints.
+     */
+    public function browserConsumerDevice(?string $ip, ?string $userAgent): array
+    {
+        return [
+            'browser' => [
+                'javaEnabled' => false,
+                'jsEnabled' => true,
+                'acceptHeader' => 'application/json',
+                'ip' => $ip ?: '127.0.0.1',
+                'colorDepth' => '24',
+                'screenW' => '1920',
+                'screenH' => '1080',
+                'tzOffset' => '-240',
+                'language' => 'ka-GE',
+                'userAgent' => $userAgent ?: '',
+            ],
+        ];
+    }
+
+    /**
+     * Fetch order details. The gateway takes the password as a query parameter
+     * (not Basic auth) and returns the data nested under `order`.
+     */
     public function getOrderDetails(int $orderId, string $password): array
     {
-        $url = config('services.quipu.api_url') . '/' . $orderId;
+        $url = config('services.quipu.api_url') . '/' . $orderId
+            . '?password=' . urlencode($password)
+            . '&tokenDetailLevel=1&tranDetailLevel=1';
 
-        $response = Http::withOptions($this->tlsOptions())
-            ->withHeaders(['Authorization' => 'Basic ' . base64_encode($orderId . ':' . $password)])
-            ->get($url);
+        $response = Http::withOptions($this->tlsOptions())->get($url);
 
         $response->throw();
 
-        return $response->json();
+        return $response->json('order') ?? [];
     }
 
     public function createCallbackHmac(string $internalId): string
@@ -84,21 +128,27 @@ class PaymentService
 
     public function verifyPaidAmount(float $expectedGel, array $details): bool
     {
-        $expectedTetri = (int) round($expectedGel * 100);
-        $actualTetri = $this->extractPaidAmountTetri($details);
+        $actual = $this->extractPaidAmount($details);
 
-        if ($actualTetri === null) {
+        if ($actual === null) {
             return false;
         }
 
-        return $actualTetri === $expectedTetri;
+        // We send the amount in major units (GEL) but the details endpoint may
+        // report it in either GEL or minor units (tetri). Accept either so a
+        // correct payment is never rejected, while a genuinely different amount
+        // still fails.
+        $expectedGel = round($expectedGel, 2);
+
+        return abs($actual - $expectedGel) < 0.01
+            || abs($actual - $expectedGel * 100) < 0.01;
     }
 
-    public function extractPaidAmountTetri(array $details): ?int
+    public function extractPaidAmount(array $details): ?float
     {
         foreach (['amount', 'totalAmount', 'orderAmount', 'Amount'] as $key) {
             if (isset($details[$key]) && is_numeric($details[$key])) {
-                return (int) $details[$key];
+                return (float) $details[$key];
             }
         }
 

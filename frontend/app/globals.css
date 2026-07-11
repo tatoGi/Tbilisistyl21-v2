@@ -288,6 +288,17 @@ h6 {
    Scoped typography for admin-authored HTML rendered via dangerouslySetInnerHTML
    in RenderBlocks (richText content, hero subheading). Tuned to the dark theme
    so we don't need the @tailwindcss/typography plugin. */
+.rich-text {
+  text-align: left;
+  font-size: 1.025rem;
+  line-height: 1.8;
+  color: rgba(255, 255, 255, 0.85);
+  letter-spacing: 0.01em;
+}
+.rich-text.text-center,
+.rich-text.text-center p {
+  text-align: center;
+}
 .rich-text > :first-child {
   margin-top: 0;
 }
@@ -295,7 +306,8 @@ h6 {
   margin-bottom: 0;
 }
 .rich-text p {
-  margin: 0 0 1em;
+  margin: 0 0 1.25rem;
+  line-height: inherit;
 }
 .rich-text h2 {
   font-family: var(--font-heading, inherit);
@@ -349,3 +361,35 @@ h6 {
   color: rgba(255, 255, 255, 0.7);
   font-style: italic;
 }
+
+/* ───────────── Ambient Glowing Orbs ───────────── */
+@keyframes ts-ambient-pulse {
+  0%, 100% {
+    opacity: 0.15;
+    transform: scale(1) translate(0, 0);
+  }
+  50% {
+    opacity: 0.35;
+    transform: scale(1.15) translate(4%, 4%);
+  }
+}
+
+@keyframes ts-ambient-pulse-alt {
+  0%, 100% {
+    opacity: 0.1;
+    transform: scale(1.1) translate(0, 0);
+  }
+  50% {
+    opacity: 0.25;
+    transform: scale(0.9) translate(-5%, -2%);
+  }
+}
+
+.ts-ambient-orb-1 {
+  animation: ts-ambient-pulse 12s ease-in-out infinite;
+}
+
+.ts-ambient-orb-2 {
+  animation: ts-ambient-pulse-alt 16s ease-in-out infinite;
+}
+

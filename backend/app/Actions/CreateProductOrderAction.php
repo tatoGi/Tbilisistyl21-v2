@@ -31,15 +31,20 @@ class CreateProductOrderAction
 
         $appUrl = config('app.url');
         $callbackUrl = "{$appUrl}/api/payments/callback?ref={$internalId}&sig={$hmac}";
-        $redirectUrl = "{$appUrl}/api/payments/redirect";
 
         $pgResponse = $this->paymentService->createOrder([
-            'amount' => (int) ($product->price_gel * 100),
+            'amount' => number_format((float) $product->price_gel, 2, '.', ''),
             'description' => $product->setLocale('en')->title ?? $product->setLocale('ka')->title,
-            'merchantId' => config('services.quipu.merchant_id'),
-            'callbackUrl' => $callbackUrl,
-            'redirectUrl' => $redirectUrl,
+            'hppRedirectUrl' => $callbackUrl,
+            'consumerDevice' => $this->paymentService->browserConsumerDevice(
+                $data['ip'] ?? null,
+                $data['userAgent'] ?? null,
+            ),
         ]);
+
+        if (empty($pgResponse['id'])) {
+            return ['error' => 'payment_gateway_error', 'status' => 502];
+        }
 
         ProductOrder::create([
             'id' => $internalId,
@@ -51,8 +56,9 @@ class CreateProductOrderAction
             'phone' => $data['phone'],
             'amount' => $product->price_gel,
             'status' => 'pending',
-            'pg_order_id' => $pgResponse['orderId'],
-            'pg_password' => $pgResponse['password'],
+            'pg_order_id' => $pgResponse['id'],
+            'pg_hpp_url' => $pgResponse['hppUrl'] ?? '',
+            'pg_password' => $pgResponse['password'] ?? '',
         ]);
 
         $token = $this->paymentService->createRedirectToken(

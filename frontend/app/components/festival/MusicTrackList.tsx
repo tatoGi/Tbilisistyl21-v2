@@ -118,7 +118,10 @@ export default function MusicTrackList({ tracks }: Props) {
     <>
       <audio ref={audioRef} onEnded={onEnded} preload="none" />
 
-      <div className="fixed bottom-5 left-5 z-40 flex flex-col items-start gap-2 sm:bottom-7 sm:left-7">
+      {/* On mobile the wide player bar is raised above the bottom-right "buy
+          tickets" CTA so the two floating widgets don't overlap; on sm+ the
+          screen is wide enough for the opposite corners to sit side by side. */}
+      <div className="fixed bottom-24 left-5 z-40 flex flex-col items-start gap-2 sm:bottom-7 sm:left-7">
         {/* Expanded track list */}
         {open && (
           <div className="mb-1 max-h-64 w-72 overflow-y-auto rounded-xl bg-black/90 p-2 shadow-2xl ring-1 ring-white/10 backdrop-blur-md sm:w-80">

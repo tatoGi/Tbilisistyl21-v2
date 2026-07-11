@@ -10,7 +10,10 @@ class ProductOrderController extends Controller
 {
     public function store(CreateProductOrderRequest $request, CreateProductOrderAction $action)
     {
-        $result = $action->execute($request->validated());
+        $result = $action->execute($request->validated() + [
+            'ip' => $request->ip(),
+            'userAgent' => $request->userAgent(),
+        ]);
         return response()->json($result, $result['status']);
     }
 }

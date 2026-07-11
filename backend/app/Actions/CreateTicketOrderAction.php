@@ -40,15 +40,20 @@ class CreateTicketOrderAction
 
             $appUrl = config('app.url');
             $callbackUrl = "{$appUrl}/api/payments/callback?ref={$internalId}&sig={$hmac}";
-            $redirectUrl = "{$appUrl}/api/payments/redirect";
 
             $pgResponse = $this->paymentService->createOrder([
-                'amount' => (int) ($ticket->price_gel * 100),
+                'amount' => number_format((float) $ticket->price_gel, 2, '.', ''),
                 'description' => $ticket->setLocale('en')->title ?? $ticket->setLocale('ka')->title,
-                'merchantId' => config('services.quipu.merchant_id'),
-                'callbackUrl' => $callbackUrl,
-                'redirectUrl' => $redirectUrl,
+                'hppRedirectUrl' => $callbackUrl,
+                'consumerDevice' => $this->paymentService->browserConsumerDevice(
+                    $data['ip'] ?? null,
+                    $data['userAgent'] ?? null,
+                ),
             ]);
+
+            if (empty($pgResponse['id'])) {
+                return ['error' => 'payment_gateway_error', 'status' => 502];
+            }
 
             $qrData = $this->qrCodeService->generateTicketData(
                 $internalId,
@@ -68,14 +73,14 @@ class CreateTicketOrderAction
                 'event_name' => $ticket->setLocale('ka')->title,
                 'event_date' => $ticket->event_date,
                 'location' => $ticket->location,
-                'pg_order_id' => $pgResponse['orderId'],
-                'pg_hpp_url' => $pgResponse['hppUrl'],
-                'pg_password' => $pgResponse['password'],
+                'pg_order_id' => $pgResponse['id'],
+                'pg_hpp_url' => $pgResponse['hppUrl'] ?? '',
+                'pg_password' => $pgResponse['password'] ?? '',
                 'qr_code' => $qrData,
             ]);
 
             $token = $this->paymentService->createRedirectToken(
-                $pgResponse['orderId'],
+                $pgResponse['id'],
                 'soldTickets',
             );
 
