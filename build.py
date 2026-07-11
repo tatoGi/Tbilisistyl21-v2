@@ -29,7 +29,7 @@ def nav(active_lang="KA"):
     )
     return (
         '<div class="nav">'
-        '<a class="brand" href="home.html">'
+        '<a class="brand" href="index.html">'
         '<div class="brand__mark">21</div>'
         '<div class="brand__word">TBILISI STYLE</div>'
         '</a>'
@@ -409,13 +409,13 @@ def result_page(ok):
         title = "გადახდა წარმატებით დასრულდა"
         text = "ბილეთი გაეგზავნა თქვენს ელ.ფოსტაზე. გელოდებით Tbilisi Style 21-ზე!"
         actions = ('<a class="btn btn--gold" href="tickets.html">ბილეთები</a>'
-                   '<a class="btn btn--ghost" href="home.html">მთავარი</a>')
+                   '<a class="btn btn--ghost" href="index.html">მთავარი</a>')
     else:
         icon = '<div class="result__icon result__icon--fail">✕</div>'
         title = "გადახდა ვერ განხორციელდა"
         text = "სამწუხაროდ, გადახდა ვერ დასრულდა. სცადე ხელახლა ან დაგვიკავშირდი."
         actions = ('<a class="btn btn--gold" href="tickets.html">ხელახლა ცდა</a>'
-                   '<a class="btn btn--ghost" href="home.html">მთავარი</a>')
+                   '<a class="btn btn--ghost" href="index.html">მთავარი</a>')
     body = (
         '<div class="result">' + icon
         + '<h1>' + title + '</h1><p>' + text + '</p>'
@@ -427,8 +427,6 @@ def result_page(ok):
 
 def index_page():
     pages = [
-        ("home.html", "Home", "„enter the energy“ splash — სადაც ყველაფერი იწყება"),
-        ("festival.html", "Festival", "ფესტივალის hub — ყველა სცენა/ზონა"),
         ("show.html", "Show / Content", "უნივერსალური CMS თარგმანი (~12 გვერდი)"),
         ("partners.html", "Partners", "პარტნიორები — Title / Official / Media"),
         ("tickets.html", "Tickets", "ბილეთები — ტარიფები + POPULAR"),
@@ -462,8 +460,6 @@ def index_page():
 
 PAGES = {
     "index.html": index_page,
-    "home.html": home_page,
-    "festival.html": festival_page,
     "show.html": show_page,
     "partners.html": partners_page,
     "tickets.html": tickets_page,
