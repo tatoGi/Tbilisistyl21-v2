@@ -13,7 +13,7 @@ class Partner extends Model
 
     public array $translatable = ['name', 'description'];
 
-    protected $fillable = ['name', 'description', 'logo_id', 'url', 'order'];
+    protected $fillable = ['name', 'description', 'logo_id', 'url', 'order', 'tier'];
 
     public function logo(): BelongsTo
     {

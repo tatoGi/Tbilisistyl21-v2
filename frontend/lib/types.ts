@@ -101,6 +101,7 @@ export interface Partner {
   logo: Media | null;
   url: string;
   order: number;
+  tier?: string; // title | official | media (additive; defaults to official)
 }
 
 export interface SiteSettings {

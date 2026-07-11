@@ -16,12 +16,15 @@ export type SiteContact = {
 
 export type SocialLinks = { instagram: string | null; tiktok: string | null };
 
+export type PartnerTier = "title" | "official" | "media";
+
 export type PartnerCard = {
   id: string;
   name: string;
   description: string | null;
   logoUrl: string | null;
   website: string | null;
+  tier: PartnerTier;
 };
 
 export type NewsCard = {
@@ -87,13 +90,17 @@ export async function getFeaturedPartners(): Promise<PartnerCard[]> {
   try {
     const res = await api<{ data: ApiPartner[] }>("/api/partners", { locale });
     const data = Array.isArray(res?.data) ? res.data : [];
-    return data.map((p) => ({
-      id: String(p.id),
-      name: t(p.name, locale),
-      description: t(p.description, locale) || null,
-      logoUrl: logoUrlOf(p.logo ?? null),
-      website: (p.url ?? "").trim() || null,
-    }));
+    return data.map((p) => {
+      const tier = p.tier === "title" || p.tier === "media" ? p.tier : "official";
+      return {
+        id: String(p.id),
+        name: t(p.name, locale),
+        description: t(p.description, locale) || null,
+        logoUrl: logoUrlOf(p.logo ?? null),
+        website: (p.url ?? "").trim() || null,
+        tier: tier as PartnerTier,
+      };
+    });
   } catch {
     return [];
   }

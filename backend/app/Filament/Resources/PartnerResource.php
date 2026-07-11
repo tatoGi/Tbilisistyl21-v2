@@ -61,6 +61,16 @@ class PartnerResource extends Resource
                     ->schema([
                         Forms\Components\Section::make('Display')
                             ->schema([
+                                Forms\Components\Select::make('tier')
+                                    ->label('Tier')
+                                    ->options([
+                                        'title' => 'Title partner (large)',
+                                        'official' => 'Official partner',
+                                        'media' => 'Media partner',
+                                    ])
+                                    ->default('official')
+                                    ->required()
+                                    ->helperText('Grouping on the /partners page.'),
                                 Forms\Components\TextInput::make('order')
                                     ->numeric()
                                     ->default(0)
