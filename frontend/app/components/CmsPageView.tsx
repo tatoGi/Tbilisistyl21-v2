@@ -31,19 +31,18 @@ export default async function CmsPageView({ slug, routePath }: CmsPageViewProps)
   const backLabel = translations("backToFestival");
 
   return (
-    <main className="relative min-h-screen overflow-hidden bg-black text-white">
-      {/* Immersive background festival ambient glows */}
-      <div className="pointer-events-none absolute -left-40 -top-40 z-0 h-[45rem] w-[45rem] rounded-full bg-gradient-to-tr from-yellow-400/10 via-amber-500/5 to-transparent blur-[120px] ts-ambient-orb-1" />
-      <div className="pointer-events-none absolute -right-40 top-1/3 z-0 h-[50rem] w-[50rem] rounded-full bg-gradient-to-bl from-purple-600/8 via-fuchsia-500/3 to-transparent blur-[140px] ts-ambient-orb-2" />
+    <main className="relative min-h-screen overflow-hidden bg-[#0b0906] text-[color:var(--ts-body)]">
+      {/* Ambient gold glow (redesign) */}
+      <div className="pointer-events-none absolute left-1/2 top-[-200px] z-0 h-[600px] w-[1200px] max-w-full -translate-x-1/2 rounded-full bg-[radial-gradient(ellipse_at_center,rgba(232,184,75,0.33)_0%,transparent_70%)] opacity-35" />
 
       <div className="relative z-10">
         {title ? (
-          <header className="mx-auto max-w-[72rem] px-6 pt-32 sm:pt-36 ts-fade-up">
-            {/* Sleek breadcrumbs / back-arrow button */}
-            <div className="mb-6 flex justify-start">
+          <header className="mx-auto max-w-[1440px] px-8 pt-28 sm:pt-32 ts-fade-up">
+            {/* Back-arrow button */}
+            <div className="mb-8 flex justify-start">
               <Link
                 href="/dashboard/festival"
-                className="group inline-flex items-center gap-2 text-xs font-bold uppercase tracking-[0.25em] text-white/50 transition-colors duration-300 hover:text-yellow-300"
+                className="group inline-flex items-center gap-2 text-xs font-bold uppercase tracking-[0.22em] text-[color:var(--ts-muted)] transition-colors duration-300 hover:text-[color:var(--ts-gold)]"
               >
                 <span className="inline-block transition-transform duration-300 group-hover:-translate-x-1">
                   ←
@@ -52,17 +51,20 @@ export default async function CmsPageView({ slug, routePath }: CmsPageViewProps)
               </Link>
             </div>
 
-            <p className="font-heading mb-4 text-[10px] font-bold uppercase tracking-[0.4em] text-yellow-300/70">
-              Tbilisi Style 21
-            </p>
-            <h1 className="font-heading text-[clamp(2.25rem,6vw,4rem)] font-black leading-[1.02] uppercase tracking-[0.02em] text-white drop-shadow-[0_2px_15px_rgba(253,224,71,0.15)]">
+            {/* Eyebrow */}
+            <div className="mb-5 flex items-center gap-3">
+              <span className="h-[2px] w-[34px] bg-[color:var(--ts-gold)]" />
+              <span className="font-unbounded text-[13px] font-bold uppercase tracking-[0.22em] text-[color:var(--ts-gold)]">
+                Tbilisi Style 21
+              </span>
+            </div>
+            <h1 className="font-unbounded max-w-[900px] text-[clamp(2.4rem,6vw,4.75rem)] font-extrabold leading-[1.02] tracking-[-0.01em] text-[color:var(--ts-head)]">
               {title}
             </h1>
-            <span className="mt-8 block h-[2px] w-full bg-gradient-to-r from-yellow-300/50 via-white/10 to-transparent" />
           </header>
         ) : null}
-        
-        <div className="pb-24 pt-16">
+
+        <div className="pb-28 pt-16">
           <RenderBlocks blocks={page.blocks} locale={locale} contact={contact} />
         </div>
       </div>

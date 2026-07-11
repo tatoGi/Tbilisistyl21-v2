@@ -180,7 +180,7 @@ function ImageBlock({
   const picture = full ? (
     // Unknown intrinsic size: the width=0/height=0 + sizes pattern lets
     // next/image render responsively at the image's natural ratio.
-    <div className="group relative overflow-hidden rounded-3xl shadow-2xl shadow-black/60 border border-white/10 transition-all duration-500 hover:border-yellow-300/30">
+    <div className="group relative overflow-hidden rounded-3xl shadow-2xl shadow-black/60 border border-white/10 transition-all duration-500 hover:border-[#e8b84b]/30">
       <Image
         src={src}
         alt={caption || ""}
@@ -191,7 +191,7 @@ function ImageBlock({
       />
     </div>
   ) : (
-    <div className="group relative aspect-[16/9] overflow-hidden rounded-3xl shadow-2xl shadow-black/60 border border-white/10 transition-all duration-500 hover:border-yellow-300/30">
+    <div className="group relative aspect-[16/9] overflow-hidden rounded-3xl shadow-2xl shadow-black/60 border border-white/10 transition-all duration-500 hover:border-[#e8b84b]/30">
       <Image
         src={src}
         alt={caption || ""}
@@ -215,7 +215,7 @@ function ImageBlock({
       )}
       {caption ? (
         <figcaption className="mt-3 flex items-center justify-center gap-2 text-center text-sm font-semibold tracking-wide text-white/50">
-          <span className="h-1.5 w-1.5 rounded-full bg-yellow-300" />
+          <span className="h-1.5 w-1.5 rounded-full bg-[#e8b84b]" />
           <span>{caption}</span>
         </figcaption>
       ) : null}
@@ -239,7 +239,7 @@ function GalleryBlock({
       {items.map((item) => (
         <figure key={item.lightboxIndex} className="group/fig">
           <LightboxTrigger index={item.lightboxIndex}>
-            <div className="group relative aspect-square overflow-hidden rounded-2xl border border-white/10 shadow-lg shadow-black/40 transition-all duration-500 hover:-translate-y-1 hover:border-yellow-300/30 hover:shadow-2xl hover:shadow-yellow-300/5">
+            <div className="group relative aspect-square overflow-hidden rounded-2xl border border-white/10 shadow-lg shadow-black/40 transition-all duration-500 hover:-translate-y-1 hover:border-[#e8b84b]/30 hover:shadow-2xl hover:shadow-[#e8b84b]/5">
               <Image
                 src={item.src}
                 alt={item.caption || ""}
@@ -252,7 +252,7 @@ function GalleryBlock({
           </LightboxTrigger>
           {item.caption ? (
             <figcaption className="mt-3 flex items-center justify-center gap-1.5 text-center text-xs font-semibold tracking-wide text-white/45 transition-colors duration-300 group-hover/fig:text-white/70">
-              <span className="h-1 w-1 rounded-full bg-yellow-300/60" />
+              <span className="h-1 w-1 rounded-full bg-[#e8b84b]/60" />
               <span>{item.caption}</span>
             </figcaption>
           ) : null}
@@ -296,7 +296,7 @@ function BlockRenderer({
           ) : null}
           <div className="relative z-10">
             {heading ? (
-              <h2 className="font-heading text-[clamp(1.75rem,4.5vw,3.25rem)] font-extrabold uppercase leading-[1.05] tracking-[0.03em] text-white drop-shadow-[0_2px_15px_rgba(0,0,0,0.85)]">
+              <h2 className="font-unbounded text-[clamp(1.75rem,4.5vw,3.25rem)] font-extrabold leading-[1.05] tracking-[-0.01em] text-[color:var(--ts-head)] drop-shadow-[0_2px_15px_rgba(0,0,0,0.85)]">
                 {heading}
               </h2>
             ) : null}
@@ -309,7 +309,7 @@ function BlockRenderer({
             {ctaLabel && ctaHref ? (
               <Link
                 href={ctaHref}
-                className="font-heading mt-8 inline-flex items-center gap-2 rounded-full bg-yellow-300 px-8 py-3.5 text-xs font-extrabold uppercase tracking-[0.15em] text-black transition-all duration-300 hover:scale-105 hover:bg-white hover:shadow-[0_0_25px_rgba(253,224,71,0.45)] active:scale-95"
+                className="font-heading mt-8 inline-flex items-center gap-2 rounded-full bg-[#e8b84b] px-8 py-3.5 text-xs font-extrabold uppercase tracking-[0.15em] text-[#1a1206] transition-all duration-300 hover:scale-105 hover:bg-white hover:shadow-[0_0_25px_rgba(253,224,71,0.45)] active:scale-95"
               >
                 <span>{ctaLabel}</span>
                 <svg
@@ -353,7 +353,7 @@ function BlockRenderer({
         <div className="text-center">
           <Link
             href={href}
-            className="font-heading inline-block rounded-full bg-yellow-300 px-10 py-3 text-sm font-bold uppercase tracking-[0.12em] text-black transition hover:bg-yellow-200"
+            className="font-heading inline-block rounded-full bg-[#e8b84b] px-10 py-3 text-sm font-bold uppercase tracking-[0.12em] text-[#1a1206] transition hover:bg-white"
           >
             {label}
           </Link>
@@ -369,26 +369,26 @@ function BlockRenderer({
             {contact?.phone ? (
               <a
                 href={`tel:${contact.phoneHref}`}
-                className="group flex flex-col items-center justify-center rounded-2xl border border-white/5 bg-black/30 p-5 text-center transition duration-300 hover:border-yellow-300/30 hover:bg-yellow-300/[0.04] hover:-translate-y-1"
+                className="group flex flex-col items-center justify-center rounded-2xl border border-white/5 bg-black/30 p-5 text-center transition duration-300 hover:border-[#e8b84b]/30 hover:bg-[#e8b84b]/[0.04] hover:-translate-y-1"
               >
-                <span className="font-heading text-[10px] font-bold uppercase tracking-[0.25em] text-yellow-300/80 group-hover:text-yellow-300">Phone</span>
-                <span className="mt-2 block font-heading text-lg font-bold text-white group-hover:text-yellow-300 transition-colors duration-300">{contact.phone}</span>
+                <span className="font-heading text-[10px] font-bold uppercase tracking-[0.25em] text-[#e8b84b]/80 group-hover:text-[#e8b84b]">Phone</span>
+                <span className="mt-2 block font-heading text-lg font-bold text-white group-hover:text-[#e8b84b] transition-colors duration-300">{contact.phone}</span>
               </a>
             ) : null}
             {contact?.email ? (
               <a
                 href={`mailto:${contact.email}`}
-                className="group flex flex-col items-center justify-center rounded-2xl border border-white/5 bg-black/30 p-5 text-center transition duration-300 hover:border-yellow-300/30 hover:bg-yellow-300/[0.04] hover:-translate-y-1"
+                className="group flex flex-col items-center justify-center rounded-2xl border border-white/5 bg-black/30 p-5 text-center transition duration-300 hover:border-[#e8b84b]/30 hover:bg-[#e8b84b]/[0.04] hover:-translate-y-1"
               >
-                <span className="font-heading text-[10px] font-bold uppercase tracking-[0.25em] text-yellow-300/80 group-hover:text-yellow-300">Email</span>
-                <span className="mt-2 block break-all font-heading text-base font-bold text-white group-hover:text-yellow-300 transition-colors duration-300">{contact.email}</span>
+                <span className="font-heading text-[10px] font-bold uppercase tracking-[0.25em] text-[#e8b84b]/80 group-hover:text-[#e8b84b]">Email</span>
+                <span className="mt-2 block break-all font-heading text-base font-bold text-white group-hover:text-[#e8b84b] transition-colors duration-300">{contact.email}</span>
               </a>
             ) : null}
             {contact?.address ? (
               <div
                 className="flex flex-col items-center justify-center rounded-2xl border border-white/5 bg-black/30 p-5 text-center transition duration-300 hover:border-white/20"
               >
-                <span className="font-heading text-[10px] font-bold uppercase tracking-[0.25em] text-yellow-300/80">Address</span>
+                <span className="font-heading text-[10px] font-bold uppercase tracking-[0.25em] text-[#e8b84b]/80">Address</span>
                 <span className="mt-2 block font-heading text-base font-bold text-white">{contact.address}</span>
               </div>
             ) : null}
