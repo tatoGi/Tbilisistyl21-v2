@@ -130,18 +130,35 @@ function ImageTextRow({
 
   if (!src && !content) return null;
 
-  // Stacked, Untold-style: a large full-width image on top, a centered readable
-  // text column beneath it.
+  // Respect the block's "Image display" setting: "full" shows the whole image at
+  // its natural ratio (no crop); default "cover" crops to a uniform 16:9 banner.
+  const full = imageData.fit === "full";
+
+  // Stacked, Untold-style: a large full-width image on top, a full-width text
+  // block beneath it.
   const picture = src ? (
-    <div className="group relative aspect-[16/9] w-full overflow-hidden rounded-3xl shadow-2xl shadow-black/50 ring-1 ring-white/5">
-      <Image
-        src={src}
-        alt={caption || ""}
-        fill
-        className="object-cover object-center transition-transform duration-700 ease-out group-hover:scale-[1.03]"
-        sizes="(max-width: 1152px) 100vw, 1152px"
-      />
-    </div>
+    full ? (
+      <div className="group relative w-full overflow-hidden rounded-3xl shadow-2xl shadow-black/50 ring-1 ring-white/5">
+        <Image
+          src={src}
+          alt={caption || ""}
+          width={0}
+          height={0}
+          sizes="100vw"
+          className="h-auto w-full transition-transform duration-700 ease-out group-hover:scale-[1.02]"
+        />
+      </div>
+    ) : (
+      <div className="group relative aspect-[16/9] w-full overflow-hidden rounded-3xl shadow-2xl shadow-black/50 ring-1 ring-white/5">
+        <Image
+          src={src}
+          alt={caption || ""}
+          fill
+          className="object-cover object-center transition-transform duration-700 ease-out group-hover:scale-[1.03]"
+          sizes="(max-width: 1440px) 100vw, 1440px"
+        />
+      </div>
+    )
   ) : null;
 
   return (
@@ -163,7 +180,7 @@ function ImageTextRow({
 
       {content ? (
         <div
-          className="rich-text mx-auto w-full max-w-2xl text-white/85"
+          className="rich-text w-full text-[color:var(--ts-body)]"
           dangerouslySetInnerHTML={{ __html: sanitizeRichHtml(content) }}
         />
       ) : null}
