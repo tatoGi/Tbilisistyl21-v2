@@ -137,13 +137,13 @@ export default function MusicTrackList({ tracks }: Props) {
                     setOpen(false);
                   }}
                   className={`flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-left transition-colors ${
-                    isActive ? "bg-yellow-400/15" : "hover:bg-white/10"
+                    isActive ? "bg-[#e8b84b]/15" : "hover:bg-white/10"
                   }`}
                 >
                   <span
                     className={`flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-xs font-bold ${
                       isActive
-                        ? "bg-yellow-400 text-black"
+                        ? "bg-[#e8b84b] text-black"
                         : "bg-white/10 text-white/50"
                     }`}
                   >
@@ -159,7 +159,7 @@ export default function MusicTrackList({ tracks }: Props) {
                   <span className="min-w-0 flex-1">
                     <span
                       className={`block truncate text-sm font-medium ${
-                        isActive ? "text-yellow-300" : "text-white"
+                        isActive ? "text-[#e8b84b]" : "text-white"
                       }`}
                     >
                       {track.title}
@@ -176,16 +176,16 @@ export default function MusicTrackList({ tracks }: Props) {
           </div>
         )}
 
-        {/* Mini player bar */}
-        <div className="w-72 rounded-2xl bg-black/90 shadow-2xl ring-1 ring-white/10 backdrop-blur-md sm:w-80">
+        {/* Mini player bar — collapses to just the play button on mobile. */}
+        <div className="w-auto rounded-full bg-black/90 shadow-2xl ring-1 ring-white/10 backdrop-blur-md sm:w-80 sm:rounded-2xl">
           {/* Track info row */}
-          <div className="flex items-center gap-3 px-3 pt-3 pb-1">
+          <div className="flex items-center gap-3 p-1.5 sm:px-3 sm:pt-3 sm:pb-1">
             {/* Prev */}
             <button
               type="button"
               onClick={prevTrack}
               aria-label="Previous track"
-              className="shrink-0 text-white/50 transition-colors hover:text-white"
+              className="hidden shrink-0 text-white/50 transition-colors hover:text-white sm:block"
             >
               <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
                 <path d="M6 6a1 1 0 0 1 1 1v10a1 1 0 1 1-2 0V7a1 1 0 0 1 1-1Zm13.52 4.16-9-6A1 1 0 0 0 9 5v14a1 1 0 0 0 1.52.84l9-6a1 1 0 0 0 0-1.68Z" transform="scale(-1,1) translate(-24,0)" />
@@ -197,7 +197,7 @@ export default function MusicTrackList({ tracks }: Props) {
               type="button"
               onClick={toggle}
               aria-label={playing ? "Pause" : "Play"}
-              className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-yellow-300 text-black transition-transform duration-150 hover:scale-105 hover:bg-white"
+              className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[#e8b84b] text-black transition-transform duration-150 hover:scale-105 hover:bg-white"
             >
               {playing ? (
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
@@ -216,7 +216,7 @@ export default function MusicTrackList({ tracks }: Props) {
               type="button"
               onClick={nextTrack}
               aria-label="Next track"
-              className="shrink-0 text-white/50 transition-colors hover:text-white"
+              className="hidden shrink-0 text-white/50 transition-colors hover:text-white sm:block"
             >
               <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
                 <path d="M18 6a1 1 0 0 1 1 1v10a1 1 0 1 1-2 0V7a1 1 0 0 1 1-1ZM4.48 10.16l9-6A1 1 0 0 1 15 5v14a1 1 0 0 1-1.52.84l-9-6a1 1 0 0 1 0-1.68Z" />
@@ -227,7 +227,7 @@ export default function MusicTrackList({ tracks }: Props) {
             <button
               type="button"
               onClick={() => setOpen((o) => !o)}
-              className="min-w-0 flex-1 text-left"
+              className="hidden min-w-0 flex-1 text-left sm:block"
             >
               {current ? (
                 <>
@@ -248,7 +248,7 @@ export default function MusicTrackList({ tracks }: Props) {
               type="button"
               onClick={() => setOpen((o) => !o)}
               aria-label={open ? "Close track list" : "Open track list"}
-              className="shrink-0 text-white/40 transition-colors hover:text-white"
+              className="hidden shrink-0 text-white/40 transition-colors hover:text-white sm:block"
             >
               <svg
                 width="16"
@@ -263,18 +263,18 @@ export default function MusicTrackList({ tracks }: Props) {
             </button>
           </div>
 
-          {/* Progress bar + times */}
-          <div className="px-3 pb-3 pt-1">
+          {/* Progress bar + times — desktop only (mobile shows just the play button) */}
+          <div className="hidden px-3 pb-3 pt-1 sm:block">
             <div
               className="group relative h-1.5 cursor-pointer rounded-full bg-white/10"
               onClick={seek}
             >
               <div
-                className="absolute inset-y-0 left-0 rounded-full bg-yellow-400 transition-[width] duration-100"
+                className="absolute inset-y-0 left-0 rounded-full bg-[#e8b84b] transition-[width] duration-100"
                 style={{ width: `${progress}%` }}
               />
               <div
-                className="absolute top-1/2 -translate-y-1/2 h-3 w-3 rounded-full bg-yellow-300 opacity-0 shadow transition-opacity group-hover:opacity-100"
+                className="absolute top-1/2 -translate-y-1/2 h-3 w-3 rounded-full bg-[#e8b84b] opacity-0 shadow transition-opacity group-hover:opacity-100"
                 style={{ left: `${progress}%`, marginLeft: -6 }}
               />
             </div>
