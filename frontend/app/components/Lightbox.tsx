@@ -95,11 +95,16 @@ export function LightboxProvider({
         >
           <button
             type="button"
-            onClick={close}
+            onClick={(e) => {
+              e.stopPropagation();
+              close();
+            }}
             aria-label="Close"
-            className="absolute right-4 top-4 z-10 flex h-11 w-11 items-center justify-center rounded-full bg-white/10 text-2xl text-white transition hover:bg-white/20"
+            className="absolute right-4 top-4 z-20 flex h-12 w-12 items-center justify-center rounded-full bg-[#e8b84b] text-[#1a1206] shadow-lg transition hover:scale-105 hover:bg-white"
           >
-            &times;
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" aria-hidden="true">
+              <path d="M6 6l12 12M18 6L6 18" />
+            </svg>
           </button>
 
           {count > 1 ? (
