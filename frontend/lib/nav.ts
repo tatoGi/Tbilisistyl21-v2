@@ -3,6 +3,7 @@ import { t, mediaUrl } from "./utils";
 import { getCurrentLocale } from "./locale";
 import { listNavPages, listFeaturedPages, listFooterPages, pageHref, pageLabel } from "./pages";
 import { getSiteSettings } from "./site-settings";
+import { excerptOf } from "./posts";
 import type { Partner as ApiPartner, Post as ApiPost, Media } from "./types";
 
 export type NavLink = { label: string; href: string };
@@ -123,7 +124,7 @@ export async function getFeaturedNews(limit = 6): Promise<NewsCard[]> {
         id: String(p.id),
         title: t(p.title, locale),
         slug: (p.slug ?? "").trim(),
-        excerpt: t(p.excerpt, locale) || null,
+        excerpt: excerptOf(p.excerpt, locale),
         coverUrl,
         publishedAt: p.created_at ?? null,
       };
