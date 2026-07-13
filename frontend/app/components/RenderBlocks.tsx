@@ -433,12 +433,14 @@ function BlockRenderer({
 
     case "richText": {
       // Admin-authored HTML from the Filament rich-text editor. Rendered as HTML
-      // and styled by the `.rich-text` rules in globals.css.
+      // and styled by the `.rich-text` rules in globals.css. Standalone (no card
+      // beside it) → full width; on wide screens it flows into two readable
+      // columns so long copy fills the width instead of a narrow strip.
       const content = t(data.content as Localized, locale);
       if (!content) return null;
       return (
         <div
-          className="rich-text w-full max-w-2xl mx-auto text-white/85"
+          className="rich-text w-full text-[color:var(--ts-body)] lg:columns-2 lg:gap-14 [&_h2]:break-inside-avoid [&_h3]:break-inside-avoid"
           dangerouslySetInnerHTML={{ __html: sanitizeRichHtml(content) }}
         />
       );
