@@ -85,6 +85,17 @@ export function RenderBlocks({ blocks, locale, contact }: RenderBlocksProps) {
       continue;
     }
 
+    // Untold/handoff-style two-column: an intro paragraph on the left and the
+    // event-info card on the right. Only pairs when a richText is immediately
+    // followed by an eventInfo block; otherwise each renders on its own.
+    if (block.type === "richText" && next?.type === "eventInfo") {
+      nodes.push(
+        <ContentGrid key={i} textBlock={block} eventBlock={next} locale={locale} />,
+      );
+      i += 2;
+      continue;
+    }
+
     nodes.push(
       <BlockRenderer key={i} block={block} locale={locale} contact={contact} />,
     );
@@ -262,6 +273,77 @@ function GalleryBlock({
   );
 }
 
+type EventInfo = {
+  label: string;
+  note: string;
+  rows: { k: string; v: string }[];
+};
+
+/** Parse an eventInfo block's localized payload into display strings. */
+function eventInfoData(data: Record<string, unknown>, locale: string): EventInfo {
+  const label = t(data.label as Localized, locale);
+  const note = t(data.note as Localized, locale);
+  const rawRows = Array.isArray(data.rows) ? (data.rows as Record<string, unknown>[]) : [];
+  const rows = rawRows
+    .map((r) => ({ k: t(r.k as Localized, locale), v: t(r.v as Localized, locale) }))
+    .filter((r) => r.k || r.v);
+  return { label, note, rows };
+}
+
+function EventInfoCard({ label, note, rows }: EventInfo) {
+  if (!label && !note && !rows.length) return null;
+  return (
+    <div className="rounded-[20px] border border-white/10 bg-[linear-gradient(160deg,rgba(232,184,75,0.1),rgba(255,255,255,0.02))] p-8">
+      {label ? (
+        <div className="font-unbounded mb-5 text-xs uppercase tracking-[0.18em] text-[#e8b84b]">
+          {label}
+        </div>
+      ) : null}
+      <div className="flex flex-col gap-[18px]">
+        {rows.map((r, i) => (
+          <div key={i} className="flex justify-between gap-4 text-[15px]">
+            <span className="text-[color:var(--ts-muted)]">{r.k}</span>
+            <span className="font-semibold text-[color:var(--ts-tile)]">{r.v}</span>
+          </div>
+        ))}
+      </div>
+      {note ? (
+        <>
+          <div className="my-6 h-px bg-white/10" />
+          <div className="text-[13px] leading-relaxed text-[color:var(--ts-body)]">{note}</div>
+        </>
+      ) : null}
+    </div>
+  );
+}
+
+/** Two-column intro + event-info card (handoff show-page layout). */
+function ContentGrid({
+  textBlock,
+  eventBlock,
+  locale,
+}: {
+  textBlock: PageBlock;
+  eventBlock: PageBlock;
+  locale: string;
+}) {
+  const content = t(textBlock.data?.content as Localized, locale);
+  const ev = eventInfoData(eventBlock.data ?? {}, locale);
+  return (
+    <section className="grid grid-cols-1 items-start gap-12 md:grid-cols-[1.1fr_0.85fr] md:gap-16">
+      {content ? (
+        <div
+          className="rich-text text-[color:var(--ts-body)] [&_p]:text-[19px] [&_p]:leading-[1.8]"
+          dangerouslySetInnerHTML={{ __html: sanitizeRichHtml(content) }}
+        />
+      ) : (
+        <div />
+      )}
+      <EventInfoCard {...ev} />
+    </section>
+  );
+}
+
 function BlockRenderer({
   block,
   locale,
@@ -407,34 +489,11 @@ function BlockRenderer({
     }
 
     case "eventInfo": {
-      const label = t(data.label as Localized, locale);
-      const note = t(data.note as Localized, locale);
-      const rawRows = Array.isArray(data.rows) ? (data.rows as Record<string, unknown>[]) : [];
-      const rows = rawRows
-        .map((r) => ({ k: t(r.k as Localized, locale), v: t(r.v as Localized, locale) }))
-        .filter((r) => r.k || r.v);
-      if (!label && !note && !rows.length) return null;
+      const ev = eventInfoData(data, locale);
+      if (!ev.label && !ev.note && !ev.rows.length) return null;
       return (
-        <section className="mx-auto w-full max-w-md rounded-[20px] border border-white/10 bg-[linear-gradient(160deg,rgba(232,184,75,0.1),rgba(255,255,255,0.02))] p-8">
-          {label ? (
-            <div className="font-unbounded mb-5 text-xs uppercase tracking-[0.18em] text-[#e8b84b]">
-              {label}
-            </div>
-          ) : null}
-          <div className="flex flex-col gap-[18px]">
-            {rows.map((r, i) => (
-              <div key={i} className="flex justify-between gap-4 text-[15px]">
-                <span className="text-[color:var(--ts-muted)]">{r.k}</span>
-                <span className="font-semibold text-[color:var(--ts-tile)]">{r.v}</span>
-              </div>
-            ))}
-          </div>
-          {note ? (
-            <>
-              <div className="my-6 h-px bg-white/10" />
-              <div className="text-[13px] leading-relaxed text-[color:var(--ts-body)]">{note}</div>
-            </>
-          ) : null}
+        <section className="mx-auto w-full max-w-md">
+          <EventInfoCard {...ev} />
         </section>
       );
     }
