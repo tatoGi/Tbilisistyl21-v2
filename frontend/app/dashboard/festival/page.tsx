@@ -26,10 +26,12 @@ export default async function FestivalPage() {
 
       <ProductReel products={products} />
 
-      {partners.length > 0 ? <PartnersStrip partners={partners} heading="" /> : null}
+      {partners.length > 0 ? (
+        <PartnersStrip partners={partners} heading="პარტნიორები" viewAllLabel="ყველას ნახვა" />
+      ) : null}
 
       {featuredNews.length > 0 ? (
-        <NewsTeaser posts={featuredNews} heading="" viewAllLabel="" />
+        <NewsTeaser posts={featuredNews} heading="სიახლეები" viewAllLabel="ყველას ნახვა" />
       ) : null}
     </main>
   );
