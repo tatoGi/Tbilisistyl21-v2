@@ -516,6 +516,33 @@ function BlockRenderer({
       );
     }
 
+    case "stats": {
+      // Chip row under the page title: gold value + muted label, divided.
+      const rawItems = Array.isArray(data.items) ? (data.items as Record<string, unknown>[]) : [];
+      const items = rawItems
+        .map((it) => ({
+          value: typeof it.value === "string" ? it.value : "",
+          label: t(it.label as Localized, locale),
+        }))
+        .filter((s) => s.value || s.label);
+      if (!items.length) return null;
+      return (
+        <div className="-mt-6 flex flex-wrap gap-x-9 gap-y-6">
+          {items.map((s, i) => (
+            <div
+              key={i}
+              className="flex flex-col gap-1 border-r border-white/10 pr-9 last:border-r-0"
+            >
+              <div className="font-unbounded text-[26px] font-bold text-[#e8b84b]">{s.value}</div>
+              <div className="text-[13px] tracking-[0.03em] text-[color:var(--ts-muted)]">
+                {s.label}
+              </div>
+            </div>
+          ))}
+        </div>
+      );
+    }
+
     default:
       return null;
   }

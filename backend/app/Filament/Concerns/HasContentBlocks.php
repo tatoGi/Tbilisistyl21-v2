@@ -125,6 +125,22 @@ trait HasContentBlocks
                             ])
                             ->defaultItems(3),
                     ]),
+
+                BlockBuilder\Block::make('stats')
+                    ->label('Stat chips')
+                    ->icon('heroicon-o-chart-bar')
+                    ->schema([
+                        Forms\Components\Repeater::make('items')
+                            ->label('Stats (shown as a row under the page title)')
+                            ->schema([
+                                Forms\Components\TextInput::make('value')
+                                    ->label('Value')
+                                    ->placeholder('60×15მ'),
+                                static::localizedInput('label', 'Label'),
+                            ])
+                            ->columns(2)
+                            ->defaultItems(4),
+                    ]),
             ]);
     }
 
