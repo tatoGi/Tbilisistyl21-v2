@@ -1,17 +1,27 @@
 import { notFound } from "next/navigation";
 import { listProducts } from "@/lib/products";
 import { getCmsPageTitle } from "@/lib/cms-page-title";
+import Pagination from "@/app/components/Pagination";
 import ProductsClient from "./ProductsClient";
 
 export const dynamic = "force-dynamic";
 
-export default async function ShopPage() {
-  const [products, title] = await Promise.all([
+const PER_PAGE = 12;
+
+type PageProps = { searchParams: Promise<{ page?: string }> };
+
+export default async function ShopPage({ searchParams }: PageProps) {
+  const [allProducts, title] = await Promise.all([
     listProducts({ publicOnly: true }),
     getCmsPageTitle("shop"),
   ]);
 
   if (!title) notFound();
+
+  const { page } = await searchParams;
+  const totalPages = Math.max(1, Math.ceil(allProducts.length / PER_PAGE));
+  const current = Math.min(Math.max(1, Number(page) || 1), totalPages);
+  const products = allProducts.slice((current - 1) * PER_PAGE, current * PER_PAGE);
 
   return (
     <main className="mx-auto min-h-screen w-full max-w-6xl px-5 pb-16 pt-28 text-[color:var(--ts-body)] md:px-10">
@@ -26,6 +36,7 @@ export default async function ShopPage() {
       </h1>
 
       <ProductsClient products={products} />
+      <Pagination basePath="/dashboard/shop" currentPage={current} totalPages={totalPages} />
     </main>
   );
 }

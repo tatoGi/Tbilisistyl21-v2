@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { listNews } from "@/lib/posts";
 import NewsCardGrid from "@/app/components/NewsCardGrid";
+import Pagination from "@/app/components/Pagination";
 
 export const dynamic = "force-dynamic";
 
@@ -8,8 +9,16 @@ export const metadata: Metadata = {
   title: "News — Tbilisi Style 21",
 };
 
-export default async function NewsPage() {
-  const posts = await listNews();
+const PER_PAGE = 9;
+
+type PageProps = { searchParams: Promise<{ page?: string }> };
+
+export default async function NewsPage({ searchParams }: PageProps) {
+  const allPosts = await listNews();
+  const { page } = await searchParams;
+  const totalPages = Math.max(1, Math.ceil(allPosts.length / PER_PAGE));
+  const current = Math.min(Math.max(1, Number(page) || 1), totalPages);
+  const posts = allPosts.slice((current - 1) * PER_PAGE, current * PER_PAGE);
 
   return (
     <main className="relative min-h-screen w-full overflow-hidden bg-[#0b0906] px-6 pb-20 pt-28 text-[color:var(--ts-body)] md:pb-28 md:pt-32">
@@ -28,10 +37,13 @@ export default async function NewsPage() {
           </h1>
         </div>
 
-        {posts.length === 0 ? (
+        {allPosts.length === 0 ? (
           <p className="text-white/50">No news yet.</p>
         ) : (
-          <NewsCardGrid posts={posts} variant="redesign" />
+          <>
+            <NewsCardGrid posts={posts} variant="redesign" />
+            <Pagination basePath="/news" currentPage={current} totalPages={totalPages} />
+          </>
         )}
       </div>
     </main>
