@@ -104,7 +104,7 @@ export function RenderBlocks({ blocks, locale, contact }: RenderBlocksProps) {
 
   return (
     <LightboxProvider images={images}>
-      <div className="mx-auto flex max-w-[72rem] flex-col gap-20 px-6 sm:gap-24">
+      <div className="mx-auto flex max-w-[1440px] flex-col gap-20 px-8 sm:gap-24">
         {nodes}
       </div>
     </LightboxProvider>
