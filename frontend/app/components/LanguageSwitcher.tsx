@@ -49,7 +49,7 @@ export default function LanguageSwitcher() {
             className={[
               "font-sans h-9 min-w-11 rounded-full px-3.5 text-xs font-semibold tracking-wide transition-all duration-200",
               isActive
-                ? "bg-yellow-300 text-black shadow-[0_0_16px_rgba(253,224,71,0.45)]"
+                ? "bg-[#e8b84b] text-black shadow-[0_0_16px_rgba(253,224,71,0.45)]"
                 : "text-white hover:bg-white/15",
             ].join(" ")}
           >

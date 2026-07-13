@@ -20,7 +20,7 @@ export default function TicketCta() {
     <Link
       href="/dashboard/tickets"
       aria-label={t("common.buyTickets")}
-      className="ts-ticket-pulse fixed bottom-5 right-5 z-40 flex items-center gap-2 rounded-full bg-yellow-300 px-5 py-3.5 text-sm font-extrabold uppercase tracking-wide text-black transition-transform duration-200 hover:scale-105 hover:bg-white sm:bottom-7 sm:right-7 sm:px-7 sm:py-4 sm:text-base"
+      className="ts-ticket-pulse fixed bottom-5 right-5 z-40 flex items-center gap-2 rounded-full bg-[#e8b84b] px-5 py-3.5 text-sm font-extrabold uppercase tracking-wide text-black transition-transform duration-200 hover:scale-105 hover:bg-white sm:bottom-7 sm:right-7 sm:px-7 sm:py-4 sm:text-base"
     >
       <svg
         xmlns="http://www.w3.org/2000/svg"

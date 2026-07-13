@@ -121,7 +121,7 @@ export default function BuyProductModal({
         </button>
 
         <div className="border-b border-white/10 bg-white/[0.02] px-6 pb-5 pt-6">
-          <p className="mb-1 text-[10px] font-bold uppercase tracking-[0.2em] text-yellow-300">
+          <p className="mb-1 text-[10px] font-bold uppercase tracking-[0.2em] text-[#e8b84b]">
             Checkout
           </p>
           <h2 className="text-2xl font-black uppercase text-white">
@@ -131,7 +131,7 @@ export default function BuyProductModal({
 
         <div className="px-6 py-5">
           {/* Order summary */}
-          <div className="mb-6 rounded-xl border border-yellow-300/20 bg-yellow-300/[0.04] p-4 text-sm">
+          <div className="mb-6 rounded-xl border border-[#e8b84b]/20 bg-[#e8b84b]/[0.04] p-4 text-sm">
             <div className="mb-2 flex justify-between text-white/70">
               <span>Product</span>
               <span className="text-white">{product.title}</span>
@@ -144,9 +144,9 @@ export default function BuyProductModal({
               <span>Quantity</span>
               <span className="text-white">1</span>
             </div>
-            <div className="mt-3 flex justify-between border-t border-yellow-300/20 pt-3 text-base font-bold">
+            <div className="mt-3 flex justify-between border-t border-[#e8b84b]/20 pt-3 text-base font-bold">
               <span className="text-white">Total</span>
-              <span className="text-yellow-300">{product.priceGel} ₾</span>
+              <span className="text-[#e8b84b]">{product.priceGel} ₾</span>
             </div>
           </div>
 
@@ -154,7 +154,7 @@ export default function BuyProductModal({
             {/* Size selector */}
             <div>
               <label className="mb-1.5 block text-xs font-semibold uppercase tracking-[0.06em] text-white/90">
-                Size <span className="text-yellow-300">*</span>
+                Size <span className="text-[#e8b84b]">*</span>
               </label>
               <div className="flex flex-wrap gap-2">
                 {availableSizes.map((s) => (
@@ -165,7 +165,7 @@ export default function BuyProductModal({
                     disabled={isSubmitting}
                     className={`min-w-[3rem] rounded-lg border px-3 py-2 text-sm font-bold uppercase transition ${
                       size === s.size
-                        ? "border-yellow-300 bg-yellow-300 text-black"
+                        ? "border-[#e8b84b] bg-[#e8b84b] text-black"
                         : "border-white/20 text-white/80 hover:border-white/50"
                     }`}
                   >
@@ -231,7 +231,7 @@ export default function BuyProductModal({
                 onChange={(e) =>
                   setFormData({ ...formData, terms: e.target.checked })
                 }
-                className="mt-[3px] accent-yellow-300"
+                className="mt-[3px] accent-[#e8b84b]"
               />
               <span>
                 I agree to the{" "}
@@ -239,7 +239,7 @@ export default function BuyProductModal({
                   href="/rules-and-terms"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="text-yellow-300 underline"
+                  className="text-[#e8b84b] underline"
                 >
                   Rules &amp; Terms
                 </a>{" "}
@@ -256,7 +256,7 @@ export default function BuyProductModal({
             <button
               type="submit"
               disabled={isSubmitting}
-              className="flex w-full items-center justify-center gap-2 rounded-xl bg-yellow-300 py-4 text-sm font-black uppercase tracking-[0.06em] text-black shadow-lg shadow-yellow-300/20 transition hover:bg-white disabled:cursor-not-allowed disabled:opacity-70"
+              className="flex w-full items-center justify-center gap-2 rounded-xl bg-[#e8b84b] py-4 text-sm font-black uppercase tracking-[0.06em] text-black shadow-lg shadow-[#e8b84b]/20 transition hover:bg-white disabled:cursor-not-allowed disabled:opacity-70"
             >
               {isSubmitting ? (
                 <>
@@ -296,7 +296,7 @@ function Field({
   return (
     <div>
       <label className="mb-1.5 block text-xs font-semibold uppercase tracking-[0.06em] text-white/90">
-        {label} {required ? <span className="text-yellow-300">*</span> : null}
+        {label} {required ? <span className="text-[#e8b84b]">*</span> : null}
       </label>
       {children}
       {hint ? <p className="mt-1 text-xs text-white/45">{hint}</p> : null}
@@ -305,4 +305,4 @@ function Field({
 }
 
 const inputClass =
-  "w-full rounded-lg border border-white/15 bg-white/[0.04] p-3 text-white outline-none transition focus:border-yellow-300 focus:bg-white/[0.06] disabled:opacity-50";
+  "w-full rounded-lg border border-white/15 bg-white/[0.04] p-3 text-white outline-none transition focus:border-[#e8b84b] focus:bg-white/[0.06] disabled:opacity-50";

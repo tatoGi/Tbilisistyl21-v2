@@ -137,7 +137,7 @@ export default function FestivalMenu({
                 key={`${item.href}-${i}`}
                 href={item.href}
                 onClick={() => setNavOpen(false)}
-                className="font-heading block uppercase font-bold tracking-[0.12em] text-white transition-all duration-200 hover:pl-2 hover:text-yellow-300"
+                className="font-heading block uppercase font-bold tracking-[0.12em] text-white transition-all duration-200 hover:pl-2 hover:text-[#e8b84b]"
                 style={{
                   fontSize: "clamp(0.75rem, 2.2vh, 1.05rem)",
                   padding: "10px 0",

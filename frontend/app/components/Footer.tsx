@@ -23,18 +23,18 @@ export default function Footer({
       <div className="mx-auto grid max-w-6xl gap-10 md:grid-cols-3 md:items-start">
         {/* Contact */}
         <div className="flex flex-col items-center gap-3 text-center md:items-start md:text-left">
-          <p className="mb-1 text-[11px] font-bold uppercase tracking-[0.28em] text-yellow-300/80">
+          <p className="mb-1 text-[11px] font-bold uppercase tracking-[0.28em] text-[#e8b84b]/80">
             {t("contactUs.title")}
           </p>
           <a
             href={`mailto:${contact.email}`}
-            className="text-sm font-medium tracking-wide text-white/80 transition-colors hover:text-yellow-300"
+            className="text-sm font-medium tracking-wide text-white/80 transition-colors hover:text-[#e8b84b]"
           >
             {t("contactUs.email")}: {contact.email}
           </a>
           <a
             href={`tel:${contact.phoneHref}`}
-            className="text-sm font-medium tracking-wide text-white/80 transition-colors hover:text-yellow-300"
+            className="text-sm font-medium tracking-wide text-white/80 transition-colors hover:text-[#e8b84b]"
           >
             {t("contactUs.phone")}: {contact.phone}
           </a>
@@ -52,14 +52,14 @@ export default function Footer({
             aria-label="Footer"
             className="flex flex-col items-center gap-2.5 text-center md:items-start md:text-left"
           >
-            <p className="mb-1 text-[11px] font-bold uppercase tracking-[0.28em] text-yellow-300/80">
+            <p className="mb-1 text-[11px] font-bold uppercase tracking-[0.28em] text-[#e8b84b]/80">
               Tbilisi Style 21
             </p>
             {footerPages.map((link) => (
               <Link
                 key={link.href}
                 href={link.href}
-                className="text-xs font-bold uppercase tracking-[0.18em] text-white/65 transition-colors hover:text-yellow-300"
+                className="text-xs font-bold uppercase tracking-[0.18em] text-white/65 transition-colors hover:text-[#e8b84b]"
               >
                 {link.label}
               </Link>
@@ -73,13 +73,13 @@ export default function Footer({
         <div className="flex flex-col items-center gap-3 md:items-end">
           <Link
             href="/dashboard/tickets"
-            className="rounded-full bg-yellow-300 px-6 py-2.5 text-xs font-extrabold uppercase tracking-wide text-black shadow-[0_0_24px_rgba(253,224,71,0.28)] transition-all duration-200 hover:bg-white"
+            className="rounded-full bg-[#e8b84b] px-6 py-2.5 text-xs font-extrabold uppercase tracking-wide text-black shadow-[0_0_24px_rgba(253,224,71,0.28)] transition-all duration-200 hover:bg-white"
           >
             {t("common.buyTickets")}
           </Link>
           <Link
             href="/dashboard/shop"
-            className="rounded-full border border-white/25 px-6 py-2.5 text-xs font-extrabold uppercase tracking-wide text-white transition-all duration-200 hover:border-yellow-300 hover:text-yellow-300"
+            className="rounded-full border border-white/25 px-6 py-2.5 text-xs font-extrabold uppercase tracking-wide text-white transition-all duration-200 hover:border-[#e8b84b] hover:text-[#e8b84b]"
           >
             {t("nav.shop")}
           </Link>

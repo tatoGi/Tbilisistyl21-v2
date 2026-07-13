@@ -225,7 +225,7 @@ export default function BuyTicketModal({ isOpen, onClose, ticket }: BuyTicketMod
         </button>
 
         <div className="border-b border-white/10 bg-white/[0.02] px-6 pb-5 pt-6">
-          <p className="mb-1 text-[10px] font-bold uppercase tracking-[0.2em] text-yellow-300">
+          <p className="mb-1 text-[10px] font-bold uppercase tracking-[0.2em] text-[#e8b84b]">
             Checkout
           </p>
           <h2 className="text-2xl font-black uppercase leading-tight text-white">{ticket.title}</h2>
@@ -233,7 +233,7 @@ export default function BuyTicketModal({ isOpen, onClose, ticket }: BuyTicketMod
 
         <div className="px-6 py-5">
           {/* FIX: Order Summary — transparency before payment */}
-          <div className="mb-6 rounded-xl border border-yellow-300/20 bg-yellow-300/[0.04] p-4 text-sm">
+          <div className="mb-6 rounded-xl border border-[#e8b84b]/20 bg-[#e8b84b]/[0.04] p-4 text-sm">
             <div className="flex justify-between mb-2 text-white/70">
               <span>Ticket</span>
               <span className="text-white">{ticket.title}</span>
@@ -254,9 +254,9 @@ export default function BuyTicketModal({ isOpen, onClose, ticket }: BuyTicketMod
               <span>Quantity</span>
               <span className="text-white">1</span>
             </div>
-            <div className="flex justify-between pt-3 mt-3 border-t border-yellow-300/20 font-bold text-base">
+            <div className="flex justify-between pt-3 mt-3 border-t border-[#e8b84b]/20 font-bold text-base">
               <span className="text-white">Total</span>
-              <span className="text-yellow-300">{ticket.priceGel} ₾</span>
+              <span className="text-[#e8b84b]">{ticket.priceGel} ₾</span>
             </div>
           </div>
 
@@ -342,7 +342,7 @@ export default function BuyTicketModal({ isOpen, onClose, ticket }: BuyTicketMod
                 onBlur={handleEmailBlur}
               />
               {emailSuggestion ? (
-                <p className="mt-1 text-xs text-yellow-300">
+                <p className="mt-1 text-xs text-[#e8b84b]">
                   Did you mean{' '}
                   <button
                     type="button"
@@ -364,7 +364,7 @@ export default function BuyTicketModal({ isOpen, onClose, ticket }: BuyTicketMod
                 disabled={isSubmitting}
                 checked={formData.terms}
                 onChange={(e) => setFormData({ ...formData, terms: e.target.checked })}
-                className="mt-[3px] accent-yellow-300"
+                className="mt-[3px] accent-[#e8b84b]"
               />
               <span>
                 I agree to the{' '}
@@ -372,7 +372,7 @@ export default function BuyTicketModal({ isOpen, onClose, ticket }: BuyTicketMod
                   href="/rules-and-terms"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="text-yellow-300 underline"
+                  className="text-[#e8b84b] underline"
                 >
                   Rules & Terms
                 </a>{' '}
@@ -390,7 +390,7 @@ export default function BuyTicketModal({ isOpen, onClose, ticket }: BuyTicketMod
             <button
               type="submit"
               disabled={isSubmitting}
-              className="flex w-full items-center justify-center gap-2 rounded-xl bg-yellow-300 py-4 text-sm font-black uppercase tracking-[0.06em] text-black shadow-lg shadow-yellow-300/20 transition hover:bg-white disabled:cursor-not-allowed disabled:opacity-70"
+              className="flex w-full items-center justify-center gap-2 rounded-xl bg-[#e8b84b] py-4 text-sm font-black uppercase tracking-[0.06em] text-black shadow-lg shadow-[#e8b84b]/20 transition hover:bg-white disabled:cursor-not-allowed disabled:opacity-70"
             >
               {isSubmitting ? (
                 <>
@@ -433,7 +433,7 @@ function FormField({
   return (
     <div>
       <label className="mb-1.5 block text-xs font-semibold uppercase tracking-[0.06em] text-white/90">
-        {label} {required ? <span className="text-yellow-300">*</span> : null}
+        {label} {required ? <span className="text-[#e8b84b]">*</span> : null}
       </label>
       {children}
       {hint ? (
@@ -458,5 +458,5 @@ function inputClass(hintType: 'error' | 'success' | '') {
     'w-full rounded-lg border bg-white/[0.04] p-3 text-white outline-none transition focus:bg-white/[0.06] disabled:opacity-50'
   if (hintType === 'error') return `${base} border-red-400/60 bg-red-500/[0.04] focus:border-red-400`
   if (hintType === 'success') return `${base} border-emerald-400/60 focus:border-emerald-400`
-  return `${base} border-white/15 focus:border-yellow-300`
+  return `${base} border-white/15 focus:border-[#e8b84b]`
 }

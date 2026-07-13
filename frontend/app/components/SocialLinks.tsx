@@ -15,7 +15,7 @@ export default function SocialLinksRow({ social, label, className = "" }: Props)
   return (
     <div className={`flex flex-col gap-3 ${className}`}>
       {label ? (
-        <p className="text-[11px] font-bold uppercase tracking-[0.28em] text-yellow-300/80">
+        <p className="text-[11px] font-bold uppercase tracking-[0.28em] text-[#e8b84b]/80">
           {label}
         </p>
       ) : null}
@@ -26,7 +26,7 @@ export default function SocialLinksRow({ social, label, className = "" }: Props)
             target="_blank"
             rel="noopener noreferrer"
             aria-label="Instagram"
-            className="text-white/70 transition-colors hover:text-yellow-300"
+            className="text-white/70 transition-colors hover:text-[#e8b84b]"
           >
             <InstagramIcon />
           </a>
@@ -37,7 +37,7 @@ export default function SocialLinksRow({ social, label, className = "" }: Props)
             target="_blank"
             rel="noopener noreferrer"
             aria-label="TikTok"
-            className="text-white/70 transition-colors hover:text-yellow-300"
+            className="text-white/70 transition-colors hover:text-[#e8b84b]"
           >
             <TikTokIcon />
           </a>
