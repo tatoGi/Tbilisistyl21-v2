@@ -27,9 +27,7 @@ export default async function TicketsPage() {
         <h1 className="font-unbounded text-[clamp(2.2rem,5vw,4.25rem)] font-extrabold tracking-[-0.01em] text-[color:var(--ts-head)]">
           {title}
         </h1>
-        <p className="mt-4 max-w-[640px] text-[17px] leading-relaxed text-[color:var(--ts-muted)]">
-          აირჩიე ფორმატი, რომელიც შენ გერგება — ერთი ღამიდან სრულ ფესტივალამდე.
-        </p>
+        
       </div>
 
       <div className="relative z-10">
