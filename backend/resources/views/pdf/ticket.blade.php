@@ -3,102 +3,179 @@
 <head>
     <meta charset="UTF-8">
     <style>
+        @page { margin: 0; }
         body {
             margin: 0;
             padding: 0;
             background: #000;
             color: #fff;
-            font-family: Arial, sans-serif;
+            font-family: 'DejaVu Sans', Arial, sans-serif;
         }
-        .ticket {
-            width: 600px;
-            margin: 20px auto;
-            border: 3px solid #f5a623;
-            padding: 30px;
+        .page {
+            padding: 22px;
         }
-        .header {
+        .frame {
+            border: 2px solid #f5a623;
+            padding: 14px;
+        }
+        .inner {
+            border: 1px solid rgba(245, 166, 35, 0.45);
+            padding: 20px 24px;
+        }
+        .welcome {
             text-align: center;
-            border-bottom: 2px solid #f5a623;
-            padding-bottom: 20px;
-            margin-bottom: 20px;
+            padding: 10px 0 4px;
         }
-        .header h1 {
+        .welcome .small {
+            font-size: 15px;
+            letter-spacing: 4px;
+            color: #ffffff;
+        }
+        .welcome .brand {
+            font-size: 34px;
+            font-weight: bold;
+            letter-spacing: 3px;
             color: #f5a623;
-            font-size: 28px;
-            margin: 0;
+            padding-top: 6px;
         }
-        .header h2 {
-            color: #fff;
-            font-size: 18px;
-            margin: 10px 0 0;
+        .artwork {
+            width: 100%;
+            text-align: center;
+            padding: 16px 0 0;
         }
-        .info {
-            margin: 15px 0;
+        .artwork img {
+            width: 100%;
         }
-        .info-row {
-            display: flex;
-            justify-content: space-between;
-            padding: 8px 0;
-            border-bottom: 1px solid #333;
+        .band {
+            margin-top: 18px;
+            border-top: 2px solid #f5a623;
+            border-bottom: 2px solid #f5a623;
+            text-align: center;
+            padding: 12px 0;
         }
-        .info-label {
+        .band .title {
+            font-size: 26px;
+            font-weight: bold;
+            letter-spacing: 4px;
+            color: #f5a623;
+        }
+        .event-name {
+            text-align: center;
+            font-size: 20px;
+            font-weight: bold;
+            color: #ffffff;
+            padding: 16px 0 6px;
+        }
+        .details {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+        }
+        .details td {
+            vertical-align: top;
+        }
+        .rows {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        .rows td {
+            padding: 9px 0;
+            font-size: 14px;
+        }
+        .rows .label {
             color: #f5a623;
             font-weight: bold;
+            width: 150px;
         }
-        .qr-section {
-            text-align: center;
-            margin: 30px 0;
+        .rows .value {
+            color: #ffffff;
         }
-        .qr-section img {
-            width: 250px;
-            height: 250px;
+        .qr-cell {
+            width: 190px;
+            text-align: right;
+        }
+        .qr-card {
+            background: #ffffff;
+            border: 2px solid #f5a623;
+            padding: 8px;
+            width: 170px;
+        }
+        .qr-card img {
+            width: 154px;
+            height: 154px;
         }
         .footer {
+            margin-top: 22px;
+            border-top: 1px solid rgba(245, 166, 35, 0.45);
             text-align: center;
-            color: #888;
-            font-size: 12px;
-            margin-top: 20px;
+            padding: 12px 0 4px;
+            font-size: 11px;
+            letter-spacing: 2px;
+            color: #cccccc;
         }
     </style>
 </head>
 <body>
-    <div class="ticket">
-        <div class="header">
-            <h1>TbilisiStyle21</h1>
-            <h2>{{ $eventName ?? 'Event Ticket' }}</h2>
-        </div>
+    <div class="page">
+        <div class="frame">
+            <div class="inner">
+                <div class="welcome">
+                    <div class="small">WELCOME TO</div>
+                    <div class="brand">TBILISI STYLE 21</div>
+                </div>
 
-        <div class="info">
-            <div class="info-row">
-                <span class="info-label">Name:</span>
-                <span>{{ $name }} {{ $surname }}</span>
-            </div>
-            <div class="info-row">
-                <span class="info-label">Date:</span>
-                <span>{{ $eventDate ?? '-' }}</span>
-            </div>
-            <div class="info-row">
-                <span class="info-label">Location:</span>
-                <span>{{ $location ?? '-' }}</span>
-            </div>
-            <div class="info-row">
-                <span class="info-label">Amount:</span>
-                <span>{{ $amount ?? '-' }} GEL</span>
-            </div>
-            <div class="info-row">
-                <span class="info-label">Ticket ID:</span>
-                <span>{{ $ticketId }}</span>
-            </div>
-        </div>
+                @if (!empty($artworkPath))
+                    <div class="artwork">
+                        <img src="{{ $artworkPath }}" alt="">
+                    </div>
+                @endif
 
-        <div class="qr-section">
-            @if (!empty($qrCode))
-                <img src="{{ $qrCode }}" alt="QR Code">
-            @endif
-        </div>
+                <div class="band">
+                    <div class="title">EVENT TICKET</div>
+                </div>
 
-        <div class="footer">
-            <p>Present this ticket at the entrance. Do not share your QR code.</p>
+                <div class="event-name">{{ $eventName ?? 'Event Ticket' }}</div>
+
+                <table class="details">
+                    <tr>
+                        <td>
+                            <table class="rows">
+                                <tr>
+                                    <td class="label">Date:</td>
+                                    <td class="value">{{ $eventDate ?? '-' }}</td>
+                                </tr>
+                                <tr>
+                                    <td class="label">Name:</td>
+                                    <td class="value">{{ $name }} {{ $surname }}</td>
+                                </tr>
+                                <tr>
+                                    <td class="label">Personal Number:</td>
+                                    <td class="value">{{ $personalNumber ?? '-' }}</td>
+                                </tr>
+                                <tr>
+                                    <td class="label">Amount Paid:</td>
+                                    <td class="value">{{ $amount ?? '-' }} {{ $currency ?? 'GEL' }}</td>
+                                </tr>
+                                <tr>
+                                    <td class="label">Ticket ID:</td>
+                                    <td class="value">{{ $ticketId }}</td>
+                                </tr>
+                            </table>
+                        </td>
+                        <td class="qr-cell">
+                            @if (!empty($qrCode))
+                                <div class="qr-card">
+                                    <img src="{{ $qrCode }}" alt="QR Code">
+                                </div>
+                            @endif
+                        </td>
+                    </tr>
+                </table>
+
+                <div class="footer">
+                    PLEASE PRESENT THIS TICKET AT THE ENTRANCE
+                </div>
+            </div>
         </div>
     </div>
 </body>

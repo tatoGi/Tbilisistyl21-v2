@@ -145,7 +145,7 @@ class ProcessPaymentCallbackAction
                 'paid_at' => now(),
             ]);
 
-            if ($this->isJokerTicket($locked->event_name)) {
+            if ($locked->isJokerEvent()) {
                 JokerTicket::create([
                     'sold_ticket_id' => $locked->id,
                     'personal_number' => $locked->personal_number,
@@ -247,12 +247,4 @@ class ProcessPaymentCallbackAction
         });
     }
 
-    private function isJokerTicket(?string $eventName): bool
-    {
-        if (!$eventName) {
-            return false;
-        }
-
-        return str_contains(strtolower($eventName), 'joker');
-    }
 }

@@ -2,10 +2,12 @@
 
 namespace App\Jobs;
 
+use App\Models\SiteSetting;
 use App\Models\SoldTicket;
 use App\Services\EmailService;
 use App\Services\PdfService;
 use App\Services\QrCodeService;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
@@ -21,8 +23,11 @@ class SendTicketEmailJob implements ShouldQueue
 
     public function __construct(public string $soldTicketId) {}
 
-    public function handle(EmailService $emailService, PdfService $pdfService): void
-    {
+    public function handle(
+        EmailService $emailService,
+        PdfService $pdfService,
+        QrCodeService $qrCodeService,
+    ): void {
         $soldTicket = SoldTicket::findOrFail($this->soldTicketId);
 
         $pdfContent = $pdfService->generateTicketPdf([
@@ -35,7 +40,8 @@ class SendTicketEmailJob implements ShouldQueue
             'location' => $soldTicket->location,
             'amount' => $soldTicket->amount,
             'currency' => 'GEL',
-            'qrCode' => (new QrCodeService())->generate($soldTicket->qr_code),
+            'qrCode' => $qrCodeService->generate($soldTicket->qr_code),
+            'artworkPath' => $this->resolveArtworkPath($soldTicket),
         ]);
 
         $emailService->sendTicketEmail(
@@ -45,5 +51,27 @@ class SendTicketEmailJob implements ShouldQueue
             ticketId: $soldTicket->id,
             eventName: $soldTicket->event_name,
         );
+    }
+
+    /**
+     * Admin-uploaded PDF artwork (Site Settings → "Ticket email PDF"). Joker
+     * events get their own image; a missing upload or deleted file renders the
+     * ticket without artwork rather than failing the email.
+     */
+    private function resolveArtworkPath(SoldTicket $soldTicket): ?string
+    {
+        $settings = SiteSetting::get('ticketPdf', []);
+
+        $relative = $soldTicket->isJokerEvent()
+            ? ($settings['jokerArtwork'] ?? null)
+            : ($settings['artwork'] ?? null);
+
+        if (!$relative) {
+            return null;
+        }
+
+        $path = Storage::disk('public')->path($relative);
+
+        return is_file($path) ? $path : null;
     }
 }

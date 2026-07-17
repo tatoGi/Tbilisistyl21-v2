@@ -42,6 +42,10 @@ class SiteSettings extends Page implements HasForms
                 'subheading' => [],
                 'image' => null,
             ]),
+            'ticketPdf' => SiteSetting::get('ticketPdf', [
+                'artwork' => null,
+                'jokerArtwork' => null,
+            ]),
             'instagramUrl' => SiteSetting::get('instagramUrl'),
             'tiktokUrl' => SiteSetting::get('tiktokUrl'),
             'contact' => SiteSetting::get('contact', [
@@ -110,6 +114,23 @@ class SiteSettings extends Page implements HasForms
                             ->image()
                             ->imageEditor(),
                     ]),
+                Forms\Components\Section::make('Ticket email PDF')
+                    ->description('Artwork embedded in the ticket PDF that buyers receive by email. Joker tickets use their own image; all other tickets use the standard one. Recommended: portrait/square PNG or JPEG, ~1200px wide.')
+                    ->schema([
+                        Forms\Components\FileUpload::make('ticketPdf.artwork')
+                            ->label('Standard ticket artwork')
+                            ->disk('public')
+                            ->directory('media')
+                            ->visibility('public')
+                            ->image(),
+                        Forms\Components\FileUpload::make('ticketPdf.jokerArtwork')
+                            ->label('Joker ticket artwork')
+                            ->disk('public')
+                            ->directory('media')
+                            ->visibility('public')
+                            ->image(),
+                    ])
+                    ->columns(2),
                 Forms\Components\Section::make('Social links')
                     ->schema([
                         Forms\Components\TextInput::make('instagramUrl')->label('Instagram URL')->url(),
@@ -132,7 +153,7 @@ class SiteSettings extends Page implements HasForms
     {
         $data = $this->form->getState();
 
-        foreach (['landing', 'hero', 'instagramUrl', 'tiktokUrl', 'contact'] as $key) {
+        foreach (['landing', 'hero', 'ticketPdf', 'instagramUrl', 'tiktokUrl', 'contact'] as $key) {
             SiteSetting::set($key, $data[$key] ?? null);
         }
 

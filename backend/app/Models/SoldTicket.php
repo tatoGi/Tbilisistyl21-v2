@@ -29,6 +29,12 @@ class SoldTicket extends Model
         ];
     }
 
+    public function isJokerEvent(): bool
+    {
+        return $this->event_name !== null
+            && str_contains(strtolower($this->event_name), 'joker');
+    }
+
     public function setPgPasswordAttribute(?string $value): void
     {
         $this->attributes['pg_password'] = $value ? Crypt::encryptString($value) : null;
