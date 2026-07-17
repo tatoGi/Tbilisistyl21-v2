@@ -8,8 +8,19 @@ function inStock(product: Product) {
   return product.sizes.reduce((sum, s) => sum + Math.max(0, s.quantity), 0);
 }
 
-export default function ProductsClient({ products }: { products: Product[] }) {
-  const [selected, setSelected] = useState<Product | null>(null);
+export default function ProductsClient({
+  products,
+  initialProduct = null,
+}: {
+  products: Product[];
+  initialProduct?: Product | null;
+}) {
+  // A deep-linked product only auto-opens the modal when it can be bought.
+  const [selected, setSelected] = useState<Product | null>(
+    initialProduct && initialProduct.status !== "sold_out" && inStock(initialProduct) > 0
+      ? initialProduct
+      : null
+  );
 
   return (
     <>

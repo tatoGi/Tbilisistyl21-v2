@@ -13,7 +13,7 @@ function ProductCard({ product }: { product: Product }) {
 
   return (
     <Link
-      href="/dashboard/shop"
+      href={`/dashboard/shop?product=${product.id}`}
       className="group relative mx-3 flex w-[210px] shrink-0 flex-col overflow-hidden rounded-2xl border border-white/5 bg-white/[0.01] transition-all duration-500 hover:-translate-y-2 hover:border-yellow-300/30 hover:bg-white/[0.03] hover:shadow-[0_15px_30px_rgba(0,0,0,0.5)] sm:w-[250px]"
     >
       <div className="relative aspect-square w-full overflow-hidden bg-white/[0.02]">

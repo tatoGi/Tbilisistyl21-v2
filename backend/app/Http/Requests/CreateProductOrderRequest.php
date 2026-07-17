@@ -13,7 +13,9 @@ class CreateProductOrderRequest extends FormRequest
         return [
             'productId' => ['required', 'uuid', 'exists:products,id'],
             'size' => ['required', 'string', 'max:10'],
-            'name' => ['required', 'string', 'max:100'],
+            'name' => ['required', 'string', 'max:100', 'regex:/^[a-zA-Z\s\-]+$/'],
+            'surname' => ['required', 'string', 'max:100', 'regex:/^[a-zA-Z\s\-]+$/'],
+            'personalNumber' => ['required', 'string', 'digits:11'],
             'email' => ['required', 'email:rfc'],
             'phone' => ['required', 'string', 'min:9', 'regex:/^\+?[0-9]+$/'],
         ];

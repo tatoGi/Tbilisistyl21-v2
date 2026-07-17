@@ -8,7 +8,7 @@ export const dynamic = "force-dynamic";
 
 const PER_PAGE = 12;
 
-type PageProps = { searchParams: Promise<{ page?: string }> };
+type PageProps = { searchParams: Promise<{ page?: string; product?: string }> };
 
 export default async function ShopPage({ searchParams }: PageProps) {
   const [allProducts, title] = await Promise.all([
@@ -18,10 +18,15 @@ export default async function ShopPage({ searchParams }: PageProps) {
 
   if (!title) notFound();
 
-  const { page } = await searchParams;
+  const { page, product } = await searchParams;
   const totalPages = Math.max(1, Math.ceil(allProducts.length / PER_PAGE));
   const current = Math.min(Math.max(1, Number(page) || 1), totalPages);
   const products = allProducts.slice((current - 1) * PER_PAGE, current * PER_PAGE);
+
+  // Deep link from the home-page product reel: open this product's buy modal.
+  const initialProduct = product
+    ? allProducts.find((p) => p.id === product) ?? null
+    : null;
 
   return (
     <main className="mx-auto min-h-screen w-full max-w-6xl px-5 pb-16 pt-28 text-[color:var(--ts-body)] md:px-10">
@@ -35,7 +40,7 @@ export default async function ShopPage({ searchParams }: PageProps) {
         {title}
       </h1>
 
-      <ProductsClient products={products} />
+      <ProductsClient products={products} initialProduct={initialProduct} />
       <Pagination basePath="/dashboard/shop" currentPage={current} totalPages={totalPages} />
     </main>
   );

@@ -52,6 +52,8 @@ class CreateProductOrderAction
             'product_title' => $product->setLocale('ka')->title,
             'size' => $data['size'],
             'name' => $data['name'],
+            'surname' => $data['surname'],
+            'personal_number' => $data['personalNumber'],
             'email' => $data['email'],
             'phone' => $data['phone'],
             'amount' => $product->price_gel,
@@ -62,7 +64,7 @@ class CreateProductOrderAction
         ]);
 
         $token = $this->paymentService->createRedirectToken(
-            $pgResponse['orderId'],
+            $pgResponse['id'],
             'productOrders',
         );
 

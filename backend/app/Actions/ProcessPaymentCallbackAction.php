@@ -2,12 +2,17 @@
 
 namespace App\Actions;
 
+use App\Jobs\SendProductOrderEmailJob;
 use App\Jobs\SendTicketEmailJob;
 use App\Models\JokerTicket;
+use App\Models\Product;
+use App\Models\ProductOrder;
 use App\Models\SoldTicket;
 use App\Models\Ticket;
 use App\Services\PaymentService;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 class ProcessPaymentCallbackAction
 {
@@ -20,6 +25,19 @@ class ProcessPaymentCallbackAction
             ->first();
 
         if (!$soldTicket) {
+            $productOrder = ProductOrder::where('id', $ref)
+                ->where('pg_order_id', $pgOrderId)
+                ->first();
+
+            if ($productOrder) {
+                return $this->processProductOrder($productOrder, $ref, $pgOrderId);
+            }
+
+            Log::channel('payment')->warning('callback: order not found', [
+                'ref' => $ref,
+                'pg_order_id' => $pgOrderId,
+            ]);
+
             return ['error' => 'ticket_not_found', 'status' => 404];
         }
 
@@ -35,7 +53,20 @@ class ProcessPaymentCallbackAction
         $pgStatus = strtolower($details['status'] ?? '');
         $isPaid = in_array($pgStatus, ['paid', 'completed', 'fullypaid'], true);
 
+        Log::channel('payment')->info('callback: gateway order status', [
+            'ref' => $ref,
+            'pg_order_id' => $pgOrderId,
+            'pg_status' => $pgStatus,
+            'is_paid' => $isPaid,
+        ]);
+
         if (!$isPaid) {
+            Log::channel('payment')->warning('callback: payment not paid', [
+                'ref' => $ref,
+                'pg_order_id' => $pgOrderId,
+                'pg_status' => $pgStatus,
+            ]);
+
             $soldTicket->update([
                 'status' => 'failed',
                 'failed_at' => now(),
@@ -46,6 +77,13 @@ class ProcessPaymentCallbackAction
         }
 
         if (!$this->paymentService->verifyPaidAmount((float) $soldTicket->amount, $details)) {
+            Log::channel('payment')->warning('callback: amount mismatch', [
+                'ref' => $ref,
+                'pg_order_id' => $pgOrderId,
+                'expected_gel' => (float) $soldTicket->amount,
+                'reported' => $this->paymentService->extractPaidAmount($details),
+            ]);
+
             $soldTicket->update([
                 'status' => 'failed',
                 'failed_at' => now(),
@@ -118,6 +156,92 @@ class ProcessPaymentCallbackAction
             }
 
             SendTicketEmailJob::dispatch($locked->id);
+
+            return ['status' => 200];
+        });
+    }
+
+    private function processProductOrder(ProductOrder $order, string $ref, int $pgOrderId): array
+    {
+        if ($order->status === 'paid') {
+            return ['status' => 200];
+        }
+
+        $details = $this->paymentService->getOrderDetails(
+            $order->pg_order_id,
+            $order->pg_password,
+        );
+
+        $pgStatus = strtolower($details['status'] ?? '');
+        $isPaid = in_array($pgStatus, ['paid', 'completed', 'fullypaid'], true);
+
+        Log::channel('payment')->info('callback: gateway order status', [
+            'collection' => 'productOrders',
+            'ref' => $ref,
+            'pg_order_id' => $pgOrderId,
+            'pg_status' => $pgStatus,
+            'is_paid' => $isPaid,
+        ]);
+
+        if (!$isPaid) {
+            Log::channel('payment')->warning('callback: payment not paid', [
+                'collection' => 'productOrders',
+                'ref' => $ref,
+                'pg_order_id' => $pgOrderId,
+                'pg_status' => $pgStatus,
+            ]);
+
+            $order->update(['status' => 'failed']);
+
+            return ['error' => 'payment_failed', 'status' => 400];
+        }
+
+        if (!$this->paymentService->verifyPaidAmount((float) $order->amount, $details)) {
+            Log::channel('payment')->warning('callback: amount mismatch', [
+                'collection' => 'productOrders',
+                'ref' => $ref,
+                'pg_order_id' => $pgOrderId,
+                'expected_gel' => (float) $order->amount,
+                'reported' => $this->paymentService->extractPaidAmount($details),
+            ]);
+
+            $order->update(['status' => 'failed']);
+
+            return ['error' => 'amount_mismatch', 'status' => 400];
+        }
+
+        return DB::transaction(function () use ($order) {
+            $locked = ProductOrder::where('id', $order->id)->lockForUpdate()->first();
+
+            if ($locked->status === 'paid') {
+                return ['status' => 200];
+            }
+
+            $decremented = DB::table('product_sizes')
+                ->where('product_id', $locked->product_id)
+                ->where('size', $locked->size)
+                ->where('quantity', '>', 0)
+                ->decrement('quantity');
+
+            if ($decremented === 0) {
+                Log::channel('payment')->warning('callback: product size sold out', [
+                    'ref' => $locked->id,
+                    'product_id' => $locked->product_id,
+                    'size' => $locked->size,
+                ]);
+
+                $locked->update(['status' => 'failed']);
+
+                return ['error' => 'sold_out', 'status' => 400];
+            }
+
+            // Raw decrement skips the ProductSize model events that normally
+            // flush the public products cache.
+            Cache::forget(Product::API_CACHE_KEY);
+
+            $locked->update(['status' => 'paid']);
+
+            SendProductOrderEmailJob::dispatch($locked->id);
 
             return ['status' => 200];
         });

@@ -56,6 +56,10 @@ class ProductOrderResource extends Resource
                 Forms\Components\TextInput::make('name')
                     ->required()
                     ->maxLength(255),
+                Forms\Components\TextInput::make('surname')
+                    ->maxLength(255),
+                Forms\Components\TextInput::make('personal_number')
+                    ->maxLength(11),
                 Forms\Components\TextInput::make('email')
                     ->email()
                     ->required()
@@ -93,6 +97,10 @@ class ProductOrderResource extends Resource
                 Tables\Columns\TextColumn::make('size')
                     ->searchable(),
                 Tables\Columns\TextColumn::make('name')
+                    ->searchable(),
+                Tables\Columns\TextColumn::make('surname')
+                    ->searchable(),
+                Tables\Columns\TextColumn::make('personal_number')
                     ->searchable(),
                 Tables\Columns\TextColumn::make('email')
                     ->searchable(),

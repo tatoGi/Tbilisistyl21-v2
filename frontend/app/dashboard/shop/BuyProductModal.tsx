@@ -24,6 +24,8 @@ export default function BuyProductModal({
   const [size, setSize] = useState<string>(availableSizes[0]?.size ?? "");
   const [formData, setFormData] = useState({
     name: "",
+    surname: "",
+    personalNumber: "",
     email: "",
     phone: "",
     terms: false,
@@ -50,7 +52,15 @@ export default function BuyProductModal({
       return;
     }
     if (formData.name.trim().length < 2) {
-      setError("Please enter your full name.");
+      setError("Please enter your first name.");
+      return;
+    }
+    if (formData.surname.trim().length < 2) {
+      setError("Please enter your surname.");
+      return;
+    }
+    if (formData.personalNumber.length !== 11) {
+      setError("Personal ID number must be exactly 11 digits.");
       return;
     }
     if (!EMAIL_REGEX.test(formData.email)) {
@@ -75,15 +85,21 @@ export default function BuyProductModal({
           productId: product.id,
           size,
           name: formData.name.trim(),
+          surname: formData.surname.trim(),
+          personalNumber: formData.personalNumber,
           email: formData.email.trim(),
-          phone: formData.phone.trim(),
+          // The backend accepts digits with an optional leading + only, so
+          // strip the spaces/dashes people naturally type ("+995 5XX XX XX XX").
+          phone: formData.phone.replace(/[\s\-()]/g, ""),
         }),
       });
       const data = await res.json();
 
       if (data.error || !data.redirectUrl) {
+        // Laravel validation failures (422) carry `message`, not `error`.
         setError(
           data.error ||
+            data.message ||
             "We could not start the payment. Please try again in a moment."
         );
         setLoadingStage("");
@@ -175,17 +191,63 @@ export default function BuyProductModal({
               </div>
             </div>
 
-            <Field label="Full name" required>
+            <div className="grid grid-cols-2 gap-3">
+              <Field label="First name" required>
+                <input
+                  type="text"
+                  required
+                  autoComplete="given-name"
+                  placeholder="Giorgi"
+                  disabled={isSubmitting}
+                  className={inputClass}
+                  value={formData.name}
+                  onChange={(e) =>
+                    setFormData({
+                      ...formData,
+                      name: e.target.value.replace(/[^a-zA-Z\s\-]/g, ""),
+                    })
+                  }
+                />
+              </Field>
+
+              <Field label="Surname" required>
+                <input
+                  type="text"
+                  required
+                  autoComplete="family-name"
+                  placeholder="Beridze"
+                  disabled={isSubmitting}
+                  className={inputClass}
+                  value={formData.surname}
+                  onChange={(e) =>
+                    setFormData({
+                      ...formData,
+                      surname: e.target.value.replace(/[^a-zA-Z\s\-]/g, ""),
+                    })
+                  }
+                />
+              </Field>
+            </div>
+
+            <Field
+              label="Personal ID number"
+              required
+              hint="11 digits — as written on your ID"
+            >
               <input
                 type="text"
                 required
-                autoComplete="name"
-                placeholder="Giorgi Beridze"
+                inputMode="numeric"
+                maxLength={11}
+                placeholder="01001234567"
                 disabled={isSubmitting}
                 className={inputClass}
-                value={formData.name}
+                value={formData.personalNumber}
                 onChange={(e) =>
-                  setFormData({ ...formData, name: e.target.value })
+                  setFormData({
+                    ...formData,
+                    personalNumber: e.target.value.replace(/\D/g, "").slice(0, 11),
+                  })
                 }
               />
             </Field>

@@ -40,7 +40,9 @@ class ProductOrderTest extends TestCase
     {
         $response = $this->postJson('/api/orders/products', []);
         $response->assertUnprocessable()
-            ->assertJsonValidationErrors(['productId', 'size', 'name', 'email', 'phone']);
+            ->assertJsonValidationErrors([
+                'productId', 'size', 'name', 'surname', 'personalNumber', 'email', 'phone',
+            ]);
     }
 
     public function test_create_product_order_rejects_unavailable_product(): void
@@ -61,7 +63,9 @@ class ProductOrderTest extends TestCase
         $response = $this->postJson('/api/orders/products', [
             'productId' => $product->id,
             'size' => 'M',
-            'name' => 'John Doe',
+            'name' => 'John',
+            'surname' => 'Doe',
+            'personalNumber' => '01001234567',
             'email' => 'john@test.com',
             'phone' => '+995555123456',
         ]);
@@ -77,7 +81,9 @@ class ProductOrderTest extends TestCase
         $response = $this->postJson('/api/orders/products', [
             'productId' => $product->id,
             'size' => 'L', // quantity = 0
-            'name' => 'John Doe',
+            'name' => 'John',
+            'surname' => 'Doe',
+            'personalNumber' => '01001234567',
             'email' => 'john@test.com',
             'phone' => '+995555123456',
         ]);
@@ -93,7 +99,9 @@ class ProductOrderTest extends TestCase
         $response = $this->postJson('/api/orders/products', [
             'productId' => $product->id,
             'size' => 'XXL', // doesn't exist
-            'name' => 'John Doe',
+            'name' => 'John',
+            'surname' => 'Doe',
+            'personalNumber' => '01001234567',
             'email' => 'john@test.com',
             'phone' => '+995555123456',
         ]);

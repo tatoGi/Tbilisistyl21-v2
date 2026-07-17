@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Log;
 
 class PaymentService
 {
@@ -28,8 +29,24 @@ class PaymentService
             ], $order),
         ];
 
+        Log::channel('payment')->info('quipu.createOrder request', [
+            'payload' => $payload,
+        ]);
+
         $response = Http::withOptions($this->tlsOptions())
             ->post(config('services.quipu.api_url'), $payload);
+
+        if ($response->failed()) {
+            Log::channel('payment')->error('quipu.createOrder failed', [
+                'http_status' => $response->status(),
+                'body' => $response->body(),
+            ]);
+        } else {
+            Log::channel('payment')->info('quipu.createOrder response', [
+                'http_status' => $response->status(),
+                'order' => $this->maskSensitive($response->json('order') ?? []),
+            ]);
+        }
 
         $response->throw();
 
@@ -70,9 +87,37 @@ class PaymentService
 
         $response = Http::withOptions($this->tlsOptions())->get($url);
 
+        if ($response->failed()) {
+            Log::channel('payment')->error('quipu.getOrderDetails failed', [
+                'pg_order_id' => $orderId,
+                'http_status' => $response->status(),
+                'body' => $response->body(),
+            ]);
+        } else {
+            Log::channel('payment')->info('quipu.getOrderDetails response', [
+                'pg_order_id' => $orderId,
+                'http_status' => $response->status(),
+                'order' => $this->maskSensitive($response->json('order') ?? []),
+            ]);
+        }
+
         $response->throw();
 
         return $response->json('order') ?? [];
+    }
+
+    /**
+     * Strip per-order secrets before a gateway response reaches the logs.
+     */
+    private function maskSensitive(array $order): array
+    {
+        foreach (['password', 'hppUrl'] as $key) {
+            if (isset($order[$key])) {
+                $order[$key] = '***';
+            }
+        }
+
+        return $order;
     }
 
     public function createCallbackHmac(string $internalId): string

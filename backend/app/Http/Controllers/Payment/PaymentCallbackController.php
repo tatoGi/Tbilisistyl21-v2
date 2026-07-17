@@ -8,6 +8,7 @@ use App\Models\ProductOrder;
 use App\Models\SoldTicket;
 use App\Services\PaymentService;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 
 class PaymentCallbackController extends Controller
 {
@@ -16,7 +17,18 @@ class PaymentCallbackController extends Controller
         $ref = $request->query('ref');
         $pgOrderId = (int) $request->query('ID');
 
+        Log::channel('payment')->info('callback: received', [
+            'query' => $request->except('sig'),
+            'ip' => $request->ip(),
+        ]);
+
         $result = $action->execute($ref, $pgOrderId);
+
+        Log::channel('payment')->info('callback: result', [
+            'ref' => $ref,
+            'pg_order_id' => $pgOrderId,
+            'result' => $result,
+        ]);
 
         if (isset($result['error'])) {
             $frontendUrl = config('app.frontend_url');
@@ -35,6 +47,10 @@ class PaymentCallbackController extends Controller
         $data = $paymentService->verifyRedirectToken($token);
 
         if (!$data) {
+            Log::channel('payment')->warning('redirect: invalid token', [
+                'token_present' => (bool) $token,
+            ]);
+
             return redirect("{$frontendUrl}/dashboard/fail?error=invalid_token");
         }
 
@@ -46,8 +62,21 @@ class PaymentCallbackController extends Controller
             : ProductOrder::where('pg_order_id', $data['pgOrderId'])->first();
 
         if (!$record || !$record->pg_hpp_url || !$record->pg_password) {
+            Log::channel('payment')->warning('redirect: order record missing or incomplete', [
+                'collection' => $data['collection'],
+                'pg_order_id' => $data['pgOrderId'],
+                'record_found' => (bool) $record,
+                'has_hpp_url' => (bool) ($record->pg_hpp_url ?? null),
+                'has_password' => (bool) ($record->pg_password ?? null),
+            ]);
+
             return redirect("{$frontendUrl}/dashboard/fail?error=order_not_found");
         }
+
+        Log::channel('payment')->info('redirect: forwarding buyer to HPP', [
+            'collection' => $data['collection'],
+            'pg_order_id' => $data['pgOrderId'],
+        ]);
 
         $separator = str_contains($record->pg_hpp_url, '?') ? '&' : '?';
         $hppUrl = $record->pg_hpp_url . $separator

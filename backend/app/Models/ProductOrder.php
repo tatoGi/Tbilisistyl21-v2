@@ -11,8 +11,8 @@ class ProductOrder extends Model
     protected $keyType = 'string';
 
     protected $fillable = [
-        'id', 'product_id', 'product_title', 'size', 'name', 'email',
-        'phone', 'amount', 'status', 'pg_order_id', 'pg_hpp_url', 'pg_password', 'qr_code',
+        'id', 'product_id', 'product_title', 'size', 'name', 'surname', 'personal_number',
+        'email', 'phone', 'amount', 'status', 'pg_order_id', 'pg_hpp_url', 'pg_password', 'qr_code',
     ];
 
     protected function casts(): array
