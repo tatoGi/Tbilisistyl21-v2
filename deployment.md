@@ -30,14 +30,21 @@ git pull --ff-only
 #    (მხოლოდ შეცვლილი სერვისები იქმნება ხელახლა; volume-ები უცვლელი რჩება)
 docker compose up -d --build
 
-# 3. მიგრაციები (მხოლოდ migrate — არასდროს fresh/refresh/rollback)
+# 3. nginx-ის reload — აუცილებელია!
+#    up --build ხელახლა ქმნის laravel/nextjs კონტეინერებს ახალი შიდა IP-ებით,
+#    nginx-ს კი ძველი აქვს დაქეშილი → საიტი/ადმინი 502-ს დააბრუნებს.
+#    reload downtime-ის გარეშე ანახლებს (restart არ სჭირდება).
+docker compose exec nginx nginx -s reload
+
+# 4. მიგრაციები (მხოლოდ migrate — არასდროს fresh/refresh/rollback)
 docker compose exec laravel php artisan migrate --force
 
-# 4. შემოწმება
+# 5. შემოწმება
 docker compose ps                          # ყველა სერვისი "Up" უნდა იყოს
 docker compose logs --tail=50 laravel      # შეცდომები ხომ არ არის
 docker compose logs --tail=50 queue        # queue worker მუშაობს
-curl -s https://<დომენი>/api/site-settings | head -c 200   # API პასუხობს
+curl -s -o /dev/null -w '%{http_code}\n' https://tbilisistyle.com/           # 200
+curl -s -o /dev/null -w '%{http_code}\n' https://tbilisistyle.com/admin/login # 200 (502 = nginx reload დაგავიწყდა)
 ```
 
 ეს არის სრული პროცედურა. `db:seed` განახლებისას **არ გაუშვა** — ის მხოლოდ

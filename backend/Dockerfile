@@ -22,6 +22,13 @@ RUN apk add --no-cache \
         exif \
         pcntl
 
+# imagick — required by bacon/qr-code to render ticket QR PNGs (email jobs).
+RUN apk add --no-cache imagemagick imagemagick-libs \
+    && apk add --no-cache --virtual .imagick-build $PHPIZE_DEPS imagemagick-dev \
+    && pecl install imagick \
+    && docker-php-ext-enable imagick \
+    && apk del .imagick-build
+
 # OPcache production config
 RUN { \
     echo 'opcache.memory_consumption=128'; \

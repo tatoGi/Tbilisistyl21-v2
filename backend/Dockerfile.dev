@@ -9,6 +9,7 @@ RUN apt-get update && apt-get install -y \
     libzip-dev \
     libicu-dev \
     libonig-dev \
+    libmagickwand-dev \
     zip \
     unzip \
     git \
@@ -29,6 +30,9 @@ RUN docker-php-ext-configure gd --with-freetype --with-jpeg \
         mbstring \
         exif \
         pcntl
+
+# imagick — required by bacon/qr-code to render ticket QR PNGs (email jobs).
+RUN pecl install imagick && docker-php-ext-enable imagick
 
 # Install Composer from official image
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
