@@ -50,7 +50,8 @@ class MediaResource extends Resource
             ->columns([
                 Tables\Columns\ImageColumn::make('preview')
                     ->label('')
-                    ->getStateUsing(fn ($record) => '/storage/media/' . $record->filename)
+                    ->disk('public')
+                    ->getStateUsing(fn ($record) => 'media/' . $record->filename)
                     ->square(),
                 Tables\Columns\TextColumn::make('filename')
                     ->searchable(),

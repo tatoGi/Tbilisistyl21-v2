@@ -38,6 +38,13 @@ RUN { \
     echo 'opcache.enable_cli=1'; \
 } > /usr/local/etc/php/conf.d/opcache-prod.ini
 
+# Media uploads: Filament allows images up to 5 MB (maxSize 5120), so PHP's
+# 2M/8M defaults silently rejected them and records saved without an image.
+RUN { \
+    echo 'upload_max_filesize=10M'; \
+    echo 'post_max_size=25M'; \
+} > /usr/local/etc/php/conf.d/uploads.ini
+
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
 WORKDIR /var/www/html
