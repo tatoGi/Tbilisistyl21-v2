@@ -41,10 +41,14 @@
         .artwork {
             width: 100%;
             text-align: center;
-            padding: 16px 0 0;
+            padding: 14px 0 0;
         }
+        /* Fixed square so the client-required 1:1 artwork renders edge-to-edge
+           with no letterboxing AND the whole ticket still fits on one page
+           (a full-width 741px square overflows the 650x1000pt paper). */
         .artwork img {
-            width: 100%;
+            width: 680px;
+            height: 680px;
         }
         .band {
             margin-top: 18px;
