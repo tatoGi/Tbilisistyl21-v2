@@ -71,7 +71,11 @@ class PageSeeder extends Seeder
         $blocks = [];
 
         foreach ($config['images'] ?? [] as $src) {
-            $blocks[] = ['type' => 'image', 'data' => ['image' => $src, 'width' => 'full']];
+            $data = ['image' => $src, 'width' => 'full'];
+            if (isset($config['imageFit'])) {
+                $data['fit'] = $config['imageFit'];
+            }
+            $blocks[] = ['type' => 'image', 'data' => $data];
         }
 
         $ns = $config['ns'] ?? null;
@@ -141,6 +145,8 @@ class PageSeeder extends Seeder
                 'images' => ['/images/technoqvevri.jpeg'],
             ],
             'lineup' => [
+                // Poster artwork: never crop to the 16:9 banner.
+                'imageFit' => 'full',
                 'images' => [
                     '/lineups/tbilisistyleday1.jpeg',
                     '/lineups/tbilisistyleday2.jpeg',

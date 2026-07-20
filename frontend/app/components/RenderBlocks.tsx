@@ -272,7 +272,7 @@ function GalleryBlock({
                 src={item.src}
                 alt={item.caption || ""}
                 fill
-                className="object-cover transition-transform duration-700 ease-out group-hover:scale-[1.04]"
+                className="object-contain transition-transform duration-700 ease-out group-hover:scale-[1.04]"
                 sizes="(max-width: 640px) 100vw, 33vw"
               />
               <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
