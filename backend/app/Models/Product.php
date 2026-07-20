@@ -20,7 +20,7 @@ class Product extends Model
 
     protected $fillable = [
         'title', 'description', 'price_gel', 'category',
-        'is_vip', 'image_id', 'status',
+        'is_vip', 'image_id', 'status', 'sort_order',
     ];
 
     protected function casts(): array

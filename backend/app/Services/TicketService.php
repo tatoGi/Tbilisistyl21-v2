@@ -18,6 +18,8 @@ class TicketService
         return Cache::remember(Ticket::API_CACHE_KEY, 3600, function () {
             return Ticket::active()
                 ->withCount(['soldTickets as sold' => fn ($q) => $q->where('status', 'paid')])
+                ->orderBy('sort_order')
+                ->orderBy('created_at')
                 ->get()
                 ->toArray();
         });

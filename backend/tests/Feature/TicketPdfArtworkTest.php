@@ -123,7 +123,28 @@ class TicketPdfArtworkTest extends TestCase
         $this->assertTrue($this->createPaidTicket('3-Day JOKER Ticket')->isJokerEvent());
 
         SoldTicket::where('id', 'PDFT0001')->delete();
+        $this->assertTrue($this->createPaidTicket('3-დღიანი ჯოკერ ბილეთი')->isJokerEvent());
+
+        SoldTicket::where('id', 'PDFT0001')->delete();
+        $flagged = $this->createPaidTicket('Any Name At All');
+        $flagged->update(['is_joker' => true]);
+        $this->assertTrue($flagged->isJokerEvent());
+
+        SoldTicket::where('id', 'PDFT0001')->delete();
         $this->assertFalse($this->createPaidTicket('VIP Ticket 1-Day')->isJokerEvent());
+    }
+
+    public function test_joker_ticket_with_georgian_name_uses_joker_artwork(): void
+    {
+        SiteSetting::set('ticketPdf', [
+            'artwork' => 'media/standard.png',
+            'jokerArtwork' => 'media/joker.png',
+        ]);
+        Storage::disk('public')->put('media/joker.png', base64_decode(self::TINY_PNG_B64));
+
+        $data = $this->capturePdfData($this->createPaidTicket('3-დღიანი ჯოკერ ბილეთი'));
+
+        $this->assertStringEndsWith('joker.png', $data['artworkPath']);
     }
 
     public function test_pdf_renders_with_and_without_artwork(): void

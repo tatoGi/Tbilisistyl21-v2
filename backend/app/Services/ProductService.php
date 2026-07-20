@@ -18,7 +18,12 @@ class ProductService
         // class. toArray() preserves the same JSON shape (full translations +
         // nested image/sizes). Mirrors the MusicTrackController approach.
         return Cache::remember(Product::API_CACHE_KEY, 3600, function () {
-            return Product::active()->with(['sizes', 'image'])->get()->toArray();
+            return Product::active()
+                ->with(['sizes', 'image'])
+                ->orderBy('sort_order')
+                ->orderBy('created_at')
+                ->get()
+                ->toArray();
         });
     }
 

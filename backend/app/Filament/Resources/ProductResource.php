@@ -95,7 +95,8 @@ class ProductResource extends Resource
     {
         return $table
             ->modifyQueryUsing(fn (Builder $query) => $query->with('image'))
-            ->defaultSort('created_at', 'desc')
+            ->reorderable('sort_order')
+            ->defaultSort('sort_order')
             ->columns([
                 Tables\Columns\ImageColumn::make('image')
                     ->label('')

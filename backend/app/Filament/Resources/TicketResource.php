@@ -85,6 +85,9 @@ class TicketResource extends Resource
                                 Forms\Components\Toggle::make('is_featured')
                                     ->label('Highlight as “Popular”')
                                     ->helperText('Adds the POPULAR ribbon and gold highlight to this card.'),
+                                Forms\Components\Toggle::make('is_joker')
+                                    ->label('Joker ticket')
+                                    ->helperText('Joker buyers get the joker artwork in the email PDF and enter the Joker draw.'),
                             ]),
                     ])
                     ->columnSpan(['lg' => 2]),
@@ -115,7 +118,8 @@ class TicketResource extends Resource
     public static function table(Table $table): Table
     {
         return $table
-            ->defaultSort('created_at', 'desc')
+            ->reorderable('sort_order')
+            ->defaultSort('sort_order')
             ->columns([
                 Tables\Columns\ImageColumn::make('image')
                     ->label('')
@@ -149,6 +153,9 @@ class TicketResource extends Resource
                         default => "{$state} available",
                     })
                     ->sortable(),
+                Tables\Columns\IconColumn::make('is_joker')
+                    ->label('Joker')
+                    ->boolean(),
                 Tables\Columns\TextColumn::make('status')
                     ->badge()
                     ->color(fn (string $state): string => match ($state) {

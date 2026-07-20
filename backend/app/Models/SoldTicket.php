@@ -15,7 +15,7 @@ class SoldTicket extends Model
         'status', 'original_ticket_id', 'event_name', 'event_date',
         'location', 'paid_at', 'scanned_at', 'scanned_by',
         'pg_order_id', 'pg_hpp_url', 'pg_password', 'qr_code',
-        'failed_at', 'fail_reason',
+        'failed_at', 'fail_reason', 'is_joker',
     ];
 
     protected function casts(): array
@@ -26,13 +26,18 @@ class SoldTicket extends Model
             'paid_at' => 'datetime',
             'scanned_at' => 'datetime',
             'failed_at' => 'datetime',
+            'is_joker' => 'boolean',
         ];
     }
 
     public function isJokerEvent(): bool
     {
-        return $this->event_name !== null
-            && str_contains(strtolower($this->event_name), 'joker');
+        // The explicit admin checkbox is authoritative; the name check keeps
+        // legacy rows working (both latin and Georgian spellings).
+        return (bool) $this->is_joker
+            || ($this->event_name !== null
+                && (str_contains(strtolower($this->event_name), 'joker')
+                    || str_contains($this->event_name, 'ჯოკერ')));
     }
 
     public function setPgPasswordAttribute(?string $value): void
