@@ -50,6 +50,13 @@
             width: 680px;
             height: 680px;
         }
+        /* Techno artwork is a portrait poster — constrain by height and let the
+           width scale so it keeps its aspect ratio (no squashing) while using
+           the same vertical footprint as the square artwork. */
+        .artwork.contain img {
+            width: auto;
+            height: 680px;
+        }
         .band {
             margin-top: 18px;
             border-top: 2px solid #f5a623;
@@ -129,7 +136,7 @@
                 </div>
 
                 @if (!empty($artworkPath))
-                    <div class="artwork">
+                    <div class="artwork {{ !empty($artworkContain) ? 'contain' : '' }}">
                         <img src="{{ $artworkPath }}" alt="">
                     </div>
                 @endif

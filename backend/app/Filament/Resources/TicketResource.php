@@ -88,6 +88,9 @@ class TicketResource extends Resource
                                 Forms\Components\Toggle::make('is_joker')
                                     ->label('Joker ticket')
                                     ->helperText('Joker buyers get the joker artwork in the email PDF and enter the Joker draw.'),
+                                Forms\Components\Toggle::make('is_techno')
+                                    ->label('Techno ticket')
+                                    ->helperText('Techno buyers automatically get the built-in techno artwork in the email PDF — no upload needed in Site settings.'),
                             ]),
                     ])
                     ->columnSpan(['lg' => 2]),
@@ -155,6 +158,9 @@ class TicketResource extends Resource
                     ->sortable(),
                 Tables\Columns\IconColumn::make('is_joker')
                     ->label('Joker')
+                    ->boolean(),
+                Tables\Columns\IconColumn::make('is_techno')
+                    ->label('Techno')
                     ->boolean(),
                 Tables\Columns\TextColumn::make('status')
                     ->badge()

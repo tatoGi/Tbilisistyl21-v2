@@ -15,7 +15,7 @@ class SoldTicket extends Model
         'status', 'original_ticket_id', 'event_name', 'event_date',
         'location', 'paid_at', 'scanned_at', 'scanned_by',
         'pg_order_id', 'pg_hpp_url', 'pg_password', 'qr_code',
-        'failed_at', 'fail_reason', 'is_joker',
+        'failed_at', 'fail_reason', 'is_joker', 'is_techno',
     ];
 
     protected function casts(): array
@@ -27,6 +27,7 @@ class SoldTicket extends Model
             'scanned_at' => 'datetime',
             'failed_at' => 'datetime',
             'is_joker' => 'boolean',
+            'is_techno' => 'boolean',
         ];
     }
 
@@ -38,6 +39,16 @@ class SoldTicket extends Model
             || ($this->event_name !== null
                 && (str_contains(strtolower($this->event_name), 'joker')
                     || str_contains($this->event_name, 'ჯოკერ')));
+    }
+
+    public function isTechnoEvent(): bool
+    {
+        // Mirrors isJokerEvent(): explicit admin toggle is authoritative, with
+        // a name fallback (latin "techno" and Georgian "ტექნო") for legacy rows.
+        return (bool) $this->is_techno
+            || ($this->event_name !== null
+                && (str_contains(strtolower($this->event_name), 'techno')
+                    || str_contains($this->event_name, 'ტექნო')));
     }
 
     public function setPgPasswordAttribute(?string $value): void

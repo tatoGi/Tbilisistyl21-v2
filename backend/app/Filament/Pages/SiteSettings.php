@@ -115,7 +115,7 @@ class SiteSettings extends Page implements HasForms
                             ->imageEditor(),
                     ]),
                 Forms\Components\Section::make('Ticket email PDF')
-                    ->description('Artwork embedded in the ticket PDF that buyers receive by email. Joker tickets use their own image; all other tickets use the standard one. Recommended: portrait/square PNG or JPEG, ~1200px wide.')
+                    ->description('Artwork embedded in the ticket PDF that buyers receive by email. Joker tickets use their own image; all other tickets use the standard one. Techno tickets use a built-in image and need no upload here. Recommended: portrait/square PNG or JPEG, ~1200px wide.')
                     ->schema([
                         Forms\Components\FileUpload::make('ticketPdf.artwork')
                             ->label('Standard ticket artwork')

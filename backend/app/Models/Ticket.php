@@ -20,7 +20,7 @@ class Ticket extends Model
     protected $fillable = [
         'title', 'description', 'image', 'price_gel', 'quantity',
         'event_date', 'location', 'status', 'sale_url',
-        'category', 'features', 'is_featured', 'is_joker', 'sort_order',
+        'category', 'features', 'is_featured', 'is_joker', 'is_techno', 'sort_order',
     ];
 
     protected function casts(): array
@@ -30,6 +30,7 @@ class Ticket extends Model
             'price_gel' => 'decimal:2',
             'is_featured' => 'boolean',
             'is_joker' => 'boolean',
+            'is_techno' => 'boolean',
         ];
     }
 

@@ -102,6 +102,49 @@ class TicketPdfArtworkTest extends TestCase
         $this->assertStringEndsWith('joker.png', $data['artworkPath']);
     }
 
+    public function test_techno_ticket_uses_builtin_artwork(): void
+    {
+        // No upload configured — techno must still resolve to the built-in image.
+        SiteSetting::set('ticketPdf', ['artwork' => null, 'jokerArtwork' => null]);
+
+        $ticket = $this->createPaidTicket('VIP Ticket 1-Day');
+        $ticket->update(['is_techno' => true]);
+
+        $data = $this->capturePdfData($ticket);
+
+        $this->assertNotNull($data['artworkPath']);
+        $this->assertStringEndsWith('techno-ticket.png', str_replace('\\', '/', $data['artworkPath']));
+        $this->assertTrue($data['artworkContain']);
+        $this->assertFileExists($data['artworkPath']);
+    }
+
+    public function test_techno_ticket_by_name_uses_builtin_artwork(): void
+    {
+        $data = $this->capturePdfData($this->createPaidTicket('Techno Qvevri Rave'));
+
+        $this->assertStringEndsWith('techno-ticket.png', str_replace('\\', '/', $data['artworkPath']));
+
+        SoldTicket::where('id', 'PDFT0001')->delete();
+        $data = $this->capturePdfData($this->createPaidTicket('ტექნო ღამე'));
+        $this->assertStringEndsWith('techno-ticket.png', str_replace('\\', '/', $data['artworkPath']));
+    }
+
+    public function test_sold_ticket_techno_detection(): void
+    {
+        $this->assertTrue($this->createPaidTicket('TECHNO Night')->isTechnoEvent());
+
+        SoldTicket::where('id', 'PDFT0001')->delete();
+        $this->assertTrue($this->createPaidTicket('ტექნო ღამე')->isTechnoEvent());
+
+        SoldTicket::where('id', 'PDFT0001')->delete();
+        $flagged = $this->createPaidTicket('Any Name At All');
+        $flagged->update(['is_techno' => true]);
+        $this->assertTrue($flagged->isTechnoEvent());
+
+        SoldTicket::where('id', 'PDFT0001')->delete();
+        $this->assertFalse($this->createPaidTicket('VIP Ticket 1-Day')->isTechnoEvent());
+    }
+
     public function test_missing_artwork_setting_degrades_to_null(): void
     {
         $data = $this->capturePdfData($this->createPaidTicket('VIP Ticket 1-Day'));

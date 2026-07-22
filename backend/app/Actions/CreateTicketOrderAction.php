@@ -72,6 +72,7 @@ class CreateTicketOrderAction
                 'original_ticket_id' => $ticket->id,
                 'event_name' => $ticket->setLocale('ka')->title,
                 'is_joker' => $ticket->is_joker,
+                'is_techno' => $ticket->is_techno,
                 'event_date' => $ticket->event_date,
                 'location' => $ticket->location,
                 'pg_order_id' => $pgResponse['id'],
