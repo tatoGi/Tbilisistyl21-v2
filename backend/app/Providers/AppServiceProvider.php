@@ -41,6 +41,10 @@ class AppServiceProvider extends ServiceProvider
             return Limit::perMinute(5)->by($request->ip());
         });
 
+        RateLimiter::for('votes', function ($request) {
+            return Limit::perMinute(20)->by($request->ip());
+        });
+
         // Livewire/Filament admin uploads expect this directory on the default disk.
         $livewireTmp = storage_path('app/private/livewire-tmp');
         if (! is_dir($livewireTmp)) {

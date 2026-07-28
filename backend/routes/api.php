@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Admin\AuthController;
 use App\Http\Controllers\Admin\TicketScannerController;
+use App\Http\Controllers\Api\DjVoteController;
 use App\Http\Controllers\Api\LocaleController;
 use App\Http\Controllers\Api\MusicTrackController;
 use App\Http\Controllers\Api\PageController;
@@ -46,6 +47,11 @@ Route::middleware(['locale', 'throttle:api'])->group(function () {
 Route::middleware(['locale', 'throttle:orders'])->group(function () {
     Route::post('/orders/tickets', [TicketOrderController::class, 'store']);
     Route::post('/orders/products', [ProductOrderController::class, 'store']);
+});
+
+Route::middleware(['locale', 'throttle:votes'])->group(function () {
+    Route::get('/dj-vote', [DjVoteController::class, 'show']);
+    Route::post('/dj-vote', [DjVoteController::class, 'store']);
 });
 
 Route::post('/check-personal-number', [PersonalNumberController::class, 'check'])
