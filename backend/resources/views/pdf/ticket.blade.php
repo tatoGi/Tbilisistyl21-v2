@@ -111,9 +111,13 @@
             padding: 8px;
             width: 170px;
         }
+        /* Must match .qr-card's width exactly: any leftover width collects on
+           one side (the cell is right-aligned) and the white frame goes
+           lopsided. display:block also drops the inline baseline gap. */
         .qr-card img {
-            width: 154px;
-            height: 154px;
+            display: block;
+            width: 170px;
+            height: 170px;
         }
         .footer {
             margin-top: 22px;
