@@ -16,7 +16,7 @@ class DjVoteController extends Controller
 
     public function show(Request $request): JsonResponse
     {
-        return response()->json($this->state($request, DjVotingRound::current()));
+        return response()->json($this->state(DjVotingRound::current(), $this->tokenOrNull($request)));
     }
 
     public function store(Request $request): JsonResponse
@@ -40,21 +40,25 @@ class DjVoteController extends Controller
 
         $this->votes->castVote($round, $djId, $token, $request->ip());
 
-        return response()->json($this->state($request, $round->refresh()));
+        return response()->json($this->state($round, $token));
     }
 
-    /** The full client-facing payload for a round (or the no-round case). */
-    private function state(Request $request, ?DjVotingRound $round): array
+    /**
+     * The full client-facing payload for a round (or the no-round case).
+     *
+     * A public read never requires a voter token — only casting a vote does.
+     * A null token means "unknown voter": skip the vote lookup and report
+     * the not-voted payload rather than guessing an identity.
+     */
+    private function state(?DjVotingRound $round, ?string $token): array
     {
-        $token = $this->token($request);
-
         if (!$round) {
             return ['round' => null, 'djs' => [], 'hasVoted' => false, 'votedDjId' => null, 'results' => null];
         }
 
-        $vote = DjVote::where('round_id', $round->id)
-            ->where('voter_token', $token)
-            ->first();
+        $vote = $token !== null
+            ? DjVote::where('round_id', $round->id)->where('voter_token', $token)->first()
+            : null;
 
         $djs = $round->djs()->published()->with('photo')->get()->map(fn ($dj) => [
             'id' => $dj->id,
@@ -75,12 +79,25 @@ class DjVoteController extends Controller
         ];
     }
 
+    /** Strict: casting a vote requires a real voter token. */
     private function token(Request $request): string
+    {
+        $token = $this->tokenOrNull($request);
+
+        if ($token === null) {
+            throw ValidationException::withMessages(['token' => 'A voter token is required.']);
+        }
+
+        return $token;
+    }
+
+    /** Lenient: a public ballot read is allowed without one. */
+    private function tokenOrNull(Request $request): ?string
     {
         $token = trim((string) $request->header('X-Vote-Token'));
 
         if ($token === '' || strlen($token) > 64) {
-            throw ValidationException::withMessages(['token' => 'A voter token is required.']);
+            return null;
         }
 
         return $token;

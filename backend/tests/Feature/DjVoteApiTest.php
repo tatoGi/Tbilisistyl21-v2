@@ -170,4 +170,24 @@ class DjVoteApiTest extends TestCase
 
         $this->postJson('/api/dj-vote', ['djId' => $dj->id])->assertStatus(422);
     }
+
+    public function test_get_without_a_token_still_returns_the_ballot(): void
+    {
+        $round = $this->openRound();
+        $dj = Dj::create(['name' => 'A', 'status' => 'published']);
+        $round->djs()->attach($dj->id);
+
+        $response = $this->getJson('/api/dj-vote')
+            ->assertOk()
+            ->assertJson(['hasVoted' => false, 'votedDjId' => null, 'results' => null]);
+
+        $this->assertSame(['A'], array_column($response->json('djs'), 'name'));
+    }
+
+    public function test_get_without_a_token_and_without_an_open_round_returns_null_round(): void
+    {
+        $this->getJson('/api/dj-vote')
+            ->assertOk()
+            ->assertJson(['round' => null]);
+    }
 }
