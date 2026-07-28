@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class DjVotingRound extends Model
 {
@@ -23,6 +24,11 @@ class DjVotingRound extends Model
             ->using(DjVotingRoundDj::class)
             ->withPivot('order')
             ->orderByRaw('COALESCE(dj_voting_round_dj.`order`, djs.`order`)');
+    }
+
+    public function votes(): HasMany
+    {
+        return $this->hasMany(DjVote::class, 'round_id');
     }
 
     /** Derived from the clock so it can never drift out of sync. */

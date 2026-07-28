@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Spatie\Translatable\HasTranslations;
 
 class Dj extends Model
@@ -19,6 +20,11 @@ class Dj extends Model
     public function photo(): BelongsTo
     {
         return $this->belongsTo(Media::class, 'photo_id');
+    }
+
+    public function votes(): HasMany
+    {
+        return $this->hasMany(DjVote::class, 'dj_id');
     }
 
     public function scopePublished(Builder $query): Builder
