@@ -2,8 +2,10 @@
 
 namespace App\Filament\Concerns;
 
+use App\Models\Media;
 use Filament\Forms;
 use Filament\Forms\Components\Builder as BlockBuilder;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
 /**
@@ -269,6 +271,53 @@ trait HasContentBlocks
         }
 
         return is_string($value) && $value !== '' ? $value : null;
+    }
+
+    /**
+     * Map a Filament upload to a `media` row and set the owning foreign key.
+     *
+     * An absent upload key means the field was not part of this form submission
+     * and is left untouched; an empty one means the user cleared the image.
+     */
+    public static function mergeUploadedMedia(array $data, string $uploadField, string $foreignKey): array
+    {
+        if (!array_key_exists($uploadField, $data)) {
+            return $data;
+        }
+
+        $raw = static::extractFilePath($data[$uploadField]);
+        unset($data[$uploadField]);
+
+        if (!$raw) {
+            $data[$foreignKey] = null;
+
+            return $data;
+        }
+
+        $diskPath = static::diskPath($raw) ?? ltrim($raw, '/');
+        $filename = basename($diskPath);
+
+        if (!Storage::disk('public')->exists($diskPath)) {
+            $diskPath = 'media/' . $filename;
+        }
+
+        $media = Media::firstOrCreate(
+            ['filename' => $filename],
+            [
+                'path' => 'media/' . $filename,
+                'mime_type' => Storage::disk('public')->mimeType($diskPath) ?: 'image/jpeg',
+                'size' => Storage::disk('public')->size($diskPath) ?: 0,
+                'alt' => null,
+            ],
+        );
+
+        if ($media->path !== 'media/' . $filename) {
+            $media->update(['path' => 'media/' . $filename]);
+        }
+
+        $data[$foreignKey] = $media->id;
+
+        return $data;
     }
 
     /** Stored/API path: always `/storage/...` for frontend consumption. */

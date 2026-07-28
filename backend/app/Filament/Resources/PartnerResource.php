@@ -11,7 +11,6 @@ use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
-use Illuminate\Support\Facades\Storage;
 
 class PartnerResource extends Resource
 {
@@ -126,43 +125,7 @@ class PartnerResource extends Resource
     /** Map a Filament upload to a `media` row and set `logo_id` on the partner payload. */
     public static function mergeUploadedLogo(array $data): array
     {
-        if (!array_key_exists('logo_upload', $data)) {
-            return $data;
-        }
-
-        $raw = static::extractFilePath($data['logo_upload']);
-        unset($data['logo_upload']);
-
-        if (!$raw) {
-            $data['logo_id'] = null;
-
-            return $data;
-        }
-
-        $diskPath = static::diskPath($raw) ?? ltrim($raw, '/');
-        $filename = basename($diskPath);
-
-        if (!Storage::disk('public')->exists($diskPath)) {
-            $diskPath = 'media/' . $filename;
-        }
-
-        $media = Media::firstOrCreate(
-            ['filename' => $filename],
-            [
-                'path' => 'media/' . $filename,
-                'mime_type' => Storage::disk('public')->mimeType($diskPath) ?: 'image/jpeg',
-                'size' => Storage::disk('public')->size($diskPath) ?: 0,
-                'alt' => null,
-            ],
-        );
-
-        if ($media->path !== 'media/' . $filename) {
-            $media->update(['path' => 'media/' . $filename]);
-        }
-
-        $data['logo_id'] = $media->id;
-
-        return $data;
+        return static::mergeUploadedMedia($data, 'logo_upload', 'logo_id');
     }
 
     public static function logoForForm(?Media $logo): array
