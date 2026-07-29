@@ -66,4 +66,50 @@ class DjVotingRoundTest extends TestCase
 
         $this->assertSame(['One'], $round->refresh()->djs->pluck('name')->all());
     }
+
+    /**
+     * The ballot ordering is raw SQL, and `order` is a reserved word that has
+     * to be quoted. The test suite runs on SQLite, which tolerates MySQL
+     * backticks; the app runs on Postgres, which rejects them outright. So
+     * assert the identifier quoting comes from the connection's own grammar
+     * rather than being hardcoded for one driver.
+     */
+    public function test_ballot_ordering_is_quoted_by_the_connection_grammar(): void
+    {
+        $round = DjVotingRound::create([
+            'title' => 'Now',
+            'starts_at' => now()->subHour(),
+            'ends_at' => now()->addHour(),
+        ]);
+
+        $sql = $round->djs()->toSql();
+        $grammar = $round->getConnection()->getQueryGrammar();
+
+        $this->assertStringNotContainsString('`', $sql);
+        $this->assertStringContainsString(
+            sprintf(
+                'coalesce(%s, %s)',
+                $grammar->wrap('dj_voting_round_dj.order'),
+                $grammar->wrap('djs.order'),
+            ),
+            strtolower($sql),
+        );
+    }
+
+    /** Per-round order wins; DJs without an override fall back to their own. */
+    public function test_ballot_order_prefers_the_pivot_override(): void
+    {
+        $round = DjVotingRound::create([
+            'title' => 'Now',
+            'starts_at' => now()->subHour(),
+            'ends_at' => now()->addHour(),
+        ]);
+        $first = Dj::create(['name' => 'First', 'order' => 9, 'status' => 'published']);
+        $second = Dj::create(['name' => 'Second', 'order' => 2, 'status' => 'published']);
+
+        $round->djs()->attach($first->id, ['order' => 1]);
+        $round->djs()->attach($second->id);
+
+        $this->assertSame(['First', 'Second'], $round->djs()->pluck('name')->all());
+    }
 }

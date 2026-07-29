@@ -20,10 +20,19 @@ class DjVotingRound extends Model
 
     public function djs(): BelongsToMany
     {
+        // `order` is a reserved word, so it must be quoted — and the quoting
+        // has to come from the connection's grammar, not be hardcoded:
+        // Postgres (what we run on) rejects the MySQL backtick outright.
+        $grammar = $this->getConnection()->getQueryGrammar();
+
         return $this->belongsToMany(Dj::class, 'dj_voting_round_dj', 'round_id', 'dj_id')
             ->using(DjVotingRoundDj::class)
             ->withPivot('order')
-            ->orderByRaw('COALESCE(dj_voting_round_dj.`order`, djs.`order`)');
+            ->orderByRaw(sprintf(
+                'COALESCE(%s, %s)',
+                $grammar->wrap('dj_voting_round_dj.order'),
+                $grammar->wrap('djs.order'),
+            ));
     }
 
     public function votes(): HasMany
