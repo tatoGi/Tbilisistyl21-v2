@@ -3,8 +3,8 @@
 namespace App\Filament\Resources\DjVotingRoundResource\Pages;
 
 use App\Filament\Resources\DjVotingRoundResource;
+use App\Models\DjVotingRound;
 use Filament\Resources\Pages\CreateRecord;
-use Illuminate\Support\Carbon;
 
 class CreateDjVotingRound extends CreateRecord
 {
@@ -13,10 +13,11 @@ class CreateDjVotingRound extends CreateRecord
     /** `ends_at` is always derived from start + duration, never edited directly. */
     protected function mutateFormDataBeforeCreate(array $data): array
     {
-        $hours = (int) ($data['duration_hours'] ?? 24);
-        unset($data['duration_hours']);
+        $value = (int) ($data['duration_value'] ?? 24);
+        $unit = (string) ($data['duration_unit'] ?? 'hours');
+        unset($data['duration_value'], $data['duration_unit']);
 
-        $data['ends_at'] = Carbon::parse($data['starts_at'])->addHours($hours);
+        $data['ends_at'] = DjVotingRound::resolveEndsAt($data['starts_at'], $value, $unit);
 
         return $data;
     }

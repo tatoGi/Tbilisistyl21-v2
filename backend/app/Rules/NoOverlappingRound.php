@@ -16,17 +16,20 @@ class NoOverlappingRound implements ValidationRule
     public function __construct(
         private ?string $ignoreId,
         private ?string $startsAt,
-        private int $durationHours,
+        private int $durationValue,
+        private string $durationUnit = 'hours',
     ) {}
 
     public function validate(string $attribute, mixed $value, Closure $fail): void
     {
-        if (!$this->startsAt || $this->durationHours < 1) {
+        if (!$this->startsAt || $this->durationValue < 1) {
             return;
         }
 
         $start = Carbon::parse($this->startsAt);
-        $end = $start->copy()->addHours($this->durationHours);
+        // Same helper the form pages use, so the window that gets validated is
+        // exactly the window that gets stored.
+        $end = DjVotingRound::resolveEndsAt($start, $this->durationValue, $this->durationUnit);
 
         if (static::conflictExists($this->ignoreId, $start, $end)) {
             $fail('This window overlaps another voting round. Only one round may run at a time.');

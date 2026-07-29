@@ -51,16 +51,29 @@ class DjVotingRoundResource extends Resource
                                 new NoOverlappingRound(
                                     $record?->id,
                                     $get('starts_at'),
-                                    (int) $get('duration_hours'),
+                                    (int) $get('duration_value'),
+                                    (string) $get('duration_unit'),
                                 ),
                             ]),
-                        Forms\Components\TextInput::make('duration_hours')
-                            ->label('Duration (hours)')
+                        Forms\Components\TextInput::make('duration_value')
+                            ->label('Duration')
                             ->numeric()
                             ->minValue(1)
                             ->default(24)
                             ->required()
-                            ->helperText('Voting closes automatically after this many hours.'),
+                            ->live(onBlur: true)
+                            ->helperText('Voting closes automatically once this runs out.'),
+                        Forms\Components\Select::make('duration_unit')
+                            ->label('Duration unit')
+                            ->options([
+                                'hours' => 'Hours',
+                                'days' => 'Days',
+                                'months' => 'Months',
+                            ])
+                            ->default('hours')
+                            ->required()
+                            ->live()
+                            ->helperText('Use months for a long run, e.g. 5 months to keep voting open until December.'),
                     ])
                     ->columns(2),
             ]);

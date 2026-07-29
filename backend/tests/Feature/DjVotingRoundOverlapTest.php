@@ -24,14 +24,51 @@ class DjVotingRoundOverlapTest extends TestCase
         ]);
     }
 
-    private function fails(?string $ignoreId, string $startsAt, int $hours): bool
+    private function fails(?string $ignoreId, string $startsAt, int $value, string $unit = 'hours'): bool
     {
         $validator = Validator::make(
             ['starts_at' => $startsAt],
-            ['starts_at' => [new NoOverlappingRound($ignoreId, $startsAt, $hours)]],
+            ['starts_at' => [new NoOverlappingRound($ignoreId, $startsAt, $value, $unit)]],
         );
 
         return $validator->fails();
+    }
+
+    /**
+     * A months-long round must be checked against the window it will actually
+     * occupy, not a window mis-read as hours.
+     */
+    public function test_a_months_long_window_is_checked_in_months(): void
+    {
+        $existing = $this->existingRound();
+
+        // Starts the moment the existing round ends, runs 5 months: no overlap.
+        $this->assertFalse($this->fails(null, $existing->ends_at->toDateTimeString(), 5, 'months'));
+
+        // Starts an hour before it ends, runs 5 months: overlaps.
+        $this->assertTrue($this->fails(
+            null,
+            $existing->ends_at->copy()->subHour()->toDateTimeString(),
+            5,
+            'months',
+        ));
+    }
+
+    /** A later round must not be allowed to start inside a months-long one. */
+    public function test_a_short_round_inside_a_months_long_round_is_rejected(): void
+    {
+        DjVotingRound::create([
+            'title' => 'Until December',
+            'starts_at' => now()->startOfHour()->addDays(2),
+            'ends_at' => DjVotingRound::resolveEndsAt(now()->startOfHour()->addDays(2), 5, 'months'),
+        ]);
+
+        $this->assertTrue($this->fails(
+            null,
+            now()->startOfHour()->addMonths(2)->toDateTimeString(),
+            2,
+            'hours',
+        ));
     }
 
     public function test_overlapping_window_is_rejected(): void

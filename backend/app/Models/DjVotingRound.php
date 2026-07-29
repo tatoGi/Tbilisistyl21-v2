@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Support\Carbon;
 
 class DjVotingRound extends Model
 {
@@ -38,6 +39,52 @@ class DjVotingRound extends Model
     public function votes(): HasMany
     {
         return $this->hasMany(DjVote::class, 'round_id');
+    }
+
+    /** Duration units the admin can pick, longest-lived first. */
+    public const DURATION_UNITS = ['months', 'days', 'hours'];
+
+    /**
+     * The single place a duration becomes an `ends_at`, shared by the form
+     * pages and the overlap rule so a round can never be validated against a
+     * different window than the one that gets stored.
+     */
+    public static function resolveEndsAt(Carbon|string $startsAt, int $value, string $unit): Carbon
+    {
+        $start = $startsAt instanceof Carbon ? $startsAt->copy() : Carbon::parse($startsAt);
+
+        return match ($unit) {
+            // NoOverflow: plain addMonths turns 31 Jan + 1 month into 3 March,
+            // which is not what an admin picking "1 month" means.
+            'months' => $start->addMonthsNoOverflow($value),
+            'days' => $start->addDays($value),
+            default => $start->addHours($value),
+        };
+    }
+
+    /**
+     * The inverse of resolveEndsAt, for filling the edit form: report the
+     * largest unit that reproduces the stored window exactly, so "5 months"
+     * comes back as 5 months rather than 3672 hours. Anything that is not a
+     * whole number of larger units stays in hours.
+     */
+    public static function describeDuration(Carbon $startsAt, Carbon $endsAt): array
+    {
+        foreach (static::DURATION_UNITS as $unit) {
+            $value = match ($unit) {
+                'months' => $startsAt->diffInMonths($endsAt),
+                'days' => $startsAt->diffInDays($endsAt),
+                default => $startsAt->diffInHours($endsAt),
+            };
+
+            $value = (int) $value;
+
+            if ($value >= 1 && static::resolveEndsAt($startsAt, $value, $unit)->equalTo($endsAt)) {
+                return ['value' => $value, 'unit' => $unit];
+            }
+        }
+
+        return ['value' => max(1, (int) $startsAt->diffInHours($endsAt)), 'unit' => 'hours'];
     }
 
     /** Derived from the clock so it can never drift out of sync. */
