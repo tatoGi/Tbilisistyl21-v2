@@ -6,6 +6,17 @@ import type { DjVoteState } from "@/lib/types";
 
 type Props = { initial: DjVoteState; locale: string };
 
+/** Up to two initials, so a photoless card still reads as that specific DJ. */
+function initials(name: string): string {
+  const parts = name.trim().split(/\s+/).filter(Boolean);
+  if (parts.length === 0) return "?";
+
+  return parts
+    .slice(0, 2)
+    .map((part) => [...part][0]?.toUpperCase() ?? "")
+    .join("");
+}
+
 function remainingLabel(endsAt: string): string | null {
   const ms = new Date(endsAt).getTime() - Date.now();
   if (Number.isNaN(ms) || ms <= 0) return null;
@@ -129,7 +140,21 @@ export default function DjVote({ initial, locale }: Props) {
                         alt={dj.name}
                         className="h-full w-full object-cover"
                       />
-                    ) : null}
+                    ) : (
+                      // A bare empty square reads as a broken image, so a
+                      // photoless DJ gets a deliberate placeholder instead.
+                      <div
+                        aria-hidden="true"
+                        className="flex h-full w-full flex-col items-center justify-center gap-2 bg-gradient-to-br from-white/10 to-transparent"
+                      >
+                        <span className="text-3xl font-bold tracking-widest text-white/70 sm:text-4xl">
+                          {initials(dj.name)}
+                        </span>
+                        <span className="text-[10px] uppercase tracking-[0.2em] text-amber-400/70">
+                          ხმის მიცემა
+                        </span>
+                      </div>
+                    )}
                   </div>
 
                   <div className="p-3">
