@@ -17,11 +17,19 @@ function remainingLabel(endsAt: string): string | null {
   return hours > 0 ? `${hours}სთ ${minutes}წთ` : `${minutes}წთ`;
 }
 
-/** Ticks once a minute — the round closes on the server, this is only a hint. */
+/**
+ * Ticks once a minute — the round closes on the server, this is only a hint.
+ *
+ * Deliberately renders nothing until mounted: the remaining time is derived
+ * from `Date.now()`, so computing it during SSR guarantees a hydration
+ * mismatch as soon as the clock crosses a minute between the two renders.
+ */
 function Countdown({ endsAt }: { endsAt: string }) {
-  const [label, setLabel] = useState<string | null>(() => remainingLabel(endsAt));
+  const [label, setLabel] = useState<string | null>(null);
 
   useEffect(() => {
+    setLabel(remainingLabel(endsAt));
+
     const id = setInterval(() => setLabel(remainingLabel(endsAt)), 60_000);
     return () => clearInterval(id);
   }, [endsAt]);
