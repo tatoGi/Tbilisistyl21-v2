@@ -107,3 +107,24 @@ export interface Partner {
 export interface SiteSettings {
   [key: string]: unknown;
 }
+
+export type DjVoteBallotDj = {
+  id: string;
+  name: string;
+  bio: Translatable | null;
+  photo: string | null;
+};
+
+export type DjVoteResult = {
+  djId: string;
+  votes: number;
+  percent: number;
+};
+
+export type DjVoteState = {
+  round: { id: string; endsAt: string } | null;
+  djs: DjVoteBallotDj[];
+  hasVoted: boolean;
+  votedDjId: string | null;
+  results: DjVoteResult[] | null;
+};
