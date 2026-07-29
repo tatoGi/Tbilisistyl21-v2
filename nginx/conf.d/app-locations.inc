@@ -18,6 +18,22 @@
         include /etc/nginx/conf.d/proxy-laravel.conf;
     }
 
+    # The only /api/ path served by Next.js rather than Laravel. This route
+    # handler owns the first-party `dj_vote_token` httpOnly cookie and forwards
+    # it to Laravel as the X-Vote-Token header — Laravel itself never sees the
+    # cookie. An exact-match location outranks the `/api/` prefix below, which
+    # would otherwise send the browser straight to Laravel and fail every vote
+    # with 422 (the header only exists once Next.js has added it).
+    location = /api/dj-vote {
+        limit_req zone=api_general burst=20 nodelay;
+        proxy_pass http://nextjs;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_http_version 1.1;
+    }
+
     location /api/ {
         limit_req zone=api_general burst=20 nodelay;
         proxy_pass http://laravel;
