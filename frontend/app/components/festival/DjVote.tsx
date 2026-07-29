@@ -3,9 +3,20 @@
 import { useEffect, useState } from "react";
 import { useTranslations } from "next-intl";
 import { mediaUrl, t } from "@/lib/utils";
-import type { DjVoteState } from "@/lib/types";
+import type { DjVoteState, Translatable } from "@/lib/types";
 
 type Props = { initial: DjVoteState; locale: string };
+
+/**
+ * Admin copy for exactly this locale, or nothing.
+ *
+ * Deliberately not the shared `t()` helper: that falls back to Georgian when a
+ * language is blank, which would show Georgian to a Russian visitor. Here a
+ * blank language is meant to fall through to the built-in translation instead.
+ */
+function copyForLocale(field: Translatable | null, locale: string): string {
+  return field?.[locale as keyof Translatable]?.trim() ?? "";
+}
 
 /** Up to two initials, so a photoless card still reads as that specific DJ. */
 function initials(name: string): string {
@@ -107,10 +118,12 @@ export default function DjVote({ initial, locale }: Props) {
     <section className="w-full bg-black px-4 py-16 text-white sm:px-8">
       <div className="mx-auto max-w-5xl">
         <h2 className="text-center text-2xl font-bold uppercase tracking-widest sm:text-3xl">
-          {tr("heading")}
+          {copyForLocale(state.round.heading, locale) || tr("heading")}
         </h2>
         <p className="mt-3 text-center text-sm text-white/60">
-          {state.hasVoted ? tr("promptAfterVote") : tr("promptBeforeVote")}
+          {state.hasVoted
+            ? tr("promptAfterVote")
+            : copyForLocale(state.round.subtitle, locale) || tr("promptBeforeVote")}
         </p>
 
         <Countdown endsAt={state.round.endsAt} />

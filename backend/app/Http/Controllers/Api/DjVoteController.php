@@ -70,7 +70,15 @@ class DjVoteController extends Controller
         ])->all();
 
         return [
-            'round' => ['id' => $round->id, 'endsAt' => $round->ends_at->toIso8601String()],
+            'round' => [
+                'id' => $round->id,
+                'endsAt' => $round->ends_at->toIso8601String(),
+                // Every locale, not a collapsed string — the frontend picks.
+                // Null when the admin left it blank, so the frontend can fall
+                // back to its own translated defaults.
+                'heading' => $round->getTranslations('heading') ?: null,
+                'subtitle' => $round->getTranslations('subtitle') ?: null,
+            ],
             'djs' => $djs,
             'hasVoted' => (bool) $vote,
             'votedDjId' => $vote?->dj_id,

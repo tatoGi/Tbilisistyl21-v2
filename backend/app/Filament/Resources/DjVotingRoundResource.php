@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources;
 
+use App\Filament\Concerns\HasContentBlocks;
 use App\Filament\Resources\DjVotingRoundResource\Pages;
 use App\Models\Dj;
 use App\Models\DjVotingRound;
@@ -16,6 +17,8 @@ use Filament\Tables\Table;
 
 class DjVotingRoundResource extends Resource
 {
+    use HasContentBlocks;
+
     protected static ?string $model = DjVotingRound::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-hand-raised';
@@ -34,7 +37,8 @@ class DjVotingRoundResource extends Resource
                     ->schema([
                         Forms\Components\TextInput::make('title')
                             ->required()
-                            ->maxLength(255),
+                            ->maxLength(255)
+                            ->helperText('Admin-only label — never shown on the site.'),
                         Forms\Components\Select::make('djs')
                             ->label('DJs on the ballot')
                             ->relationship('djs', 'name', fn ($query) => $query->published())
@@ -76,6 +80,16 @@ class DjVotingRoundResource extends Resource
                             ->helperText('Use months for a long run, e.g. 5 months to keep voting open until December.'),
                     ])
                     ->columns(2),
+
+                Forms\Components\Section::make('Public copy')
+                    ->description('Shown above the ballot on the festival page. Leave a language blank to use the built-in translation for it.')
+                    ->collapsed()
+                    ->schema([
+                        static::localizedInput('heading', 'Heading')
+                            ->columnSpanFull(),
+                        static::localizedInput('subtitle', 'Subtitle', textarea: true)
+                            ->columnSpanFull(),
+                    ]),
             ]);
     }
 

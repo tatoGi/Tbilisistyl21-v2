@@ -7,12 +7,16 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Carbon;
+use Spatie\Translatable\HasTranslations;
 
 class DjVotingRound extends Model
 {
-    use HasUuids;
+    use HasUuids, HasTranslations;
 
-    protected $fillable = ['title', 'starts_at', 'ends_at'];
+    /** Public-facing copy; blank falls back to the frontend's translations. */
+    public array $translatable = ['heading', 'subtitle'];
+
+    protected $fillable = ['title', 'heading', 'subtitle', 'starts_at', 'ends_at'];
 
     protected $casts = [
         'starts_at' => 'datetime',

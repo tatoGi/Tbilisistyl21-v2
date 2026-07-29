@@ -122,7 +122,13 @@ export type DjVoteResult = {
 };
 
 export type DjVoteState = {
-  round: { id: string; endsAt: string } | null;
+  round: {
+    id: string;
+    endsAt: string;
+    /** Admin-authored copy; null means "use the built-in translation". */
+    heading: Translatable | null;
+    subtitle: Translatable | null;
+  } | null;
   djs: DjVoteBallotDj[];
   hasVoted: boolean;
   votedDjId: string | null;
