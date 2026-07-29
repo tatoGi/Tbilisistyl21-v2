@@ -97,17 +97,13 @@ class DjVotingRoundResource extends Resource
                     ->visible(fn (DjVotingRound $record) => $record->state() === 'scheduled')
                     ->action(function (DjVotingRound $record) {
                         // Pulling the start forward can collide with another
-                        // round, so the invariant is re-checked here too.
+                        // round, so the invariant is re-checked here too,
+                        // via the same predicate the form rule uses.
                         $hours = $record->starts_at->diffInHours($record->ends_at);
-                        $end = now()->addHours($hours);
+                        $now = now();
+                        $end = $now->copy()->addHours($hours);
 
-                        $conflict = DjVotingRound::query()
-                            ->whereKeyNot($record->id)
-                            ->where('starts_at', '<', $end)
-                            ->where('ends_at', '>', now())
-                            ->exists();
-
-                        if ($conflict) {
+                        if (NoOverlappingRound::conflictExists($record->id, $now, $end)) {
                             Notification::make()
                                 ->title('Another round is already running')
                                 ->danger()
@@ -116,7 +112,7 @@ class DjVotingRoundResource extends Resource
                             return;
                         }
 
-                        $record->update(['starts_at' => now(), 'ends_at' => $end]);
+                        $record->update(['starts_at' => $now, 'ends_at' => $end]);
                     }),
                 Tables\Actions\Action::make('close')
                     ->label('Close now')

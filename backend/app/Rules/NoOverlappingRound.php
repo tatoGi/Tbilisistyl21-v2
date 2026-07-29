@@ -28,14 +28,23 @@ class NoOverlappingRound implements ValidationRule
         $start = Carbon::parse($this->startsAt);
         $end = $start->copy()->addHours($this->durationHours);
 
-        $conflict = DjVotingRound::query()
-            ->when($this->ignoreId, fn ($q) => $q->whereKeyNot($this->ignoreId))
+        if (static::conflictExists($this->ignoreId, $start, $end)) {
+            $fail('This window overlaps another voting round. Only one round may run at a time.');
+        }
+    }
+
+    /**
+     * The single source of truth for the overlap predicate, shared by this
+     * rule (form-time validation) and any action that mutates a round's
+     * window at runtime (e.g. the "Start now" table action), so the
+     * invariant can't drift between the two call sites.
+     */
+    public static function conflictExists(?string $ignoreId, Carbon $start, Carbon $end): bool
+    {
+        return DjVotingRound::query()
+            ->when($ignoreId, fn ($q) => $q->whereKeyNot($ignoreId))
             ->where('starts_at', '<', $end)
             ->where('ends_at', '>', $start)
             ->exists();
-
-        if ($conflict) {
-            $fail('This window overlaps another voting round. Only one round may run at a time.');
-        }
     }
 }
