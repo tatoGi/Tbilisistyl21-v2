@@ -145,5 +145,18 @@
     "title": "Страница не найдена",
     "description": "Этот route не находится на карте Tbilisi Style 21. Вернитесь на фестиваль и продолжайте энергию.",
     "back": "Назад к фестивалю"
+  },
+  "djVote": {
+    "heading": "Кто будет играть?",
+    "promptBeforeVote": "Выбери диджея и посмотри результаты.",
+    "promptAfterVote": "Твой голос учтён — его ещё можно изменить.",
+    "remaining": "Осталось {time}",
+    "hoursMinutes": "{hours}ч {minutes}м",
+    "minutes": "{minutes}м",
+    "votePlaceholder": "Голосовать",
+    "voteCount": "{votes} голосов",
+    "errorClosed": "Голосование завершено.",
+    "errorFailed": "Не удалось сохранить голос. Попробуй ещё раз.",
+    "errorNetwork": "Ошибка соединения. Попробуй ещё раз."
   }
 }

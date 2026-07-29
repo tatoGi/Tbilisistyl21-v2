@@ -145,5 +145,18 @@
     "title": "Page Not Found",
     "description": "This route is not on the Tbilisi Style 21 map. Return to the festival and keep the energy moving.",
     "back": "Back To Festival"
+  },
+  "djVote": {
+    "heading": "Who will play?",
+    "promptBeforeVote": "Pick a DJ and see the results.",
+    "promptAfterVote": "Your vote is in — you can still change it.",
+    "remaining": "{time} left",
+    "hoursMinutes": "{hours}h {minutes}m",
+    "minutes": "{minutes}m",
+    "votePlaceholder": "Vote",
+    "voteCount": "{votes} votes",
+    "errorClosed": "Voting has closed.",
+    "errorFailed": "Your vote could not be saved. Please try again.",
+    "errorNetwork": "Connection error. Please try again."
   }
 }

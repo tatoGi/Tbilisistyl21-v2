@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useTranslations } from "next-intl";
 import { mediaUrl, t } from "@/lib/utils";
 import type { DjVoteState } from "@/lib/types";
 
@@ -17,15 +18,14 @@ function initials(name: string): string {
     .join("");
 }
 
-function remainingLabel(endsAt: string): string | null {
+/** Remaining time as raw numbers; the wording is left to the translations. */
+function remaining(endsAt: string): { hours: number; minutes: number } | null {
   const ms = new Date(endsAt).getTime() - Date.now();
   if (Number.isNaN(ms) || ms <= 0) return null;
 
   const totalMinutes = Math.floor(ms / 60000);
-  const hours = Math.floor(totalMinutes / 60);
-  const minutes = totalMinutes % 60;
 
-  return hours > 0 ? `${hours}სთ ${minutes}წთ` : `${minutes}წთ`;
+  return { hours: Math.floor(totalMinutes / 60), minutes: totalMinutes % 60 };
 }
 
 /**
@@ -36,25 +36,32 @@ function remainingLabel(endsAt: string): string | null {
  * mismatch as soon as the clock crosses a minute between the two renders.
  */
 function Countdown({ endsAt }: { endsAt: string }) {
-  const [label, setLabel] = useState<string | null>(null);
+  const tr = useTranslations("djVote");
+  const [left, setLeft] = useState<{ hours: number; minutes: number } | null>(null);
 
   useEffect(() => {
-    setLabel(remainingLabel(endsAt));
+    setLeft(remaining(endsAt));
 
-    const id = setInterval(() => setLabel(remainingLabel(endsAt)), 60_000);
+    const id = setInterval(() => setLeft(remaining(endsAt)), 60_000);
     return () => clearInterval(id);
   }, [endsAt]);
 
-  if (!label) return null;
+  if (!left) return null;
+
+  const time =
+    left.hours > 0
+      ? tr("hoursMinutes", { hours: left.hours, minutes: left.minutes })
+      : tr("minutes", { minutes: left.minutes });
 
   return (
     <p className="mt-2 text-center text-xs uppercase tracking-widest text-amber-400">
-      დარჩა {label}
+      {tr("remaining", { time })}
     </p>
   );
 }
 
 export default function DjVote({ initial, locale }: Props) {
+  const tr = useTranslations("djVote");
   const [state, setState] = useState<DjVoteState>(initial);
   const [pending, setPending] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -77,20 +84,20 @@ export default function DjVote({ initial, locale }: Props) {
       });
 
       if (res.status === 409) {
-        setError("ხმის მიცემა დასრულებულია.");
+        setError(tr("errorClosed"));
         const refreshed = await fetch("/api/dj-vote").then((r) => r.json());
         setState(refreshed as DjVoteState);
         return;
       }
 
       if (!res.ok) {
-        setError("ხმის მიცემა ვერ მოხერხდა. სცადე თავიდან.");
+        setError(tr("errorFailed"));
         return;
       }
 
       setState((await res.json()) as DjVoteState);
     } catch {
-      setError("კავშირის შეცდომა. სცადე თავიდან.");
+      setError(tr("errorNetwork"));
     } finally {
       setPending(null);
     }
@@ -100,12 +107,10 @@ export default function DjVote({ initial, locale }: Props) {
     <section className="w-full bg-black px-4 py-16 text-white sm:px-8">
       <div className="mx-auto max-w-5xl">
         <h2 className="text-center text-2xl font-bold uppercase tracking-widest sm:text-3xl">
-          ვინ დაუკრავს?
+          {tr("heading")}
         </h2>
         <p className="mt-3 text-center text-sm text-white/60">
-          {state.hasVoted
-            ? "შენი ხმა დაფიქსირდა — შეგიძლია შეცვალო."
-            : "აირჩიე დიჯეი და ნახე შედეგები."}
+          {state.hasVoted ? tr("promptAfterVote") : tr("promptBeforeVote")}
         </p>
 
         <Countdown endsAt={state.round.endsAt} />
@@ -151,7 +156,7 @@ export default function DjVote({ initial, locale }: Props) {
                           {initials(dj.name)}
                         </span>
                         <span className="text-[10px] uppercase tracking-[0.2em] text-amber-400/70">
-                          ხმის მიცემა
+                          {tr("votePlaceholder")}
                         </span>
                       </div>
                     )}
@@ -174,7 +179,7 @@ export default function DjVote({ initial, locale }: Props) {
                           />
                         </div>
                         <span className="mt-1 block text-xs text-white/60">
-                          {votes} ხმა · {percent}%
+                          {tr("voteCount", { votes })} · {percent}%
                         </span>
                       </div>
                     ) : null}
