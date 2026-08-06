@@ -8,3 +8,7 @@ nul
 
 # Local-only operations docs (server IPs, credentials hints — never push)
 _ops/
+
+# Production payment gateway certs/keys — never push
+cert/
+bank-csr/
