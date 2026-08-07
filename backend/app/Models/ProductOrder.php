@@ -12,7 +12,8 @@ class ProductOrder extends Model
 
     protected $fillable = [
         'id', 'product_id', 'product_title', 'size', 'name', 'surname', 'personal_number',
-        'email', 'phone', 'amount', 'status', 'pg_order_id', 'pg_hpp_url', 'pg_password', 'qr_code',
+        'email', 'phone', 'amount', 'base_amount', 'surcharge_amount', 'surcharge_rate',
+        'status', 'paid_at', 'pg_order_id', 'pg_hpp_url', 'pg_password', 'qr_code',
         'sold_by', 'discount_amount',
     ];
 
@@ -20,7 +21,11 @@ class ProductOrder extends Model
     {
         return [
             'amount' => 'decimal:2',
+            'base_amount' => 'decimal:2',
+            'surcharge_amount' => 'decimal:2',
+            'surcharge_rate' => 'decimal:2',
             'discount_amount' => 'decimal:2',
+            'paid_at' => 'datetime',
         ];
     }
 

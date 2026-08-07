@@ -12,6 +12,7 @@ class SoldTicket extends Model
 
     protected $fillable = [
         'id', 'personal_number', 'email', 'name', 'surname', 'amount',
+        'base_amount', 'surcharge_amount', 'surcharge_rate',
         'status', 'original_ticket_id', 'event_name', 'event_date',
         'location', 'paid_at', 'scanned_at', 'scanned_by',
         'pg_order_id', 'pg_hpp_url', 'pg_password', 'qr_code',
@@ -23,6 +24,9 @@ class SoldTicket extends Model
     {
         return [
             'amount' => 'decimal:2',
+            'base_amount' => 'decimal:2',
+            'surcharge_amount' => 'decimal:2',
+            'surcharge_rate' => 'decimal:2',
             'discount_amount' => 'decimal:2',
             'event_date' => 'date',
             'paid_at' => 'datetime',
