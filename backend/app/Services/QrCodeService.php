@@ -10,10 +10,13 @@ class QrCodeService
 
     public function generate(string $data): string
     {
+        // M (not H): long signed JSON payloads stay readable on phone cameras /
+        // PDF screenshots. H packs more redundancy into the same pixels and
+        // makes modules too small to scan reliably from a 170–220px PDF tile.
         $png = QrCode::format('png')
-            ->size(300)
-            ->margin(1)
-            ->errorCorrection('H')
+            ->size(480)
+            ->margin(2)
+            ->errorCorrection('M')
             ->generate($data);
 
         return 'data:image/png;base64,' . base64_encode($png);

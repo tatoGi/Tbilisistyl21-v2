@@ -10,10 +10,14 @@
         <div
             wire:ignore
             x-show="!$wire.result"
-            class="mx-auto aspect-square w-full max-w-sm overflow-hidden rounded-xl border border-gray-200 dark:border-white/10"
+            class="mx-auto w-full max-w-md overflow-hidden rounded-xl border border-gray-200 dark:border-white/10 bg-black"
         >
-            <div id="qr-reader" class="qr-reader h-full w-full"></div>
+            <div id="qr-reader" class="qr-reader"></div>
         </div>
+
+        <p class="text-center text-sm text-gray-500 dark:text-gray-400">
+            PDF-ის QR მთლიანად ჩასვი თეთრ ჩარჩოში. ეკრანის სიკაშკაშე მაქსიმუმზე დაიჭირე.
+        </p>
 
         <div x-show="cameraError" x-cloak class="text-sm text-danger-600">
             <span x-text="cameraError"></span>
@@ -68,16 +72,24 @@
     </div>
 
     <style>
-        .qr-reader,
+        /* Do NOT use object-fit:cover — it crops the preview away from the
+           region html5-qrcode actually decodes, so PDF QRs never hit. */
+        .qr-reader {
+            width: 100% !important;
+        }
+
         .qr-reader #qr-reader__scan_region {
             width: 100% !important;
-            height: 100% !important;
+            min-height: 280px;
+            background: #000;
         }
 
         .qr-reader video {
             width: 100% !important;
-            height: 100% !important;
-            object-fit: cover !important;
+            height: auto !important;
+            max-height: 70vh;
+            object-fit: contain !important;
+            background: #000;
         }
 
         .qr-reader video:not(:first-of-type),
@@ -100,6 +112,7 @@
         window.ticketScanner = function () {
             return {
                 cameraError: null,
+                decoding: false,
 
                 init() {
                     this.startScanning();
@@ -155,7 +168,6 @@
                         return;
                     }
 
-                    // Already running from a previous Alpine mount — keep it.
                     const existing = this.getActiveScanner();
                     if (existing) {
                         try {
@@ -175,20 +187,27 @@
 
                     window.__ticketQrStarting = true;
                     this.cameraError = null;
+                    this.decoding = false;
 
                     try {
                         await this.stopScanning();
 
-                        const scanner = new Html5Qrcode('qr-reader');
+                        const scannerOptions = { verbose: false };
+                        if (typeof Html5QrcodeSupportedFormats !== 'undefined') {
+                            scannerOptions.formatsToSupport = [Html5QrcodeSupportedFormats.QR_CODE];
+                        }
+
+                        const scanner = new Html5Qrcode('qr-reader', scannerOptions);
                         this.setActiveScanner(scanner);
 
                         await scanner.start(
                             { facingMode: 'environment' },
                             {
-                                fps: 10,
+                                fps: 15,
                                 qrbox: (viewfinderWidth, viewfinderHeight) => {
+                                    // Nearly full frame — PDF QRs are dense and need area.
                                     const edge = Math.min(viewfinderWidth, viewfinderHeight);
-                                    const size = Math.max(160, Math.floor(edge * 0.65));
+                                    const size = Math.max(220, Math.floor(edge * 0.85));
 
                                     return { width: size, height: size };
                                 },
@@ -205,8 +224,14 @@
                 },
 
                 onDecoded(decodedText) {
+                    if (this.decoding) {
+                        return;
+                    }
+                    this.decoding = true;
+
                     const scanner = this.getActiveScanner();
                     if (!scanner) {
+                        this.decoding = false;
                         return;
                     }
 
@@ -216,10 +241,15 @@
                         // ignore
                     }
 
-                    this.$wire.scan(decodedText);
+                    this.$wire.scan(decodedText).then?.(() => {}).finally?.(() => {
+                        this.decoding = false;
+                    });
+                    // Livewire may not return a thenable in all builds — always unlock.
+                    setTimeout(() => { this.decoding = false; }, 1500);
                 },
 
                 resumeScanning() {
+                    this.decoding = false;
                     const scanner = this.getActiveScanner();
                     if (!scanner) {
                         this.startScanning();

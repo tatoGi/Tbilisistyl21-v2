@@ -102,22 +102,23 @@
             color: #ffffff;
         }
         .qr-cell {
-            width: 190px;
+            width: 250px;
             text-align: right;
         }
         .qr-card {
             background: #ffffff;
             border: 2px solid #f5a623;
             padding: 8px;
-            width: 170px;
+            width: 230px;
         }
         /* Must match .qr-card's width exactly: any leftover width collects on
            one side (the cell is right-aligned) and the white frame goes
-           lopsided. display:block also drops the inline baseline gap. */
+           lopsided. display:block also drops the inline baseline gap.
+           Keep ≥220px so the signed JSON QR stays scannable on phone cameras. */
         .qr-card img {
             display: block;
-            width: 170px;
-            height: 170px;
+            width: 220px;
+            height: 220px;
         }
         .footer {
             margin-top: 22px;
