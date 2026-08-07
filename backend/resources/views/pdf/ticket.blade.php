@@ -109,12 +109,13 @@
             background: #ffffff;
             border: 2px solid #f5a623;
             padding: 8px;
-            width: 230px;
+            /* No fixed width/height — shrink-wrap to the image so DomPDF
+               cannot leave leftover content-box space on one side. */
+            display: inline-block;
+            line-height: 0;
         }
-        /* Must match .qr-card's width exactly: any leftover width collects on
-           one side (the cell is right-aligned) and the white frame goes
-           lopsided. display:block also drops the inline baseline gap.
-           Keep ≥220px so the signed JSON QR stays scannable on phone cameras. */
+        /* Keep ≥220px so the signed JSON QR stays scannable on phone cameras.
+           display:block drops the inline baseline gap under the image. */
         .qr-card img {
             display: block;
             width: 220px;

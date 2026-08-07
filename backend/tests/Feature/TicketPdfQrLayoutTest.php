@@ -60,7 +60,7 @@ class TicketPdfQrLayoutTest extends TestCase
         preg_match_all('/q\s+([\d.]+) 0 0 ([\d.]+) ([\d.]+) ([\d.]+) cm\s*\/\w+ Do/', $content, $matches, PREG_SET_ORDER);
 
         foreach ($matches as [, $w, $h, $x, $y]) {
-            if (abs((float) $w - (float) $h) < 0.5 && (float) $w < 200) {
+            if (abs((float) $w - (float) $h) < 0.5 && (float) $w < 250) {
                 return [
                     'x' => (float) $x,
                     'top' => self::PAGE_HEIGHT - (float) $y - (float) $h,
