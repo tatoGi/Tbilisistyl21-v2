@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources;
 
+use App\Filament\Concerns\EditorOnlyResource;
 use App\Filament\Concerns\HasContentBlocks;
 use App\Filament\Resources\DjResource\Pages;
 use App\Models\Dj;
@@ -14,6 +15,7 @@ use Filament\Tables\Table;
 
 class DjResource extends Resource
 {
+    use EditorOnlyResource;
     use HasContentBlocks;
 
     protected static ?string $model = Dj::class;

@@ -16,12 +16,14 @@ class SoldTicket extends Model
         'location', 'paid_at', 'scanned_at', 'scanned_by',
         'pg_order_id', 'pg_hpp_url', 'pg_password', 'qr_code',
         'failed_at', 'fail_reason', 'is_joker', 'is_techno',
+        'sold_by', 'discount_amount',
     ];
 
     protected function casts(): array
     {
         return [
             'amount' => 'decimal:2',
+            'discount_amount' => 'decimal:2',
             'event_date' => 'date',
             'paid_at' => 'datetime',
             'scanned_at' => 'datetime',

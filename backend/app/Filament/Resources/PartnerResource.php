@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources;
 
+use App\Filament\Concerns\EditorOnlyResource;
 use App\Filament\Concerns\HasContentBlocks;
 use App\Filament\Resources\PartnerResource\Pages;
 use App\Models\Media;
@@ -14,6 +15,7 @@ use Filament\Tables\Table;
 
 class PartnerResource extends Resource
 {
+    use EditorOnlyResource;
     use HasContentBlocks;
 
     protected static ?string $model = Partner::class;

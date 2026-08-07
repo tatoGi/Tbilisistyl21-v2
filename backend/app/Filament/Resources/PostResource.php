@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources;
 
+use App\Filament\Concerns\EditorOnlyResource;
 use App\Filament\Concerns\HasContentBlocks;
 use App\Filament\Resources\PostResource\Pages;
 use App\Models\Post;
@@ -14,6 +15,7 @@ use Illuminate\Support\Str;
 
 class PostResource extends Resource
 {
+    use EditorOnlyResource;
     use HasContentBlocks;
 
     protected static ?string $model = Post::class;

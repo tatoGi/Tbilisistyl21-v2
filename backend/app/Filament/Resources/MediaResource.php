@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources;
 
+use App\Filament\Concerns\EditorOnlyResource;
 use App\Filament\Resources\MediaResource\Pages;
 use App\Filament\Resources\MediaResource\RelationManagers;
 use App\Models\Media;
@@ -15,6 +16,8 @@ use Illuminate\Database\Eloquent\SoftDeletingScope;
 
 class MediaResource extends Resource
 {
+    use EditorOnlyResource;
+
     protected static ?string $model = Media::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-photo';

@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources;
 
+use App\Filament\Concerns\EditorOnlyResource;
 use App\Filament\Resources\MusicTrackResource\Pages;
 use App\Filament\Resources\MusicTrackResource\RelationManagers;
 use App\Models\MusicTrack;
@@ -15,6 +16,8 @@ use Illuminate\Database\Eloquent\SoftDeletingScope;
 
 class MusicTrackResource extends Resource
 {
+    use EditorOnlyResource;
+
     protected static ?string $model = MusicTrack::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-musical-note';

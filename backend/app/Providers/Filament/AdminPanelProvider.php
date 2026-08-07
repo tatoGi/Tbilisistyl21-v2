@@ -47,6 +47,7 @@ class AdminPanelProvider extends PanelProvider
                 'danger' => Color::Rose,
             ])
             ->navigationGroups([
+                NavigationGroup::make('Team')->icon('heroicon-o-user-group'),
                 NavigationGroup::make('Content')->icon('heroicon-o-document-text'),
                 NavigationGroup::make('Catalog')->icon('heroicon-o-squares-2x2'),
                 NavigationGroup::make('Sales')->icon('heroicon-o-banknotes'),

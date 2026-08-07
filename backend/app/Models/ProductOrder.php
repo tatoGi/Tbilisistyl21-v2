@@ -13,11 +13,15 @@ class ProductOrder extends Model
     protected $fillable = [
         'id', 'product_id', 'product_title', 'size', 'name', 'surname', 'personal_number',
         'email', 'phone', 'amount', 'status', 'pg_order_id', 'pg_hpp_url', 'pg_password', 'qr_code',
+        'sold_by', 'discount_amount',
     ];
 
     protected function casts(): array
     {
-        return ['amount' => 'decimal:2'];
+        return [
+            'amount' => 'decimal:2',
+            'discount_amount' => 'decimal:2',
+        ];
     }
 
     public function setPgPasswordAttribute(?string $value): void

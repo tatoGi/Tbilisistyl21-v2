@@ -27,6 +27,13 @@ class SiteSettings extends Page implements HasForms
 
     public ?array $data = [];
 
+    public static function canAccess(): bool
+    {
+        $user = auth()->user();
+
+        return $user && ($user->isAdmin() || $user->isEditor());
+    }
+
     public function mount(): void
     {
         $this->form->fill([

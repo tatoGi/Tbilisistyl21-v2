@@ -11,7 +11,7 @@ class TicketScannerController extends Controller
 {
     public function validateTicket(ValidateTicketRequest $request, ValidateTicketAction $action): JsonResponse
     {
-        $result = $action->execute($request->validated());
+        $result = $action->execute($request->validated(), $request->user()->name);
         return response()->json($result, $result['status']);
     }
 }
