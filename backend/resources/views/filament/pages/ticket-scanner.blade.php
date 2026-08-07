@@ -72,9 +72,8 @@
         crossorigin="anonymous"
     ></script>
 
-    @script
     <script>
-        function ticketScanner() {
+        window.ticketScanner = function () {
             return {
                 scanner: null,
                 cameraError: null,
@@ -105,7 +104,6 @@
                     }
                 },
             };
-        }
+        };
     </script>
-    @endscript
 </x-filament-panels::page>
