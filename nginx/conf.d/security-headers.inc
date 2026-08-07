@@ -13,7 +13,11 @@ add_header X-Frame-Options "SAMEORIGIN" always;
 add_header X-Content-Type-Options "nosniff" always;
 add_header X-XSS-Protection "1; mode=block" always;
 add_header Referrer-Policy "strict-origin-when-cross-origin" always;
-add_header Permissions-Policy "camera=(), microphone=(), geolocation=(), browsing-topics=()" always;
+# camera=(self): same-origin only. Laravel SecurityHeaders still sends camera=()
+# on non-scanner responses; browsers intersect multiple Permissions-Policy headers,
+# so camera stays denied everywhere except /admin/ticket-scanner (where Laravel
+# also sends camera=(self)).
+add_header Permissions-Policy "camera=(self), microphone=(), geolocation=(), browsing-topics=()" always;
 
 # CSP starts in Report-Only so it cannot break the Next.js site or the Filament
 # admin (both rely on inline scripts/styles). Watch the browser console for
