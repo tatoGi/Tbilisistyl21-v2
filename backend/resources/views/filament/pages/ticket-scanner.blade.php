@@ -7,9 +7,9 @@
     >
         <div
             x-show="!$wire.result"
-            class="overflow-hidden rounded-xl border border-gray-200 dark:border-white/10"
+            class="mx-auto w-full max-w-md overflow-hidden rounded-xl border border-gray-200 dark:border-white/10"
         >
-            <div id="qr-reader" style="width: 100%"></div>
+            <div id="qr-reader" class="qr-reader"></div>
         </div>
 
         <div x-show="cameraError" x-cloak class="text-sm text-danger-600">
@@ -66,6 +66,30 @@
         @endif
     </div>
 
+    <style>
+        /* html5-qrcode stretches the <video> to the container width while keeping
+           the camera's native height — on wide Filament layouts that produces a
+           tall, tiled/repeated feed. Force a square viewport + cover crop. */
+        .qr-reader,
+        .qr-reader #qr-reader__scan_region {
+            width: 100% !important;
+            max-width: 28rem;
+            margin-inline: auto;
+        }
+
+        .qr-reader video,
+        .qr-reader img {
+            width: 100% !important;
+            max-height: min(70vh, 28rem) !important;
+            object-fit: cover !important;
+            border-radius: 0;
+        }
+
+        .qr-reader #qr-reader__dashboard {
+            display: none !important;
+        }
+    </style>
+
     <script
         src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"
         integrity="sha384-c9d8RFSL+u3exBOJ4Yp3HUJXS4znl9f+z66d1y54ig+ea249SpqR+w1wyvXz/lk+"
@@ -85,7 +109,16 @@
                     this.scanner
                         .start(
                             { facingMode: 'environment' },
-                            { fps: 10, qrbox: 250 },
+                            {
+                                fps: 10,
+                                aspectRatio: 1,
+                                qrbox: (viewfinderWidth, viewfinderHeight) => {
+                                    const edge = Math.min(viewfinderWidth, viewfinderHeight);
+                                    const size = Math.max(180, Math.floor(edge * 0.7));
+
+                                    return { width: size, height: size };
+                                },
+                            },
                             (decodedText) => this.onDecoded(decodedText),
                             () => {},
                         )
