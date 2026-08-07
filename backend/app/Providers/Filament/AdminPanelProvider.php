@@ -51,6 +51,7 @@ class AdminPanelProvider extends PanelProvider
                 NavigationGroup::make('Content')->icon('heroicon-o-document-text'),
                 NavigationGroup::make('Catalog')->icon('heroicon-o-squares-2x2'),
                 NavigationGroup::make('Sales')->icon('heroicon-o-banknotes'),
+                NavigationGroup::make('Finance')->icon('heroicon-o-calculator'),
             ])
             ->renderHook(
                 PanelsRenderHook::STYLES_AFTER,
