@@ -18,6 +18,11 @@ class CreateTicketOrderAction
 
     public function execute(array $data): array
     {
+        $allowed = config('app.purchase_allowed_personal_numbers');
+        if ($allowed && !in_array($data['personalNumber'], $allowed, true)) {
+            return ['error' => 'ბილეთის ყიდვა დროებით შეზღუდულია.', 'status' => 403];
+        }
+
         return DB::transaction(function () use ($data) {
             $ticket = Ticket::where('id', $data['ticketId'])->lockForUpdate()->firstOrFail();
 

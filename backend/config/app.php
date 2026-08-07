@@ -58,6 +58,14 @@ return [
 
     'max_tickets_per_person' => (int) env('MAX_TICKETS_PER_PERSON', 3),
 
+    // Comma-separated personal-number allowlist for purchases. When set,
+    // only these IDs can complete checkout — everyone else gets a "purchasing
+    // is temporarily restricted" response. Empty/unset = no restriction.
+    'purchase_allowed_personal_numbers' => array_filter(array_map(
+        'trim',
+        explode(',', (string) env('PURCHASE_ALLOWED_PERSONAL_NUMBERS', ''))
+    )),
+
     /*
     |--------------------------------------------------------------------------
     | Application Timezone

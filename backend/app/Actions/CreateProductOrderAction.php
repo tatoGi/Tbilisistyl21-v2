@@ -14,6 +14,11 @@ class CreateProductOrderAction
 
     public function execute(array $data): array
     {
+        $allowed = config('app.purchase_allowed_personal_numbers');
+        if ($allowed && !in_array($data['personalNumber'], $allowed, true)) {
+            return ['error' => 'შეძენა დროებით შეზღუდულია.', 'status' => 403];
+        }
+
         $product = Product::with('sizes')->findOrFail($data['productId']);
 
         if ($product->status !== 'active') {
