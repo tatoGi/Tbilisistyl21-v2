@@ -39,8 +39,18 @@ class User extends Authenticatable implements FilamentUser
         return $this->role === 'editor';
     }
 
+    public function isScanner(): bool
+    {
+        return $this->role === 'scanner';
+    }
+
+    public function isSeller(): bool
+    {
+        return $this->role === 'seller';
+    }
+
     public function canAccessPanel(Panel $panel): bool
     {
-        return $this->isAdmin() || $this->isEditor();
+        return in_array($this->role, ['admin', 'editor', 'scanner', 'seller'], true);
     }
 }
