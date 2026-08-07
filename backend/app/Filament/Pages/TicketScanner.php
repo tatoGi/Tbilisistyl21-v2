@@ -19,6 +19,13 @@ class TicketScanner extends Page
 
     protected static string $view = 'filament.pages.ticket-scanner';
 
+    public static function canAccess(): bool
+    {
+        $user = auth()->user();
+
+        return $user && ($user->isAdmin() || $user->isScanner());
+    }
+
     public ?array $result = null;
 
     public bool $success = false;
@@ -33,7 +40,7 @@ class TicketScanner extends Page
             return;
         }
 
-        $outcome = app(ValidateTicketAction::class)->execute($decoded);
+        $outcome = app(ValidateTicketAction::class)->execute($decoded, auth()->user()->name);
 
         $this->success = $outcome['status'] === 200;
         $this->result = $outcome;

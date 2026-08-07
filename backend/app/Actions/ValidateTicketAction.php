@@ -10,7 +10,7 @@ class ValidateTicketAction
 {
     public function __construct(private QrCodeService $qrCodeService) {}
 
-    public function execute(array $qrData): array
+    public function execute(array $qrData, string $scannedBy): array
     {
         if (!$this->qrCodeService->verifyPayload($qrData)) {
             return ['error' => 'invalid_qr_signature', 'status' => 400];
@@ -43,7 +43,7 @@ class ValidateTicketAction
             ->whereNull('scanned_at')
             ->update([
                 'scanned_at' => now(),
-                'scanned_by' => 'admin',
+                'scanned_by' => $scannedBy,
                 'status' => 'scanned',
             ]);
 
