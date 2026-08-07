@@ -5,6 +5,7 @@ namespace App\Actions;
 use App\Models\SoldTicket;
 use App\Models\Ticket;
 use App\Services\PaymentService;
+use App\Services\PaymentSurchargeService;
 use App\Services\QrCodeService;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
@@ -13,6 +14,7 @@ class CreateTicketOrderAction
 {
     public function __construct(
         private PaymentService $paymentService,
+        private PaymentSurchargeService $surcharge,
         private QrCodeService $qrCodeService,
     ) {}
 
@@ -42,12 +44,13 @@ class CreateTicketOrderAction
 
             $internalId = strtoupper(Str::random(8));
             $hmac = $this->paymentService->createCallbackHmac($internalId);
+            $breakdown = $this->surcharge->breakdown((float) $ticket->price_gel);
 
             $appUrl = config('app.url');
             $callbackUrl = "{$appUrl}/api/payments/callback?ref={$internalId}&sig={$hmac}";
 
             $pgResponse = $this->paymentService->createOrder([
-                'amount' => number_format((float) $ticket->price_gel, 2, '.', ''),
+                'amount' => number_format($breakdown['amount'], 2, '.', ''),
                 'description' => $ticket->setLocale('en')->title ?? $ticket->setLocale('ka')->title,
                 'hppRedirectUrl' => $callbackUrl,
                 'consumerDevice' => $this->paymentService->browserConsumerDevice(
@@ -72,7 +75,10 @@ class CreateTicketOrderAction
                 'email' => $data['email'],
                 'name' => $data['name'],
                 'surname' => $data['surname'],
-                'amount' => $ticket->price_gel,
+                'base_amount' => $breakdown['base_amount'],
+                'surcharge_amount' => $breakdown['surcharge_amount'],
+                'surcharge_rate' => $breakdown['surcharge_rate'],
+                'amount' => $breakdown['amount'],
                 'status' => 'pending',
                 'original_ticket_id' => $ticket->id,
                 'event_name' => $ticket->setLocale('ka')->title,
