@@ -11,10 +11,69 @@ class AccountingReportService
 {
     public const BANK_FEE_RATE = 0.025;
 
-    public function summary(Carbon $from, Carbon $to, string $channel): array
+    /**
+     * Single load for the Accounting UI (summary + breakdowns + chart series).
+     *
+     * @return array{
+     *   summary: array<string, float|int>,
+     *   byKind: array<string, array{gross: float, base: float, surcharge: float, count: int}>,
+     *   byTicketType: array<string, array{gross: float, base: float, surcharge: float, count: int}>,
+     *   byDay: list<array{date: string, gross: float, count: int}>,
+     *   byChannel: array{online: array{gross: float, base: float, surcharge: float, count: int}, walk_up: array{gross: float, base: float, surcharge: float, count: int}}
+     * }
+     */
+    public function bundle(Carbon $from, Carbon $to, string $channel): array
     {
         $rows = $this->loadRows($from, $to, $channel);
 
+        return [
+            'summary' => $this->summaryFromRows($rows),
+            'byKind' => [
+                'tickets' => $this->aggregateGroup($rows->where('type', 'ticket')),
+                'products' => $this->aggregateGroup($rows->where('type', 'product')),
+            ],
+            'byTicketType' => [
+                'joker' => $this->aggregateGroup($rows->where('type', 'ticket')->where('ticket_type', 'joker')),
+                'techno' => $this->aggregateGroup($rows->where('type', 'ticket')->where('ticket_type', 'techno')),
+                'standard' => $this->aggregateGroup($rows->where('type', 'ticket')->where('ticket_type', 'standard')),
+            ],
+            'byDay' => $this->daysFromRows($rows),
+            'byChannel' => [
+                'online' => $this->aggregateGroup($rows->where('channel', 'online')),
+                'walk_up' => $this->aggregateGroup($rows->where('channel', 'walk_up')),
+            ],
+        ];
+    }
+
+    public function summary(Carbon $from, Carbon $to, string $channel): array
+    {
+        return $this->summaryFromRows($this->loadRows($from, $to, $channel));
+    }
+
+    public function breakdownByKind(Carbon $from, Carbon $to, string $channel): array
+    {
+        return $this->bundle($from, $to, $channel)['byKind'];
+    }
+
+    public function breakdownByTicketType(Carbon $from, Carbon $to, string $channel): array
+    {
+        return $this->bundle($from, $to, $channel)['byTicketType'];
+    }
+
+    /**
+     * @return list<array{date: string, gross: float, count: int}>
+     */
+    public function breakdownByDay(Carbon $from, Carbon $to, string $channel): array
+    {
+        return $this->daysFromRows($this->loadRows($from, $to, $channel));
+    }
+
+    /**
+     * @param  Collection<int, array<string, mixed>>  $rows
+     * @return array<string, float|int>
+     */
+    private function summaryFromRows(Collection $rows): array
+    {
         $gross = round($rows->sum(fn (array $row) => $row['amount']), 2);
         $base = round($rows->sum(fn (array $row) => $row['base_amount']), 2);
         $surcharge = round($rows->sum(fn (array $row) => $row['surcharge_amount']), 2);
@@ -31,33 +90,13 @@ class AccountingReportService
         ];
     }
 
-    public function breakdownByKind(Carbon $from, Carbon $to, string $channel): array
-    {
-        $rows = $this->loadRows($from, $to, $channel);
-
-        return [
-            'tickets' => $this->aggregateGroup($rows->where('type', 'ticket')),
-            'products' => $this->aggregateGroup($rows->where('type', 'product')),
-        ];
-    }
-
-    public function breakdownByTicketType(Carbon $from, Carbon $to, string $channel): array
-    {
-        $tickets = $this->loadRows($from, $to, $channel)->where('type', 'ticket');
-
-        return [
-            'joker' => $this->aggregateGroup($tickets->where('ticket_type', 'joker')),
-            'techno' => $this->aggregateGroup($tickets->where('ticket_type', 'techno')),
-            'standard' => $this->aggregateGroup($tickets->where('ticket_type', 'standard')),
-        ];
-    }
-
     /**
+     * @param  Collection<int, array<string, mixed>>  $rows
      * @return list<array{date: string, gross: float, count: int}>
      */
-    public function breakdownByDay(Carbon $from, Carbon $to, string $channel): array
+    private function daysFromRows(Collection $rows): array
     {
-        return $this->loadRows($from, $to, $channel)
+        return $rows
             ->groupBy('date')
             ->sortKeys()
             ->map(fn (Collection $dayRows, string $date) => [

@@ -27,6 +27,13 @@ class Accounting extends Page
 
     public string $channel = 'all';
 
+    /** @var 'overview'|'charts'|'ledger' */
+    public string $activeTab = 'overview';
+
+    public int $ledgerPage = 1;
+
+    public int $ledgerPerPage = 10;
+
     public static function canAccess(): bool
     {
         return auth()->user()?->isAdmin() ?? false;
@@ -37,35 +44,135 @@ class Accounting extends Page
         $this->setRangeMonth();
     }
 
+    public function updatedDateFrom(): void
+    {
+        $this->ledgerPage = 1;
+    }
+
+    public function updatedDateTo(): void
+    {
+        $this->ledgerPage = 1;
+    }
+
+    public function updatedChannel(): void
+    {
+        $this->ledgerPage = 1;
+    }
+
+    public function setTab(string $tab): void
+    {
+        if (! in_array($tab, ['overview', 'charts', 'ledger'], true)) {
+            return;
+        }
+
+        $this->activeTab = $tab;
+    }
+
     public function setRangeToday(): void
     {
         $this->dateFrom = now()->toDateString();
         $this->dateTo = now()->toDateString();
+        $this->ledgerPage = 1;
     }
 
     public function setRangeWeek(): void
     {
         $this->dateFrom = now()->startOfWeek()->toDateString();
         $this->dateTo = now()->endOfWeek()->toDateString();
+        $this->ledgerPage = 1;
     }
 
     public function setRangeMonth(): void
     {
         $this->dateFrom = now()->startOfMonth()->toDateString();
         $this->dateTo = now()->endOfMonth()->toDateString();
+        $this->ledgerPage = 1;
+    }
+
+    public function previousLedgerPage(): void
+    {
+        $this->ledgerPage = max(1, $this->ledgerPage - 1);
+    }
+
+    public function nextLedgerPage(): void
+    {
+        $total = count($this->report['byDay'] ?? []);
+        $maxPage = max(1, (int) ceil($total / $this->ledgerPerPage));
+        $this->ledgerPage = min($maxPage, $this->ledgerPage + 1);
     }
 
     public function getReportProperty(): array
     {
         [$from, $to] = $this->rangeBounds();
-        $service = app(AccountingReportService::class);
-        $channel = $this->channel ?: 'all';
+
+        return app(AccountingReportService::class)->bundle(
+            $from,
+            $to,
+            $this->channel ?: 'all',
+        );
+    }
+
+    /**
+     * @return list<array{date: string, gross: float, count: int}>
+     */
+    public function getLedgerRowsProperty(): array
+    {
+        $days = $this->report['byDay'] ?? [];
+        $offset = ($this->ledgerPage - 1) * $this->ledgerPerPage;
+
+        return array_slice($days, $offset, $this->ledgerPerPage);
+    }
+
+    public function getLedgerPageCountProperty(): int
+    {
+        $total = count($this->report['byDay'] ?? []);
+
+        return max(1, (int) ceil($total / $this->ledgerPerPage));
+    }
+
+    /**
+     * Chart.js payloads for the Charts tab (JSON-safe).
+     *
+     * @return array{daily: array, kind: array, ticketTypes: array, channel: array}
+     */
+    public function getChartsProperty(): array
+    {
+        $report = $this->report;
+        $days = $report['byDay'];
 
         return [
-            'summary' => $service->summary($from, $to, $channel),
-            'byKind' => $service->breakdownByKind($from, $to, $channel),
-            'byTicketType' => $service->breakdownByTicketType($from, $to, $channel),
-            'byDay' => $service->breakdownByDay($from, $to, $channel),
+            'daily' => [
+                'labels' => array_column($days, 'date'),
+                'gross' => array_map(fn ($d) => $d['gross'], $days),
+                'counts' => array_map(fn ($d) => $d['count'], $days),
+            ],
+            'kind' => [
+                'labels' => ['Tickets', 'Products'],
+                'values' => [
+                    $report['byKind']['tickets']['gross'],
+                    $report['byKind']['products']['gross'],
+                ],
+            ],
+            'ticketTypes' => [
+                'labels' => ['Joker', 'Techno', 'Standard'],
+                'values' => [
+                    $report['byTicketType']['joker']['gross'],
+                    $report['byTicketType']['techno']['gross'],
+                    $report['byTicketType']['standard']['gross'],
+                ],
+                'counts' => [
+                    $report['byTicketType']['joker']['count'],
+                    $report['byTicketType']['techno']['count'],
+                    $report['byTicketType']['standard']['count'],
+                ],
+            ],
+            'channel' => [
+                'labels' => ['Online', 'Walk-up'],
+                'values' => [
+                    $report['byChannel']['online']['gross'],
+                    $report['byChannel']['walk_up']['gross'],
+                ],
+            ],
         ];
     }
 
