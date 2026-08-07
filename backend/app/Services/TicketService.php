@@ -15,7 +15,9 @@ class TicketService
         // Cache a plain array, not the Eloquent Collection: serialized models
         // contain NUL bytes that don't round-trip through the Postgres `text`
         // cache column (a cached Collection deserializes as an incomplete class).
-        return Cache::remember(Ticket::API_CACHE_KEY, 3600, function () {
+        // Apply payable surcharge after cache read so rate changes take effect
+        // without busting the catalog cache.
+        $rows = Cache::remember(Ticket::API_CACHE_KEY, 3600, function () {
             return Ticket::active()
                 ->withCount(['soldTickets as sold' => fn ($q) => $q->where('status', 'paid')])
                 ->orderBy('sort_order')
@@ -23,6 +25,14 @@ class TicketService
                 ->get()
                 ->toArray();
         });
+
+        $surcharge = app(PaymentSurchargeService::class);
+
+        return array_map(function (array $row) use ($surcharge) {
+            $row['price_gel'] = $surcharge->payable((float) ($row['price_gel'] ?? 0));
+
+            return $row;
+        }, $rows);
     }
 
     public function findActive(string $id): ?Ticket

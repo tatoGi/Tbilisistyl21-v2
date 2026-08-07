@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Services\PaymentSurchargeService;
 use App\Services\TicketService;
 
 class TicketController extends Controller
@@ -20,6 +21,10 @@ class TicketController extends Controller
         if (!$ticket) {
             return response()->json(['error' => 'not_found'], 404);
         }
-        return response()->json(['data' => $ticket]);
+
+        $data = $ticket->toArray();
+        $data['price_gel'] = app(PaymentSurchargeService::class)->payable((float) $ticket->price_gel);
+
+        return response()->json(['data' => $data]);
     }
 }

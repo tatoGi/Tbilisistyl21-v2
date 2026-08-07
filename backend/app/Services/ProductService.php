@@ -17,7 +17,9 @@ class ProductService
         // cache column, so a cached Collection deserializes as an incomplete
         // class. toArray() preserves the same JSON shape (full translations +
         // nested image/sizes). Mirrors the MusicTrackController approach.
-        return Cache::remember(Product::API_CACHE_KEY, 3600, function () {
+        // Apply payable surcharge after cache read so rate changes take effect
+        // without busting the catalog cache.
+        $rows = Cache::remember(Product::API_CACHE_KEY, 3600, function () {
             return Product::active()
                 ->with(['sizes', 'image'])
                 ->orderBy('sort_order')
@@ -25,6 +27,14 @@ class ProductService
                 ->get()
                 ->toArray();
         });
+
+        $surcharge = app(PaymentSurchargeService::class);
+
+        return array_map(function (array $row) use ($surcharge) {
+            $row['price_gel'] = $surcharge->payable((float) ($row['price_gel'] ?? 0));
+
+            return $row;
+        }, $rows);
     }
 
     public function findActive(string $id): ?Product

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Services\PaymentSurchargeService;
 use App\Services\ProductService;
 
 class ProductController extends Controller
@@ -20,6 +21,10 @@ class ProductController extends Controller
         if (!$product) {
             return response()->json(['error' => 'not_found'], 404);
         }
-        return response()->json(['data' => $product]);
+
+        $data = $product->toArray();
+        $data['price_gel'] = app(PaymentSurchargeService::class)->payable((float) $product->price_gel);
+
+        return response()->json(['data' => $data]);
     }
 }
