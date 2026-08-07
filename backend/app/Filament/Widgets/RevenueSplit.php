@@ -16,7 +16,7 @@ class RevenueSplit extends ChartWidget
 
     protected function getData(): array
     {
-        $tickets = (float) SoldTicket::where('status', 'paid')->sum('amount');
+        $tickets = (float) SoldTicket::whereIn('status', ['paid', 'scanned'])->sum('amount');
         $products = (float) ProductOrder::where('status', 'paid')->sum('amount');
 
         return [

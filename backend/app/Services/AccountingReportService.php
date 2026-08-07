@@ -98,7 +98,8 @@ class AccountingReportService
     private function loadRows(Carbon $from, Carbon $to, string $channel): Collection
     {
         $tickets = SoldTicket::query()
-            ->where('status', 'paid')
+            // Scanned tickets remain sold revenue — status just means redeemed at the door.
+            ->whereIn('status', ['paid', 'scanned'])
             ->get()
             ->map(function (SoldTicket $ticket) {
                 $paidAt = $ticket->paid_at ?? $ticket->created_at;

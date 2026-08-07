@@ -16,8 +16,8 @@ class SalesBreakdown extends StatsOverviewWidget
 
     protected function getStats(): array
     {
-        $ticketRevenue = SoldTicket::where('status', 'paid')->sum('amount');
-        $ticketCount = SoldTicket::where('status', 'paid')->count();
+        $ticketRevenue = SoldTicket::whereIn('status', ['paid', 'scanned'])->sum('amount');
+        $ticketCount = SoldTicket::whereIn('status', ['paid', 'scanned'])->count();
         $productRevenue = ProductOrder::where('status', 'paid')->sum('amount');
         $productCount = ProductOrder::where('status', 'paid')->count();
 

@@ -155,4 +155,14 @@ class AccountingReportServiceTest extends TestCase
         $this->assertSame('walk_up', $walkRow['channel']);
         $this->assertEquals(0.0, $walkRow['estimated_bank_fee']);
     }
+
+    public function test_scanned_tickets_still_count_as_sold_revenue(): void
+    {
+        SoldTicket::where('id', 'ONLTKT01')->update(['status' => 'scanned']);
+
+        $online = $this->service->summary($this->from, $this->to, 'online');
+
+        $this->assertEquals(103.0, $online['gross']);
+        $this->assertEquals(1, $online['ticket_count']);
+    }
 }

@@ -16,7 +16,7 @@ class TicketsPerDay extends ChartWidget
 
     protected function getData(): array
     {
-        $data = SoldTicket::where('status', 'paid')
+        $data = SoldTicket::whereIn('status', ['paid', 'scanned'])
             ->where('paid_at', '>=', now()->subDays(14))
             ->selectRaw('DATE(paid_at) as date, COUNT(*) as total')
             ->groupBy('date')

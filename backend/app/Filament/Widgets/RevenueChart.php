@@ -16,7 +16,7 @@ class RevenueChart extends ChartWidget
 
     protected function getData(): array
     {
-        $data = SoldTicket::where('status', 'paid')
+        $data = SoldTicket::whereIn('status', ['paid', 'scanned'])
             ->where('paid_at', '>=', now()->subDays(30))
             ->selectRaw('DATE(paid_at) as date, SUM(amount) as total')
             ->groupBy('date')
