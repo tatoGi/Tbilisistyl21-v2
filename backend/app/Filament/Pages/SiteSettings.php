@@ -36,6 +36,11 @@ class SiteSettings extends Page implements HasForms
 
     public function mount(): void
     {
+        $rawSurcharge = SiteSetting::get('payment_surcharge_percent', ['percent' => 3]);
+        $surchargePercent = is_numeric($rawSurcharge)
+            ? (float) $rawSurcharge
+            : (float) (is_array($rawSurcharge) ? ($rawSurcharge['percent'] ?? 3) : 3);
+
         $this->form->fill([
             'landing' => SiteSetting::get('landing', [
                 'title' => [],
@@ -58,6 +63,7 @@ class SiteSettings extends Page implements HasForms
             'contact' => SiteSetting::get('contact', [
                 'phone' => null, 'phoneHref' => null, 'email' => null, 'address' => null,
             ]),
+            'payment_surcharge_percent' => $surchargePercent,
         ]);
     }
 
@@ -152,6 +158,19 @@ class SiteSettings extends Page implements HasForms
                         Forms\Components\TextInput::make('contact.address')->label('Address'),
                     ])
                     ->columns(2),
+                Forms\Components\Section::make('Payments')
+                    ->description('Online checkout surcharge added to catalog price (buyer sees total only). Walk-up sales are never surcharged.')
+                    ->visible(fn () => auth()->user()?->isAdmin() ?? false)
+                    ->schema([
+                        Forms\Components\TextInput::make('payment_surcharge_percent')
+                            ->label('Online surcharge %')
+                            ->numeric()
+                            ->minValue(0)
+                            ->maxValue(20)
+                            ->step(0.1)
+                            ->suffix('%')
+                            ->required(),
+                    ]),
             ])
             ->statePath('data');
     }
@@ -159,6 +178,11 @@ class SiteSettings extends Page implements HasForms
     public function save(SiteSettingService $service): void
     {
         $data = $this->form->getState();
+
+        if (auth()->user()?->isAdmin()) {
+            $percent = round((float) ($data['payment_surcharge_percent'] ?? 3), 2);
+            SiteSetting::set('payment_surcharge_percent', ['percent' => $percent]);
+        }
 
         foreach (['landing', 'hero', 'ticketPdf', 'instagramUrl', 'tiktokUrl', 'contact'] as $key) {
             SiteSetting::set($key, $data[$key] ?? null);
