@@ -147,6 +147,17 @@ class NewSale extends Page implements HasForms
             ->success()
             ->send();
 
-        $this->form->fill(['type' => 'ticket', 'discountAmount' => 0]);
+        $this->form->fill([
+            'type' => 'ticket',
+            'discountAmount' => 0,
+            'name' => null,
+            'surname' => null,
+            'personalNumber' => null,
+            'email' => null,
+            'phone' => null,
+            'ticketId' => null,
+            'productId' => null,
+            'size' => null,
+        ]);
     }
 }

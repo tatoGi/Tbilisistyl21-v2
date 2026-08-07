@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources;
 
+use App\Filament\Concerns\EditorOnlyResource;
 use App\Filament\Concerns\HasContentBlocks;
 use App\Filament\Resources\PageResource\Pages;
 use App\Models\Page;
@@ -15,6 +16,7 @@ use Illuminate\Support\Str;
 
 class PageResource extends Resource
 {
+    use EditorOnlyResource;
     use HasContentBlocks, Translatable;
 
     protected static ?string $model = Page::class;

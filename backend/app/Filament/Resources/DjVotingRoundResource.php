@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources;
 
+use App\Filament\Concerns\EditorOnlyResource;
 use App\Filament\Concerns\HasContentBlocks;
 use App\Filament\Resources\DjVotingRoundResource\Pages;
 use App\Models\Dj;
@@ -17,6 +18,7 @@ use Filament\Tables\Table;
 
 class DjVotingRoundResource extends Resource
 {
+    use EditorOnlyResource;
     use HasContentBlocks;
 
     protected static ?string $model = DjVotingRound::class;

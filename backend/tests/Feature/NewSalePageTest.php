@@ -60,7 +60,14 @@ class NewSalePageTest extends TestCase
                 'email' => 'giorgi@example.com',
                 'discountAmount' => 10,
             ])
-            ->call('create');
+            ->call('create')
+            ->assertSet('data.personalNumber', null)
+            ->assertSet('data.name', null)
+            ->assertSet('data.surname', null)
+            ->assertSet('data.email', null)
+            ->assertSet('data.ticketId', null)
+            ->assertSet('data.type', 'ticket')
+            ->assertSet('data.discountAmount', 0);
 
         $this->assertDatabaseHas('sold_tickets', [
             'personal_number' => '01011011011',
