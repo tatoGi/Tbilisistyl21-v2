@@ -54,9 +54,13 @@ class CreateWalkUpProductSaleAction
                 'email' => $data['email'],
                 'phone' => $data['phone'],
                 'amount' => $finalAmount,
+                'base_amount' => $finalAmount,
+                'surcharge_amount' => 0,
+                'surcharge_rate' => null,
                 'discount_amount' => $discount > 0 ? $discount : null,
                 'sold_by' => $data['soldBy'],
                 'status' => 'paid',
+                'paid_at' => now(),
             ]);
 
             SendProductOrderEmailJob::dispatch($order->id);

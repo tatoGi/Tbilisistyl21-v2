@@ -239,7 +239,10 @@ class ProcessPaymentCallbackAction
             // flush the public products cache.
             Cache::forget(Product::API_CACHE_KEY);
 
-            $locked->update(['status' => 'paid']);
+            $locked->update([
+                'status' => 'paid',
+                'paid_at' => now(),
+            ]);
 
             SendProductOrderEmailJob::dispatch($locked->id);
 

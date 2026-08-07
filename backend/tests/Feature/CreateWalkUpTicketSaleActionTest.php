@@ -48,6 +48,9 @@ class CreateWalkUpTicketSaleActionTest extends TestCase
         $this->assertEquals(80, (float) $soldTicket->amount);
         $this->assertEquals(20, (float) $soldTicket->discount_amount);
         $this->assertEquals('Nino Seller', $soldTicket->sold_by);
+        $this->assertEquals((float) $soldTicket->amount, (float) $soldTicket->base_amount);
+        $this->assertEquals(0, (float) $soldTicket->surcharge_amount);
+        $this->assertNull($soldTicket->surcharge_rate);
 
         $ticket->refresh();
         $this->assertEquals(4, $ticket->quantity);

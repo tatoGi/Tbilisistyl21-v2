@@ -56,6 +56,10 @@ class CreateWalkUpProductSaleActionTest extends TestCase
         $this->assertEquals(45, (float) $order->amount);
         $this->assertEquals(5, (float) $order->discount_amount);
         $this->assertEquals('Nino Seller', $order->sold_by);
+        $this->assertEquals((float) $order->amount, (float) $order->base_amount);
+        $this->assertEquals(0, (float) $order->surcharge_amount);
+        $this->assertNull($order->surcharge_rate);
+        $this->assertNotNull($order->paid_at);
 
         $size->refresh();
         $this->assertEquals(4, $size->quantity);

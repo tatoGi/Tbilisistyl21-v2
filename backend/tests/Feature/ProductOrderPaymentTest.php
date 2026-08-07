@@ -112,6 +112,7 @@ class ProductOrderPaymentTest extends TestCase
 
         $order->refresh();
         $this->assertEquals('paid', $order->status);
+        $this->assertNotNull($order->paid_at);
 
         $size->refresh();
         $this->assertEquals(4, $size->quantity);
