@@ -216,33 +216,33 @@
 
         @if ($activeTab === 'charts')
             <div
+                id="accounting-charts-root"
                 class="grid gap-6 lg:grid-cols-2"
-                x-data="accountingCharts(@js($charts))"
-                x-init="init()"
-                wire:ignore
+                data-charts='@json($charts)'
+                wire:key="accounting-charts-{{ md5(json_encode($charts)) }}"
             >
                 <div class="rounded-xl border border-white/10 bg-gray-900 p-4">
                     <h3 class="mb-3 text-sm font-medium text-gray-200">Daily gross</h3>
                     <div class="relative h-64">
-                        <canvas x-ref="daily"></canvas>
+                        <canvas id="acct-chart-daily"></canvas>
                     </div>
                 </div>
                 <div class="rounded-xl border border-white/10 bg-gray-900 p-4">
                     <h3 class="mb-3 text-sm font-medium text-gray-200">Tickets vs products</h3>
                     <div class="relative mx-auto h-64 max-w-xs">
-                        <canvas x-ref="kind"></canvas>
+                        <canvas id="acct-chart-kind"></canvas>
                     </div>
                 </div>
                 <div class="rounded-xl border border-white/10 bg-gray-900 p-4">
                     <h3 class="mb-3 text-sm font-medium text-gray-200">Ticket types (gross)</h3>
                     <div class="relative h-64">
-                        <canvas x-ref="ticketTypes"></canvas>
+                        <canvas id="acct-chart-types"></canvas>
                     </div>
                 </div>
                 <div class="rounded-xl border border-white/10 bg-gray-900 p-4">
                     <h3 class="mb-3 text-sm font-medium text-gray-200">Online vs walk-up</h3>
                     <div class="relative mx-auto h-64 max-w-xs">
-                        <canvas x-ref="channel"></canvas>
+                        <canvas id="acct-chart-channel"></canvas>
                     </div>
                 </div>
             </div>
@@ -348,124 +348,162 @@
     </div>
 
     @assets
-        <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js" defer></script>
     @endassets
 
     @script
     <script>
-        Alpine.data('accountingCharts', (payload) => ({
-            payload,
-            charts: [],
+        (() => {
+            const instances = [];
 
-            init() {
-                this.$nextTick(() => this.render());
-            },
+            const destroyCharts = () => {
+                while (instances.length) {
+                    const chart = instances.pop();
+                    try { chart.destroy(); } catch (e) {}
+                }
+            };
 
-            destroy() {
-                this.charts.forEach((c) => c.destroy());
-                this.charts = [];
-            },
-
-            render() {
-                if (typeof Chart === 'undefined') {
+            const mountCharts = () => {
+                const root = document.getElementById('accounting-charts-root');
+                if (!root || typeof window.Chart === 'undefined') {
                     return;
                 }
 
-                this.destroy();
+                // Avoid double-mount on the same DOM node.
+                if (root.dataset.chartsMounted === '1') {
+                    return;
+                }
+
+                let payload;
+                try {
+                    payload = JSON.parse(root.dataset.charts || '{}');
+                } catch (e) {
+                    return;
+                }
+
+                destroyCharts();
 
                 const text = '#d1d5db';
                 const grid = 'rgba(255,255,255,0.06)';
+                const Chart = window.Chart;
 
-                if (this.$refs.daily) {
-                    this.charts.push(new Chart(this.$refs.daily, {
-                        type: 'line',
-                        data: {
-                            labels: this.payload.daily.labels,
-                            datasets: [
-                                {
-                                    label: 'Gross GEL',
-                                    data: this.payload.daily.gross,
-                                    borderColor: '#f59e0b',
-                                    backgroundColor: 'rgba(245, 158, 11, 0.15)',
-                                    fill: true,
-                                    tension: 0.35,
-                                },
-                            ],
-                        },
-                        options: {
-                            responsive: true,
-                            maintainAspectRatio: false,
-                            plugins: { legend: { labels: { color: text } } },
-                            scales: {
-                                x: { ticks: { color: text }, grid: { color: grid } },
-                                y: { ticks: { color: text }, grid: { color: grid }, beginAtZero: true },
-                            },
-                        },
-                    }));
-                }
+                const make = (id, config) => {
+                    const canvas = document.getElementById(id);
+                    if (!canvas || typeof canvas.getContext !== 'function') {
+                        return;
+                    }
+                    instances.push(new Chart(canvas, config));
+                };
 
-                if (this.$refs.kind) {
-                    this.charts.push(new Chart(this.$refs.kind, {
-                        type: 'doughnut',
-                        data: {
-                            labels: this.payload.kind.labels,
-                            datasets: [{
-                                data: this.payload.kind.values,
-                                backgroundColor: ['#f59e0b', '#10b981'],
-                                borderWidth: 0,
-                            }],
+                make('acct-chart-daily', {
+                    type: 'line',
+                    data: {
+                        labels: payload.daily?.labels ?? [],
+                        datasets: [{
+                            label: 'Gross GEL',
+                            data: payload.daily?.gross ?? [],
+                            borderColor: '#f59e0b',
+                            backgroundColor: 'rgba(245, 158, 11, 0.15)',
+                            fill: true,
+                            tension: 0.35,
+                        }],
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: { legend: { labels: { color: text } } },
+                        scales: {
+                            x: { ticks: { color: text }, grid: { color: grid } },
+                            y: { ticks: { color: text }, grid: { color: grid }, beginAtZero: true },
                         },
-                        options: {
-                            responsive: true,
-                            maintainAspectRatio: false,
-                            plugins: { legend: { position: 'bottom', labels: { color: text } } },
-                        },
-                    }));
-                }
+                    },
+                });
 
-                if (this.$refs.ticketTypes) {
-                    this.charts.push(new Chart(this.$refs.ticketTypes, {
-                        type: 'bar',
-                        data: {
-                            labels: this.payload.ticketTypes.labels,
-                            datasets: [{
-                                label: 'Gross GEL',
-                                data: this.payload.ticketTypes.values,
-                                backgroundColor: ['#f43f5e', '#06b6d4', '#f59e0b'],
-                            }],
-                        },
-                        options: {
-                            responsive: true,
-                            maintainAspectRatio: false,
-                            plugins: { legend: { display: false } },
-                            scales: {
-                                x: { ticks: { color: text }, grid: { display: false } },
-                                y: { ticks: { color: text }, grid: { color: grid }, beginAtZero: true },
-                            },
-                        },
-                    }));
-                }
+                make('acct-chart-kind', {
+                    type: 'doughnut',
+                    data: {
+                        labels: payload.kind?.labels ?? [],
+                        datasets: [{
+                            data: payload.kind?.values ?? [],
+                            backgroundColor: ['#f59e0b', '#10b981'],
+                            borderWidth: 0,
+                        }],
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: { legend: { position: 'bottom', labels: { color: text } } },
+                    },
+                });
 
-                if (this.$refs.channel) {
-                    this.charts.push(new Chart(this.$refs.channel, {
-                        type: 'doughnut',
-                        data: {
-                            labels: this.payload.channel.labels,
-                            datasets: [{
-                                data: this.payload.channel.values,
-                                backgroundColor: ['#3b82f6', '#f97316'],
-                                borderWidth: 0,
-                            }],
+                make('acct-chart-types', {
+                    type: 'bar',
+                    data: {
+                        labels: payload.ticketTypes?.labels ?? [],
+                        datasets: [{
+                            label: 'Gross GEL',
+                            data: payload.ticketTypes?.values ?? [],
+                            backgroundColor: ['#f43f5e', '#06b6d4', '#f59e0b'],
+                        }],
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: { legend: { display: false } },
+                        scales: {
+                            x: { ticks: { color: text }, grid: { display: false } },
+                            y: { ticks: { color: text }, grid: { color: grid }, beginAtZero: true },
                         },
-                        options: {
-                            responsive: true,
-                            maintainAspectRatio: false,
-                            plugins: { legend: { position: 'bottom', labels: { color: text } } },
-                        },
-                    }));
+                    },
+                });
+
+                make('acct-chart-channel', {
+                    type: 'doughnut',
+                    data: {
+                        labels: payload.channel?.labels ?? [],
+                        datasets: [{
+                            data: payload.channel?.values ?? [],
+                            backgroundColor: ['#3b82f6', '#f97316'],
+                            borderWidth: 0,
+                        }],
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: { legend: { position: 'bottom', labels: { color: text } } },
+                    },
+                });
+
+                root.dataset.chartsMounted = '1';
+            };
+
+            const tryMount = () => {
+                // Chart.js may still be loading (defer); retry briefly.
+                let tries = 0;
+                const tick = () => {
+                    if (typeof window.Chart !== 'undefined') {
+                        mountCharts();
+                        return;
+                    }
+                    if (tries++ < 40) {
+                        setTimeout(tick, 50);
+                    }
+                };
+                tick();
+            };
+
+            tryMount();
+
+            Livewire.hook('morph.updated', () => {
+                queueMicrotask(tryMount);
+            });
+
+            Livewire.hook('morph.removed', ({ el }) => {
+                if (el?.id === 'accounting-charts-root') {
+                    destroyCharts();
                 }
-            },
-        }));
+            });
+        })();
     </script>
     @endscript
 </x-filament-panels::page>
