@@ -183,30 +183,41 @@ class Accounting extends Page
         $rows = app(AccountingReportService::class)->csvRows($from, $to, $channel);
         $filename = 'accounting-'.$this->dateFrom.'-'.$this->dateTo.'.csv';
 
+        // Human-readable English headers for accountants (not DB field names).
         $headers = [
-            'type',
-            'id',
-            'paid_at',
-            'channel',
-            'title',
-            'base_amount',
-            'surcharge_rate',
-            'surcharge_amount',
-            'amount',
-            'estimated_bank_fee',
-            'email',
-            'sold_by',
+            'Type',
+            'Order ID',
+            'Paid At',
+            'Channel',
+            'Title',
+            'Base Amount (GEL)',
+            'Surcharge Rate (%)',
+            'Surcharge Amount (GEL)',
+            'Gross Amount (GEL)',
+            'Estimated Bank Fee (GEL)',
+            'Buyer Email',
+            'Sold By',
         ];
 
         return response()->streamDownload(function () use ($rows, $headers) {
             $out = fopen('php://output', 'w');
+            // UTF-8 BOM so Excel on Windows opens Georgian titles correctly.
+            fwrite($out, "\xEF\xBB\xBF");
             fputcsv($out, $headers);
             foreach ($rows as $row) {
                 fputcsv($out, [
-                    $row['type'],
+                    match ($row['type']) {
+                        'ticket' => 'Ticket',
+                        'product' => 'Product',
+                        default => (string) $row['type'],
+                    },
                     $row['id'],
                     $row['paid_at'],
-                    $row['channel'],
+                    match ($row['channel']) {
+                        'online' => 'Online',
+                        'walk_up' => 'Walk-up',
+                        default => (string) $row['channel'],
+                    },
                     $row['title'],
                     $row['base_amount'],
                     $row['surcharge_rate'],
@@ -218,7 +229,9 @@ class Accounting extends Page
                 ]);
             }
             fclose($out);
-        }, $filename, ['Content-Type' => 'text/csv']);
+        }, $filename, [
+            'Content-Type' => 'text/csv; charset=UTF-8',
+        ]);
     }
 
     /**

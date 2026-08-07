@@ -51,7 +51,7 @@ class AccountingPageTest extends TestCase
             'surcharge_amount' => 3,
             'surcharge_rate' => 3,
             'status' => 'paid',
-            'event_name' => 'Standard Night',
+            'event_name' => 'სტანდარტი ღამე',
             'event_date' => '2026-08-05',
             'location' => 'Tbilisi',
             'paid_at' => '2026-08-05 12:00:00',
@@ -70,8 +70,12 @@ class AccountingPageTest extends TestCase
 
         $csv = base64_decode(data_get($component->effects, 'download.content'));
 
-        $this->assertStringContainsString('type,id,paid_at,channel,title', $csv);
+        $this->assertStringStartsWith("\xEF\xBB\xBF", $csv);
+        $this->assertStringContainsString('Type,"Order ID","Paid At",Channel,Title', $csv);
+        $this->assertStringContainsString('Estimated Bank Fee (GEL)', $csv);
         $this->assertStringContainsString('ACCTKT01', $csv);
-        $this->assertStringContainsString('estimated_bank_fee', $csv);
+        $this->assertStringContainsString('Ticket', $csv);
+        $this->assertStringContainsString('Online', $csv);
+        $this->assertStringContainsString('სტანდარტი ღამე', $csv);
     }
 }
