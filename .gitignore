@@ -12,3 +12,6 @@ _ops/
 # Production payment gateway certs/keys — never push
 cert/
 bank-csr/
+
+.worktrees/
+.claude/worktrees/
