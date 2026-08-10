@@ -45,10 +45,16 @@
         }
         /* Fixed square so the client-required 1:1 artwork renders edge-to-edge
            with no letterboxing AND the whole ticket still fits on one page
-           (a full-width 741px square overflows the 650x1000pt paper). */
-        .artwork img {
+           (a full-width 741px square overflows the 650x1000pt paper).
+           Rendered as a background-size:cover box (not a stretched <img>) so
+           non-square uploads get cropped to fill instead of squashed. */
+        .artwork .crop {
+            display: inline-block;
             width: 680px;
             height: 680px;
+            background-repeat: no-repeat;
+            background-position: center center;
+            background-size: cover;
         }
         /* Techno artwork is a portrait poster — constrain by height and let the
            width scale so it keeps its aspect ratio (no squashing) while using
@@ -143,7 +149,11 @@
 
                 @if (!empty($artworkPath))
                     <div class="artwork {{ !empty($artworkContain) ? 'contain' : '' }}">
-                        <img src="{{ $artworkPath }}" alt="">
+                        @if (!empty($artworkContain))
+                            <img src="{{ $artworkPath }}" alt="">
+                        @else
+                            <div class="crop" style="background-image: url('{{ $artworkPath }}');"></div>
+                        @endif
                     </div>
                 @endif
 
