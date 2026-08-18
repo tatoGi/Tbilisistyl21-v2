@@ -1,4 +1,7 @@
+"use client";
+
 import Link from "next/link";
+import { useTranslations } from "next-intl";
 
 type Props = {
   basePath: string; // e.g. "/news"
@@ -11,6 +14,7 @@ type Props = {
  * nothing when there is a single page. SEO-friendly (plain links).
  */
 export default function Pagination({ basePath, currentPage, totalPages }: Props) {
+  const t = useTranslations();
   if (totalPages <= 1) return null;
 
   const href = (p: number) => (p <= 1 ? basePath : `${basePath}?page=${p}`);
@@ -24,11 +28,11 @@ export default function Pagination({ basePath, currentPage, totalPages }: Props)
 
   return (
     <nav
-      aria-label="Pagination"
+      aria-label={t("a11y.pagination")}
       className="mt-14 flex flex-wrap items-center justify-center gap-2"
     >
       {currentPage > 1 ? (
-        <Link href={href(currentPage - 1)} className={inactive} aria-label="Previous">
+        <Link href={href(currentPage - 1)} className={inactive} aria-label={t("a11y.previous")}>
           ←
         </Link>
       ) : (
@@ -49,7 +53,7 @@ export default function Pagination({ basePath, currentPage, totalPages }: Props)
       ))}
 
       {currentPage < totalPages ? (
-        <Link href={href(currentPage + 1)} className={inactive} aria-label="Next">
+        <Link href={href(currentPage + 1)} className={inactive} aria-label={t("a11y.next")}>
           →
         </Link>
       ) : (

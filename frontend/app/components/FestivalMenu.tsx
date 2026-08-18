@@ -74,7 +74,7 @@ export default function FestivalMenu({
           <button
             onClick={() => setNavOpen(!navOpen)}
             onMouseEnter={() => setNavOpen(true)}
-            aria-label="Menu"
+            aria-label={t("a11y.menu")}
             className="relative z-50 flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-white/15 bg-black/25 backdrop-blur-md sm:h-9 sm:w-9"
           >
             <span
@@ -118,7 +118,7 @@ export default function FestivalMenu({
 
           <button
             onClick={() => setNavOpen(false)}
-            aria-label="Close menu"
+            aria-label={t("a11y.closeMenu")}
             className="absolute right-5 top-5 flex h-10 w-10 items-center justify-center sm:right-6 sm:top-6"
           >
             <span className="absolute h-[2px] w-6 rotate-45 bg-white" />

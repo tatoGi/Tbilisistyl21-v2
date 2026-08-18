@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useTranslations } from "next-intl";
 import type { Product } from "@/lib/products";
 import PaymentCardBadges from "../../components/PaymentCardBadges";
 
@@ -19,6 +20,7 @@ export default function BuyProductModal({
   onClose,
   product,
 }: BuyProductModalProps) {
+  const t = useTranslations();
   const availableSizes = product.sizes.filter((s) => s.quantity > 0);
 
   const [size, setSize] = useState<string>(availableSizes[0]?.size ?? "");
@@ -38,9 +40,9 @@ export default function BuyProductModal({
   const isSubmitting = loadingStage !== "";
 
   const submitLabel: Record<LoadingStage, string> = {
-    "": `Pay ${product.priceGel} ₾ securely`,
-    reserving: "Reserving your item…",
-    redirecting: "Redirecting to payment…",
+    "": t("buyProduct.payButton", { price: product.priceGel }),
+    reserving: t("buyProduct.reserving"),
+    redirecting: t("checkout.redirecting"),
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -48,31 +50,31 @@ export default function BuyProductModal({
     setError("");
 
     if (!size) {
-      setError("Please select a size.");
+      setError(t("buyProduct.selectSizeError"));
       return;
     }
     if (formData.name.trim().length < 2) {
-      setError("Please enter your first name.");
+      setError(t("buyProduct.firstNameError"));
       return;
     }
     if (formData.surname.trim().length < 2) {
-      setError("Please enter your surname.");
+      setError(t("buyProduct.surnameError"));
       return;
     }
     if (formData.personalNumber.length !== 11) {
-      setError("Personal ID number must be exactly 11 digits.");
+      setError(t("buyProduct.personalIdError"));
       return;
     }
     if (!EMAIL_REGEX.test(formData.email)) {
-      setError("Please enter a valid email address.");
+      setError(t("buyProduct.emailError"));
       return;
     }
     if (formData.phone.replace(/\D/g, "").length < 9) {
-      setError("Please enter a valid phone number.");
+      setError(t("buyProduct.phoneError"));
       return;
     }
     if (!formData.terms) {
-      setError("Please accept the Rules & Terms to continue.");
+      setError(t("buyProduct.termsError"));
       return;
     }
 
@@ -100,7 +102,7 @@ export default function BuyProductModal({
         setError(
           data.error ||
             data.message ||
-            "We could not start the payment. Please try again in a moment."
+            t("checkout.paymentStartError")
         );
         setLoadingStage("");
         return;
@@ -111,8 +113,8 @@ export default function BuyProductModal({
     } catch (err) {
       setError(
         err instanceof Error && err.message
-          ? `Network error: ${err.message}`
-          : "Network error. Please check your connection and try again."
+          ? `${t("checkout.networkErrorPrefix")}${err.message}`
+          : t("checkout.networkErrorGeneric")
       );
       setLoadingStage("");
     }
@@ -130,7 +132,7 @@ export default function BuyProductModal({
           type="button"
           onClick={onClose}
           disabled={isSubmitting}
-          aria-label="Close"
+          aria-label={t("a11y.close")}
           className="absolute right-4 top-4 flex h-9 w-9 items-center justify-center rounded-full bg-white/5 text-white/60 transition hover:bg-white/10 hover:text-white disabled:opacity-30"
         >
           ✕
@@ -138,7 +140,7 @@ export default function BuyProductModal({
 
         <div className="border-b border-white/10 bg-white/[0.02] px-6 pb-5 pt-6">
           <p className="mb-1 text-[10px] font-bold uppercase tracking-[0.2em] text-[#e8b84b]">
-            Checkout
+            {t("checkout.title")}
           </p>
           <h2 className="text-2xl font-black uppercase text-white">
             {product.title}
@@ -149,19 +151,19 @@ export default function BuyProductModal({
           {/* Order summary */}
           <div className="mb-6 rounded-xl border border-[#e8b84b]/20 bg-[#e8b84b]/[0.04] p-4 text-sm">
             <div className="mb-2 flex justify-between text-white/70">
-              <span>Product</span>
+              <span>{t("checkout.product")}</span>
               <span className="text-white">{product.title}</span>
             </div>
             <div className="mb-2 flex justify-between text-white/70">
-              <span>Size</span>
+              <span>{t("checkout.size")}</span>
               <span className="text-white">{size || "—"}</span>
             </div>
             <div className="mb-2 flex justify-between text-white/70">
-              <span>Quantity</span>
+              <span>{t("checkout.quantity")}</span>
               <span className="text-white">1</span>
             </div>
             <div className="mt-3 flex justify-between border-t border-[#e8b84b]/20 pt-3 text-base font-bold">
-              <span className="text-white">Total</span>
+              <span className="text-white">{t("checkout.total")}</span>
               <span className="text-[#e8b84b]">{product.priceGel} ₾</span>
             </div>
           </div>
@@ -170,7 +172,7 @@ export default function BuyProductModal({
             {/* Size selector */}
             <div>
               <label className="mb-1.5 block text-xs font-semibold uppercase tracking-[0.06em] text-white/90">
-                Size <span className="text-[#e8b84b]">*</span>
+                {t("checkout.size")} <span className="text-[#e8b84b]">*</span>
               </label>
               <div className="flex flex-wrap gap-2">
                 {availableSizes.map((s) => (
@@ -192,12 +194,12 @@ export default function BuyProductModal({
             </div>
 
             <div className="grid grid-cols-2 gap-3">
-              <Field label="First name" required>
+              <Field label={t("checkout.firstName")} required>
                 <input
                   type="text"
                   required
                   autoComplete="given-name"
-                  placeholder="Giorgi"
+                  placeholder={t("checkout.firstNamePlaceholder")}
                   disabled={isSubmitting}
                   className={inputClass}
                   value={formData.name}
@@ -210,12 +212,12 @@ export default function BuyProductModal({
                 />
               </Field>
 
-              <Field label="Surname" required>
+              <Field label={t("checkout.surname")} required>
                 <input
                   type="text"
                   required
                   autoComplete="family-name"
-                  placeholder="Beridze"
+                  placeholder={t("checkout.surnamePlaceholder")}
                   disabled={isSubmitting}
                   className={inputClass}
                   value={formData.surname}
@@ -230,9 +232,9 @@ export default function BuyProductModal({
             </div>
 
             <Field
-              label="Personal ID number"
+              label={t("buyProduct.personalIdLabel")}
               required
-              hint="11 digits — as written on your ID"
+              hint={t("buyProduct.personalIdHint")}
             >
               <input
                 type="text"
@@ -252,13 +254,13 @@ export default function BuyProductModal({
               />
             </Field>
 
-            <Field label="Email" required hint="Your pickup QR will be sent here">
+            <Field label={t("checkout.email")} required hint={t("buyProduct.emailHint")}>
               <input
                 type="email"
                 required
                 inputMode="email"
                 autoComplete="email"
-                placeholder="you@example.com"
+                placeholder={t("checkout.emailPlaceholder")}
                 disabled={isSubmitting}
                 className={inputClass}
                 value={formData.email}
@@ -268,13 +270,13 @@ export default function BuyProductModal({
               />
             </Field>
 
-            <Field label="Phone" required>
+            <Field label={t("checkout.phone")} required>
               <input
                 type="tel"
                 required
                 inputMode="tel"
                 autoComplete="tel"
-                placeholder="+995 5XX XX XX XX"
+                placeholder={t("checkout.phonePlaceholder")}
                 disabled={isSubmitting}
                 className={inputClass}
                 value={formData.phone}
@@ -296,16 +298,16 @@ export default function BuyProductModal({
                 className="mt-[3px] accent-[#e8b84b]"
               />
               <span>
-                I agree to the{" "}
+                {t("checkout.agreePrefix")}
                 <a
                   href="/rules-and-terms"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="text-[#e8b84b] underline"
                 >
-                  Rules &amp; Terms
-                </a>{" "}
-                and confirm my email is correct
+                  {t("rulesAndTerms.title")}
+                </a>
+                {t("checkout.agreeSuffix")}
               </span>
             </label>
 
@@ -335,7 +337,7 @@ export default function BuyProductModal({
 
             <PaymentCardBadges className="pt-1" />
             <p className="text-center text-[11px] text-white/45">
-              🔒 Secure 3DS payment by Quipu · Collect at the festival
+              {t("buyProduct.secureNote")}
             </p>
           </form>
         </div>

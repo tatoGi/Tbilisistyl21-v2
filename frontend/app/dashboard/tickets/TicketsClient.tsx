@@ -1,11 +1,12 @@
 'use client'
 
 import { useState } from "react"
+import { useTranslations } from "next-intl"
 import BuyTicketModal from "./BuyTicketModal"
 import { sanitizeRichHtml } from "@/lib/sanitize"
 
-function formatEventDate(value?: string) {
-  if (!value) return "Date TBA"
+function formatEventDate(value: string | undefined, dateTbaLabel: string) {
+  if (!value) return dateTbaLabel
   const raw = value.includes("T") ? value.split("T")[0] : value
   const date = new Date(raw)
   if (Number.isNaN(date.getTime())) return value
@@ -51,6 +52,7 @@ function DescriptionFallback({ content }: { content: string }) {
 }
 
 export default function TicketsClient({ tickets }: { tickets: Ticket[] }) {
+  const t = useTranslations()
   const [selectedTicket, setSelectedTicket] = useState<{
     id: string
     title: string
@@ -90,7 +92,7 @@ export default function TicketsClient({ tickets }: { tickets: Ticket[] }) {
                       : "bg-white/[0.06] text-[color:var(--ts-muted)]"
                   }`}
                 >
-                  {ticket.category || "Festival Pass"}
+                  {ticket.category || t("ticketsPage.festivalPass")}
                 </div>
 
                 {/* Title */}
@@ -102,7 +104,7 @@ export default function TicketsClient({ tickets }: { tickets: Ticket[] }) {
                 <div className="mb-6 flex items-center gap-2">
                   <span className="h-1.5 w-1.5 rounded-full bg-[color:var(--ts-muted)]" />
                   <span className="text-[13px] text-[color:var(--ts-muted)]">
-                    {formatEventDate(ticket.eventDate)}
+                    {formatEventDate(ticket.eventDate, t("ticketsPage.dateTba"))}
                     {ticket.location ? ` · ${ticket.location}` : ""}
                   </span>
                 </div>
@@ -133,7 +135,9 @@ export default function TicketsClient({ tickets }: { tickets: Ticket[] }) {
                 <div className="mb-5">
                   <div className="mb-1.5 flex justify-between text-xs text-[color:var(--ts-muted)]">
                     <span>
-                      {soldOut ? "ამოიწურა" : `${ticket.remaining} ხელმისაწვდომი`}
+                      {soldOut
+                        ? t("common.soldOut")
+                        : t("ticketsPage.available", { count: ticket.remaining })}
                     </span>
                     <span>{ticket.percentLeft}%</span>
                   </div>
@@ -148,7 +152,7 @@ export default function TicketsClient({ tickets }: { tickets: Ticket[] }) {
                 {/* CTA */}
                 {soldOut ? (
                   <span className="flex w-full cursor-not-allowed items-center justify-center rounded-full bg-white/10 py-4 text-xs font-black uppercase tracking-[0.14em] text-white/40">
-                    ამოიწურა
+                    {t("common.soldOut")}
                   </span>
                 ) : (
                   <button
@@ -164,7 +168,7 @@ export default function TicketsClient({ tickets }: { tickets: Ticket[] }) {
                     }
                     className="group/btn flex w-full items-center justify-center gap-2 rounded-full bg-[#e8b84b] py-4 text-sm font-bold text-[#1a1206] transition duration-300 hover:bg-white"
                   >
-                    <span>ბილეთის ყიდვა</span>
+                    <span>{t("common.buyTicket")}</span>
                     <span aria-hidden className="transition-transform duration-300 group-hover/btn:translate-x-0.5">
                       →
                     </span>
@@ -175,7 +179,7 @@ export default function TicketsClient({ tickets }: { tickets: Ticket[] }) {
           })
         ) : (
           <p className="rounded-[20px] border border-dashed border-white/15 bg-white/[0.02] p-10 text-center text-white/50 md:col-span-2 lg:col-span-3">
-            Tickets are not available yet.
+            {t("ticketsPage.notAvailable")}
           </p>
         )}
       </div>

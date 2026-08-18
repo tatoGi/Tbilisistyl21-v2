@@ -37,7 +37,13 @@
     "buyTicket": "Купити квиток",
     "buyTickets": "Купити квитки",
     "language": "Мова",
-    "followUs": "Стежте за нами"
+    "followUs": "Стежте за нами",
+    "viewAll": "Переглянути всі",
+    "soldOut": "Розпродано",
+    "buyNow": "Купити зараз",
+    "noImage": "Немає зображення",
+    "readArticle": "Читати статтю",
+    "festivalMerchandise": "Мерч фестивалю"
   },
   "nav": {
     "mainStage": "ГОЛОВНА СЦЕНА",
@@ -158,5 +164,118 @@
     "errorClosed": "Голосування завершено.",
     "errorFailed": "Не вдалося зберегти голос. Спробуй ще раз.",
     "errorNetwork": "Помилка з'єднання. Спробуй ще раз."
+  },
+  "a11y": {
+    "close": "Закрити",
+    "previous": "Назад",
+    "next": "Далі",
+    "previousTrack": "Попередній трек",
+    "nextTrack": "Наступний трек",
+    "play": "Відтворити",
+    "pause": "Пауза",
+    "playMusic": "Відтворити музику",
+    "pauseMusic": "Призупинити музику",
+    "menu": "Меню",
+    "closeMenu": "Закрити меню",
+    "openTrackList": "Відкрити список треків",
+    "closeTrackList": "Закрити список треків",
+    "languageSelector": "Вибір мови",
+    "pagination": "Пагінація",
+    "viewImage": "Перегляд зображення",
+    "weAcceptCards": "Ми приймаємо картки Visa і Mastercard"
+  },
+  "checkout": {
+    "title": "Оформлення замовлення",
+    "product": "Товар",
+    "ticket": "Квиток",
+    "size": "Розмір",
+    "quantity": "Кількість",
+    "total": "Разом",
+    "date": "Дата",
+    "location": "Локація",
+    "firstName": "Ім'я",
+    "firstNamePlaceholder": "Giorgi",
+    "surname": "Прізвище",
+    "surnamePlaceholder": "Beridze",
+    "email": "Email",
+    "emailPlaceholder": "you@example.com",
+    "phone": "Телефон",
+    "phonePlaceholder": "+995 5XX XX XX XX",
+    "agreePrefix": "Я погоджуюсь з ",
+    "agreeSuffix": " і підтверджую правильність моєї електронної пошти",
+    "networkErrorPrefix": "Помилка мережі: ",
+    "networkErrorGeneric": "Помилка мережі. Перевірте з'єднання і спробуйте ще раз.",
+    "paymentStartError": "Не вдалося розпочати оплату. Спробуйте ще раз трохи пізніше.",
+    "redirecting": "Перенаправлення на оплату…"
+  },
+  "buyProduct": {
+    "personalIdLabel": "Особистий номер",
+    "payButton": "Оплатити {price} ₾ безпечно",
+    "reserving": "Резервуємо ваш товар…",
+    "selectSizeError": "Будь ласка, оберіть розмір.",
+    "firstNameError": "Будь ласка, введіть ім'я.",
+    "surnameError": "Будь ласка, введіть прізвище.",
+    "personalIdError": "Особистий номер має складатися рівно з 11 цифр.",
+    "emailError": "Будь ласка, введіть дійсну електронну пошту.",
+    "phoneError": "Будь ласка, введіть дійсний номер телефону.",
+    "termsError": "Будь ласка, прийміть правила та умови, щоб продовжити.",
+    "personalIdHint": "11 цифр — як зазначено в посвідченні особи",
+    "emailHint": "Ваш QR-код для отримання буде надіслано сюди",
+    "secureNote": "🔒 Безпечна оплата 3DS через Quipu · Отримання на фестивалі"
+  },
+  "buyTicket": {
+    "personalNumberLabel": "Особистий номер (ID)",
+    "payButton": "Оплатити {price} ₾ безпечно",
+    "checkingDetails": "Перевіряємо ваші дані…",
+    "reserving": "Резервуємо ваш квиток…",
+    "latinOnlyHint": "Тільки латинські літери — як зазначено в посвідченні особи",
+    "validFormat": "✓ Коректний формат",
+    "digitsProgress": "{count}/11 цифр",
+    "looksGood": "✓ Все вірно",
+    "invalidEmailHint": "⚠ Будь ласка, введіть дійсну електронну пошту",
+    "personalIdErrorHint": "⚠ Номер має складатися рівно з 11 цифр",
+    "invalidEmailError": "Будь ласка, введіть дійсну електронну пошту",
+    "termsError": "Будь ласка, прийміть правила та умови, щоб продовжити",
+    "maxTicketsError": "Ви вже придбали максимум 3 квитки з цим номером.",
+    "personalIdHint": "11 цифр — грузинський номер посвідчення",
+    "emailHint": "Ваш QR-код квитка буде надіслано сюди",
+    "didYouMean": "Можливо, ви мали на увазі",
+    "secureNote": "🔒 Безпечна оплата 3DS через Quipu · Дані картки не зберігаються"
+  },
+  "shop": {
+    "noImage": "Немає зображення",
+    "notAvailable": "Товари поки що недоступні."
+  },
+  "ticketsPage": {
+    "dateTba": "Дата уточнюється",
+    "festivalPass": "Фестивальний абонемент",
+    "available": "{count} доступно",
+    "notAvailable": "Квитки поки що недоступні."
+  },
+  "partnersPage": {
+    "metaTitle": "Партнери — Tbilisi Style 21",
+    "subtitle": "Бренди та медіа, які підтримують нас, поки ми разом створюємо найбільший нічний фестиваль Тбілісі.",
+    "emptyState": "Партнерів поки що не додано.",
+    "titlePartnerLabel": "Титульний партнер",
+    "officialPartnersLabel": "Офіційні партнери",
+    "mediaPartnersLabel": "Медіапартнери",
+    "ctaHeading": "Станьте партнером Tbilisi Style",
+    "ctaBody": "Зв'яжіться з нашою командою щодо можливостей партнерства та отримайте доступ до 5000+ відвідувачів.",
+    "ctaButton": "Зв'язатися з нами"
+  },
+  "newsPage": {
+    "metaTitle": "Новини — Tbilisi Style 21",
+    "emptyState": "Поки що немає новин.",
+    "backToNews": "← Новини"
+  },
+  "checkoutResult": {
+    "productSuccessMessage": "Ваше замовлення успішно оформлено. QR-код для отримання надіслано на вашу пошту.",
+    "ticketSuccessMessage": "Купівлю квитка успішно завершено.",
+    "paymentSuccessTitle": "Оплату успішно завершено",
+    "backToShop": "ПОВЕРНУТИСЯ ДО МАГАЗИНУ",
+    "backToHome": "НА ГОЛОВНУ",
+    "paymentFailedTitle": "Оплата не вдалася",
+    "paymentFailedBody": "На жаль, під час обробки платежу щось пішло не так. Спробуйте ще раз.",
+    "tryAgain": "Спробувати знову"
   }
 }

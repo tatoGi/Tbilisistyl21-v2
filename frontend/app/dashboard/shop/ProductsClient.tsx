@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useTranslations } from "next-intl";
 import type { Product } from "@/lib/products";
 import BuyProductModal from "./BuyProductModal";
 
@@ -15,6 +16,7 @@ export default function ProductsClient({
   products: Product[];
   initialProduct?: Product | null;
 }) {
+  const t = useTranslations();
   // A deep-linked product only auto-opens the modal when it can be bought.
   const [selected, setSelected] = useState<Product | null>(
     initialProduct && initialProduct.status !== "sold_out" && inStock(initialProduct) > 0
@@ -45,7 +47,7 @@ export default function ProductsClient({
                     />
                   ) : (
                     <div className="flex h-full w-full items-center justify-center text-xs font-bold uppercase tracking-widest text-white/30">
-                      No image
+                      {t("shop.noImage")}
                     </div>
                   )}
                   {product.isVip ? (
@@ -55,7 +57,7 @@ export default function ProductsClient({
                   ) : null}
                   {soldOut ? (
                     <span className="absolute right-3 top-3 bg-black/80 px-2.5 py-1 text-[11px] font-black uppercase tracking-wider text-white">
-                      Sold out
+                      {t("common.soldOut")}
                     </span>
                   ) : null}
                 </div>
@@ -106,14 +108,14 @@ export default function ProductsClient({
                         disabled
                         className="w-full cursor-not-allowed rounded-full bg-white/10 py-3 text-xs font-black uppercase tracking-wider text-white/40"
                       >
-                        Sold out
+                        {t("common.soldOut")}
                       </button>
                     ) : (
                       <button
                         onClick={() => setSelected(product)}
                         className="w-full rounded-full bg-[#e8b84b] py-3 text-xs font-black uppercase tracking-wider text-[#1a1206] transition hover:bg-white"
                       >
-                        Buy now
+                        {t("common.buyNow")}
                       </button>
                     )}
                   </div>
@@ -123,7 +125,7 @@ export default function ProductsClient({
           })
         ) : (
           <p className="border border-white/10 p-5 text-white/60">
-            Products are not available yet.
+            {t("shop.notAvailable")}
           </p>
         )}
       </div>

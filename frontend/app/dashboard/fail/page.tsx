@@ -1,6 +1,9 @@
 import Link from 'next/link'
+import { getTranslations } from 'next-intl/server'
 
-export default function FailedPage() {
+export default async function FailedPage() {
+  const t = await getTranslations('checkoutResult')
+
   return (
     <div className="min-h-screen bg-[#0b0906] text-[color:var(--ts-body)] flex items-center justify-center px-4 relative overflow-hidden">
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(255,63,164,0.16),transparent_45%)]" />
@@ -15,18 +18,18 @@ export default function FailedPage() {
         </p>
 
         <h1 className="font-unbounded text-[clamp(2rem,5vw,2.75rem)] font-extrabold mb-4 leading-tight text-[color:var(--ts-head)]">
-          გადახდა ვერ განხორციელდა
+          {t('paymentFailedTitle')}
         </h1>
 
         <p className="text-[color:var(--ts-body)] text-base mb-10 leading-8">
-          სამწუხაროდ, გადახდის დამუშავებისას რაღაც ვერ მოხერხდა. სცადე ხელახლა.
+          {t('paymentFailedBody')}
         </p>
 
         <Link
           href="/dashboard/tickets"
           className="w-full inline-flex items-center justify-center bg-[#ff3fa4] text-[#1a0512] font-bold py-4 rounded-full hover:brightness-110 transition duration-300"
         >
-          ხელახლა ცდა
+          {t('tryAgain')}
         </Link>
       </div>
     </div>

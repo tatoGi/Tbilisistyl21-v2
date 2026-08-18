@@ -1,20 +1,22 @@
 import type { Metadata } from "next";
+import { getTranslations } from "next-intl/server";
 import { listNews } from "@/lib/posts";
 import NewsCardGrid from "@/app/components/NewsCardGrid";
 import Pagination from "@/app/components/Pagination";
 
 export const dynamic = "force-dynamic";
 
-export const metadata: Metadata = {
-  title: "News — Tbilisi Style 21",
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getTranslations("newsPage");
+  return { title: t("metaTitle") };
+}
 
 const PER_PAGE = 9;
 
 type PageProps = { searchParams: Promise<{ page?: string }> };
 
 export default async function NewsPage({ searchParams }: PageProps) {
-  const allPosts = await listNews();
+  const [allPosts, t] = await Promise.all([listNews(), getTranslations()]);
   const { page } = await searchParams;
   const totalPages = Math.max(1, Math.ceil(allPosts.length / PER_PAGE));
   const current = Math.min(Math.max(1, Number(page) || 1), totalPages);
@@ -33,12 +35,12 @@ export default async function NewsPage({ searchParams }: PageProps) {
             </p>
           </div>
           <h1 className="font-unbounded text-[clamp(2.2rem,5vw,4rem)] font-extrabold tracking-[-0.01em] text-[color:var(--ts-head)]">
-            სიახლეები
+            {t("nav.news")}
           </h1>
         </div>
 
         {allPosts.length === 0 ? (
-          <p className="text-white/50">No news yet.</p>
+          <p className="text-white/50">{t("newsPage.emptyState")}</p>
         ) : (
           <>
             <NewsCardGrid posts={posts} variant="redesign" />

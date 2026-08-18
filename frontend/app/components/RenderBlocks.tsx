@@ -17,6 +17,19 @@ function imageSrc(value: unknown): string | null {
 
 type Localized = Record<string, string> | undefined;
 
+/** Static labels for the "contact" block — not admin content, so kept inline here. */
+const CONTACT_LABELS = {
+  phone: { ka: "ტელეფონი", en: "Phone", ru: "Телефон", ua: "Телефон" },
+  email: { ka: "ელფოსტა", en: "Email", ru: "Email", ua: "Email" },
+  address: { ka: "მისამართი", en: "Address", ru: "Адрес", ua: "Адреса" },
+  securePayments: {
+    ka: "უსაფრთხო გადახდები მიღებულია",
+    en: "Secure payments accepted",
+    ru: "Принимаются безопасные платежи",
+    ua: "Приймаються безпечні платежі",
+  },
+} as const;
+
 type RenderBlocksProps = {
   blocks: PageBlock[];
   locale: string;
@@ -472,7 +485,7 @@ function BlockRenderer({
                 href={`tel:${contact.phoneHref}`}
                 className="group flex flex-col items-center justify-center rounded-2xl border border-white/5 bg-black/30 p-5 text-center transition duration-300 hover:border-[#e8b84b]/30 hover:bg-[#e8b84b]/[0.04] hover:-translate-y-1"
               >
-                <span className="font-heading text-[10px] font-bold uppercase tracking-[0.25em] text-[#e8b84b]/80 group-hover:text-[#e8b84b]">Phone</span>
+                <span className="font-heading text-[10px] font-bold uppercase tracking-[0.25em] text-[#e8b84b]/80 group-hover:text-[#e8b84b]">{t(CONTACT_LABELS.phone, locale)}</span>
                 <span className="mt-2 block font-heading text-lg font-bold text-white group-hover:text-[#e8b84b] transition-colors duration-300">{contact.phone}</span>
               </a>
             ) : null}
@@ -481,7 +494,7 @@ function BlockRenderer({
                 href={`mailto:${contact.email}`}
                 className="group flex flex-col items-center justify-center rounded-2xl border border-white/5 bg-black/30 p-5 text-center transition duration-300 hover:border-[#e8b84b]/30 hover:bg-[#e8b84b]/[0.04] hover:-translate-y-1"
               >
-                <span className="font-heading text-[10px] font-bold uppercase tracking-[0.25em] text-[#e8b84b]/80 group-hover:text-[#e8b84b]">Email</span>
+                <span className="font-heading text-[10px] font-bold uppercase tracking-[0.25em] text-[#e8b84b]/80 group-hover:text-[#e8b84b]">{t(CONTACT_LABELS.email, locale)}</span>
                 <span className="mt-2 block break-all font-heading text-base font-bold text-white group-hover:text-[#e8b84b] transition-colors duration-300">{contact.email}</span>
               </a>
             ) : null}
@@ -489,14 +502,14 @@ function BlockRenderer({
               <div
                 className="flex flex-col items-center justify-center rounded-2xl border border-white/5 bg-black/30 p-5 text-center transition duration-300 hover:border-white/20"
               >
-                <span className="font-heading text-[10px] font-bold uppercase tracking-[0.25em] text-[#e8b84b]/80">Address</span>
+                <span className="font-heading text-[10px] font-bold uppercase tracking-[0.25em] text-[#e8b84b]/80">{t(CONTACT_LABELS.address, locale)}</span>
                 <span className="mt-2 block font-heading text-base font-bold text-white">{contact.address}</span>
               </div>
             ) : null}
           </div>
           {showPayments ? (
             <div className="mt-8 border-t border-white/5 pt-8">
-              <p className="font-heading text-center text-xs font-bold uppercase tracking-[0.2em] text-white/40">Secure payments accepted</p>
+              <p className="font-heading text-center text-xs font-bold uppercase tracking-[0.2em] text-white/40">{t(CONTACT_LABELS.securePayments, locale)}</p>
               <div className="mt-5 flex items-center justify-center gap-6 opacity-60 hover:opacity-80 transition-opacity duration-300">
                 <Image src="/paymentLogo/Visa_Brandmark_White_RGB_2021.png" alt="Visa" width={64} height={40} className="h-7 w-auto" />
                 <Image src="/paymentLogo/ms_hrz_opt_rev_75_3x.png" alt="Mastercard" width={64} height={40} className="h-7 w-auto" />

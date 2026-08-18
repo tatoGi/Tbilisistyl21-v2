@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { useTranslations } from "next-intl";
 
 type Props = {
   src: string;
@@ -14,6 +15,7 @@ type Props = {
  * click — the button toggles play/pause.
  */
 export default function FestivalMusic({ src, title, loop }: Props) {
+  const t = useTranslations();
   const audioRef = useRef<HTMLAudioElement>(null);
   const [playing, setPlaying] = useState(false);
 
@@ -54,7 +56,7 @@ export default function FestivalMusic({ src, title, loop }: Props) {
       <button
         type="button"
         onClick={toggle}
-        aria-label={playing ? "Pause music" : "Play music"}
+        aria-label={playing ? t("a11y.pauseMusic") : t("a11y.playMusic")}
         aria-pressed={playing}
         className="flex h-12 w-12 items-center justify-center rounded-full bg-white/10 text-white shadow-lg ring-1 ring-white/30 backdrop-blur-md transition-all duration-300 hover:scale-105 hover:bg-yellow-300 hover:text-black"
       >

@@ -1,5 +1,8 @@
+"use client";
+
 import Image from "next/image";
 import Link from "next/link";
+import { useTranslations } from "next-intl";
 import { formatNewsDate } from "@/lib/posts";
 
 export type NewsCardItem = {
@@ -23,6 +26,7 @@ type Props = {
 
 /** Card grid for news lists — shared by the festival teaser and /news page. */
 export default function NewsCardGrid({ posts, variant = "default" }: Props) {
+  const t = useTranslations();
   const rd = variant === "redesign";
   const card = rd
     ? "group relative flex flex-col overflow-hidden rounded-[20px] border border-white/10 bg-white/[0.02] transition-all duration-500 hover:-translate-y-1.5 hover:border-[#e8b84b]/30 hover:bg-white/[0.04] hover:shadow-[0_15px_30px_rgba(0,0,0,0.5)]"
@@ -71,7 +75,7 @@ export default function NewsCardGrid({ posts, variant = "default" }: Props) {
               <p className="mt-3 line-clamp-2 text-xs leading-relaxed text-white/50">{post.excerpt}</p>
             ) : null}
             <div className={read}>
-              <span>Read Article</span>
+              <span>{t("common.readArticle")}</span>
               <span aria-hidden className="transition-transform duration-300 group-hover:translate-x-0.5">
                 →
               </span>

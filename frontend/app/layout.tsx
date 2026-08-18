@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { Bebas_Neue, Noto_Sans_Georgian, Oswald, Unbounded } from "next/font/google";
 import { cookies } from "next/headers";
 import { NextIntlClientProvider } from "next-intl";
-import { getMessages } from "next-intl/server";
+import { getMessages, getTranslations } from "next-intl/server";
 import { defaultLocale, isLocale, localeCookieName } from "@/i18n/config";
 import { getNavPages, getFooterPages, getSocialLinks, getSiteContact } from "@/lib/nav";
 import { getFestivalMusic } from "@/lib/festival-landing";
@@ -39,15 +39,18 @@ const unbounded = Unbounded({
   display: "swap",
 });
 
-export const metadata: Metadata = {
-  title: "Tbilisi Style 21",
-  description: "Electronic Music Festival",
-  icons: {
-    icon: "/images/logo2.jpeg",
-    shortcut: "/images/logo2.jpeg",
-    apple: "/images/logo2.jpeg",
-  },
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getTranslations("home");
+  return {
+    title: "Tbilisi Style 21",
+    description: t("subtitle"),
+    icons: {
+      icon: "/images/logo2.jpeg",
+      shortcut: "/images/logo2.jpeg",
+      apple: "/images/logo2.jpeg",
+    },
+  };
+}
 
 export const dynamic = "force-dynamic";
 

@@ -1,4 +1,7 @@
+"use client";
+
 import Image from "next/image";
+import { useTranslations } from "next-intl";
 import visaLogo from "@/public/paymentLogo/Visa_Brandmark_White_RGB_2021.png";
 import mastercardLogo from "@/public/paymentLogo/ms_hrz_opt_rev_75_3x.png";
 
@@ -12,10 +15,11 @@ export default function PaymentCardBadges({
 }: {
   className?: string;
 }) {
+  const t = useTranslations();
   return (
     <div
       className={`flex items-center justify-center gap-5 ${className}`}
-      aria-label="We accept Visa and Mastercard"
+      aria-label={t("a11y.weAcceptCards")}
     >
       <span className="relative h-6 w-12">
         <Image src={visaLogo} alt="Visa" fill className="object-contain" sizes="48px" />

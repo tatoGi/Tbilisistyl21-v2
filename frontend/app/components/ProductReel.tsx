@@ -8,7 +8,7 @@ function inStock(product: Product) {
   return product.sizes.reduce((sum, s) => sum + Math.max(0, s.quantity), 0);
 }
 
-function ProductCard({ product }: { product: Product }) {
+function ProductCard({ product, t }: { product: Product; t: ReturnType<typeof useTranslations> }) {
   const soldOut = product.status === "sold_out" || inStock(product) <= 0;
 
   return (
@@ -41,7 +41,7 @@ function ProductCard({ product }: { product: Product }) {
         ) : null}
         {soldOut ? (
           <span className="absolute right-3 top-3 z-10 rounded-md border border-white/10 bg-black/75 px-2.5 py-0.5 text-[9px] font-extrabold uppercase tracking-wider text-white/90 backdrop-blur-md">
-            Sold out
+            {t("common.soldOut")}
           </span>
         ) : null}
         <span className="absolute bottom-3 right-3 z-10 rounded-full bg-gradient-to-r from-yellow-300 to-yellow-400 px-3.5 py-1 text-sm font-black text-black shadow-md shadow-black/30 transition-transform duration-500 group-hover:scale-105">
@@ -83,7 +83,7 @@ export default function ProductReel({ products }: { products: Product[] }) {
       <div className="relative z-10 mx-auto mb-10 flex w-full max-w-6xl items-baseline justify-between gap-6 px-6">
         <div className="flex flex-col gap-1">
           <p className="text-[10px] font-bold uppercase tracking-[0.25em] text-yellow-300">
-            Festival Merchandise
+            {t("common.festivalMerchandise")}
           </p>
           <h2 className="font-heading text-2xl font-extrabold uppercase tracking-wide text-white md:text-3xl">
             {t("nav.shop")}
@@ -107,7 +107,7 @@ export default function ProductReel({ products }: { products: Product[] }) {
 
         <div className="ts-marquee-track py-4">
           {loop.map((product, i) => (
-            <ProductCard key={`${product.id}-${i}`} product={product} />
+            <ProductCard key={`${product.id}-${i}`} product={product} t={t} />
           ))}
         </div>
       </div>

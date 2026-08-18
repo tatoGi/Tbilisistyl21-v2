@@ -1,6 +1,7 @@
 "use client";
 
 import { useRef, useState, useCallback, useEffect } from "react";
+import { useTranslations } from "next-intl";
 import type { MusicTrack } from "@/lib/music-tracks";
 
 type Props = {
@@ -14,6 +15,7 @@ function formatTime(sec: number) {
 }
 
 export default function MusicTrackList({ tracks }: Props) {
+  const t = useTranslations();
   const audioRef = useRef<HTMLAudioElement>(null);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [playing, setPlaying] = useState(false);
@@ -184,7 +186,7 @@ export default function MusicTrackList({ tracks }: Props) {
             <button
               type="button"
               onClick={prevTrack}
-              aria-label="Previous track"
+              aria-label={t("a11y.previousTrack")}
               className="hidden shrink-0 text-white/50 transition-colors hover:text-white sm:block"
             >
               <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
@@ -196,7 +198,7 @@ export default function MusicTrackList({ tracks }: Props) {
             <button
               type="button"
               onClick={toggle}
-              aria-label={playing ? "Pause" : "Play"}
+              aria-label={playing ? t("a11y.pause") : t("a11y.play")}
               className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[#e8b84b] text-black transition-transform duration-150 hover:scale-105 hover:bg-white"
             >
               {playing ? (
@@ -215,7 +217,7 @@ export default function MusicTrackList({ tracks }: Props) {
             <button
               type="button"
               onClick={nextTrack}
-              aria-label="Next track"
+              aria-label={t("a11y.nextTrack")}
               className="hidden shrink-0 text-white/50 transition-colors hover:text-white sm:block"
             >
               <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
@@ -247,7 +249,7 @@ export default function MusicTrackList({ tracks }: Props) {
             <button
               type="button"
               onClick={() => setOpen((o) => !o)}
-              aria-label={open ? "Close track list" : "Open track list"}
+              aria-label={open ? t("a11y.closeTrackList") : t("a11y.openTrackList")}
               className="hidden shrink-0 text-white/40 transition-colors hover:text-white sm:block"
             >
               <svg

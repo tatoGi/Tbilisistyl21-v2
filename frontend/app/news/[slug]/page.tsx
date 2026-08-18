@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { getTranslations } from "next-intl/server";
 import { RenderBlocks } from "@/app/components/RenderBlocks";
 import { getCurrentLocale } from "@/lib/locale";
 import { getNewsPost, formatNewsDate } from "@/lib/posts";
@@ -21,7 +22,7 @@ export default async function NewsPostPage({ params }: PageProps) {
   const post = await getNewsPost(slug);
   if (!post) notFound();
 
-  const locale = await getCurrentLocale();
+  const [locale, t] = await Promise.all([getCurrentLocale(), getTranslations()]);
 
   return (
     <main className="relative min-h-screen w-full overflow-hidden bg-[#0b0906] text-[color:var(--ts-body)]">
@@ -32,7 +33,7 @@ export default async function NewsPostPage({ params }: PageProps) {
           href="/news"
           className="text-xs font-bold uppercase tracking-[0.22em] text-[#e8b84b] transition hover:text-white"
         >
-          ← News
+          {t("newsPage.backToNews")}
         </Link>
 
         {post.publishedAt ? (

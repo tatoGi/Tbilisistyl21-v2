@@ -1,3 +1,4 @@
+import { getTranslations } from "next-intl/server";
 import { getFestivalHeroContent } from "@/lib/festival-landing";
 import { getFeaturedPages, getFeaturedPartners, getFeaturedNews } from "@/lib/nav";
 import { listProducts } from "@/lib/products";
@@ -12,7 +13,7 @@ import NewsTeaser from "../../components/NewsTeaser";
 export const dynamic = "force-dynamic";
 
 export default async function FestivalPage() {
-  const [hero, featured, products, partners, featuredNews, djVote, locale] = await Promise.all([
+  const [hero, featured, products, partners, featuredNews, djVote, locale, t] = await Promise.all([
     getFestivalHeroContent(),
     getFeaturedPages(),
     listProducts({ publicOnly: true }),
@@ -20,6 +21,7 @@ export default async function FestivalPage() {
     getFeaturedNews(6),
     getDjVoteState(),
     getCurrentLocale(),
+    getTranslations(),
   ]);
 
   return (
@@ -34,11 +36,11 @@ export default async function FestivalPage() {
       <ProductReel products={products} />
 
       {partners.length > 0 ? (
-        <PartnersStrip partners={partners} heading="პარტნიორები" viewAllLabel="ყველას ნახვა" />
+        <PartnersStrip partners={partners} heading={t("nav.partners")} viewAllLabel={t("common.viewAll")} />
       ) : null}
 
       {featuredNews.length > 0 ? (
-        <NewsTeaser posts={featuredNews} heading="სიახლეები" viewAllLabel="ყველას ნახვა" />
+        <NewsTeaser posts={featuredNews} heading={t("nav.news")} viewAllLabel={t("common.viewAll")} />
       ) : null}
     </main>
   );

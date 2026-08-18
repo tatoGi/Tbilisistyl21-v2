@@ -1,6 +1,7 @@
 'use client'
 
 import { useRef, useState } from 'react'
+import { useTranslations } from 'next-intl'
 import PaymentCardBadges from '../../components/PaymentCardBadges'
 
 interface BuyTicketModalProps {
@@ -32,6 +33,7 @@ const EMAIL_TYPOS: Record<string, string> = {
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/
 
 export default function BuyTicketModal({ isOpen, onClose, ticket }: BuyTicketModalProps) {
+  const t = useTranslations()
   const [formData, setFormData] = useState({
     name: '',
     surname: '',
@@ -64,7 +66,7 @@ export default function BuyTicketModal({ isOpen, onClose, ticket }: BuyTicketMod
     const cleaned = raw.replace(/[^a-zA-Z\s]/g, '')
     setFormData((prev) => ({ ...prev, [field]: cleaned }))
     if (cleaned !== raw) {
-      setHints((prev) => ({ ...prev, [field]: 'Latin letters only — as written on your ID' }))
+      setHints((prev) => ({ ...prev, [field]: t('buyTicket.latinOnlyHint') }))
       setHintTypes((prev) => ({ ...prev, [field]: 'error' }))
       setTimeout(() => {
         setHints((prev) => ({ ...prev, [field]: '' }))
@@ -78,10 +80,10 @@ export default function BuyTicketModal({ isOpen, onClose, ticket }: BuyTicketMod
     const digits = raw.replace(/\D/g, '').slice(0, 11)
     setFormData((prev) => ({ ...prev, personalNumber: digits }))
     if (digits.length === 11) {
-      setHints((prev) => ({ ...prev, personalNumber: '✓ Valid format' }))
+      setHints((prev) => ({ ...prev, personalNumber: t('buyTicket.validFormat') }))
       setHintTypes((prev) => ({ ...prev, personalNumber: 'success' }))
     } else if (digits.length > 0) {
-      setHints((prev) => ({ ...prev, personalNumber: `${digits.length}/11 digits` }))
+      setHints((prev) => ({ ...prev, personalNumber: t('buyTicket.digitsProgress', { count: digits.length }) }))
       setHintTypes((prev) => ({ ...prev, personalNumber: '' }))
     } else {
       setHints((prev) => ({ ...prev, personalNumber: '' }))
@@ -110,10 +112,10 @@ export default function BuyTicketModal({ isOpen, onClose, ticket }: BuyTicketMod
 
     setEmailSuggestion('')
     if (EMAIL_REGEX.test(value)) {
-      setHints((prev) => ({ ...prev, email: '✓ Looks good' }))
+      setHints((prev) => ({ ...prev, email: t('buyTicket.looksGood') }))
       setHintTypes((prev) => ({ ...prev, email: 'success' }))
     } else {
-      setHints((prev) => ({ ...prev, email: '⚠ Please enter a valid email address' }))
+      setHints((prev) => ({ ...prev, email: t('buyTicket.invalidEmailHint') }))
       setHintTypes((prev) => ({ ...prev, email: 'error' }))
     }
   }
@@ -121,7 +123,7 @@ export default function BuyTicketModal({ isOpen, onClose, ticket }: BuyTicketMod
   function applyEmailSuggestion() {
     setFormData((prev) => ({ ...prev, email: emailSuggestion }))
     setEmailSuggestion('')
-    setHints((prev) => ({ ...prev, email: '✓ Looks good' }))
+    setHints((prev) => ({ ...prev, email: t('buyTicket.looksGood') }))
     setHintTypes((prev) => ({ ...prev, email: 'success' }))
   }
 
@@ -131,19 +133,19 @@ export default function BuyTicketModal({ isOpen, onClose, ticket }: BuyTicketMod
 
     // FIX: client-side 11-digit personal number validation before API call
     if (formData.personalNumber.length !== 11) {
-      setHints((prev) => ({ ...prev, personalNumber: '⚠ ID must be exactly 11 digits' }))
+      setHints((prev) => ({ ...prev, personalNumber: t('buyTicket.personalIdErrorHint') }))
       setHintTypes((prev) => ({ ...prev, personalNumber: 'error' }))
       personalNumberRef.current?.focus()
       return
     }
 
     if (!EMAIL_REGEX.test(formData.email)) {
-      setError('Please enter a valid email address')
+      setError(t('buyTicket.invalidEmailError'))
       return
     }
 
     if (!formData.terms) {
-      setError('Please accept the Rules & Terms to continue')
+      setError(t('buyTicket.termsError'))
       return
     }
 
@@ -158,7 +160,7 @@ export default function BuyTicketModal({ isOpen, onClose, ticket }: BuyTicketMod
       const checkData = await checkRes.json()
 
       if (checkData.canPurchase === false) {
-        setError('You have already purchased the maximum of 3 tickets with this ID.')
+        setError(t('buyTicket.maxTicketsError'))
         setLoadingStage('')
         return
       }
@@ -180,7 +182,7 @@ export default function BuyTicketModal({ isOpen, onClose, ticket }: BuyTicketMod
 
       if (orderData.error || !orderData.redirectUrl) {
         // FIX: surface specific error messages (instead of "Server error")
-        setError(orderData.error || 'We could not start the payment. Please try again in a moment.')
+        setError(orderData.error || t('checkout.paymentStartError'))
         setLoadingStage('')
         return
       }
@@ -191,8 +193,8 @@ export default function BuyTicketModal({ isOpen, onClose, ticket }: BuyTicketMod
     } catch (err) {
       setError(
         err instanceof Error && err.message
-          ? `Network error: ${err.message}`
-          : 'Network error. Please check your connection and try again.',
+          ? `${t('checkout.networkErrorPrefix')}${err.message}`
+          : t('checkout.networkErrorGeneric'),
       )
       setLoadingStage('')
     }
@@ -200,10 +202,10 @@ export default function BuyTicketModal({ isOpen, onClose, ticket }: BuyTicketMod
 
   const isSubmitting = loadingStage !== ''
   const submitLabel: Record<LoadingStage, string> = {
-    '': `Pay ${ticket.priceGel} ₾ securely`,
-    checking: 'Checking your details…',
-    reserving: 'Reserving your ticket…',
-    redirecting: 'Redirecting to payment…',
+    '': t('buyTicket.payButton', { price: ticket.priceGel }),
+    checking: t('buyTicket.checkingDetails'),
+    reserving: t('buyTicket.reserving'),
+    redirecting: t('checkout.redirecting'),
   }
 
   return (
@@ -218,7 +220,7 @@ export default function BuyTicketModal({ isOpen, onClose, ticket }: BuyTicketMod
           type="button"
           onClick={onClose}
           disabled={isSubmitting}
-          aria-label="Close"
+          aria-label={t('a11y.close')}
           className="absolute right-4 top-4 flex h-9 w-9 items-center justify-center rounded-full bg-white/5 text-white/60 transition hover:bg-white/10 hover:text-white disabled:opacity-30"
         >
           ✕
@@ -226,7 +228,7 @@ export default function BuyTicketModal({ isOpen, onClose, ticket }: BuyTicketMod
 
         <div className="border-b border-white/10 bg-white/[0.02] px-6 pb-5 pt-6">
           <p className="mb-1 text-[10px] font-bold uppercase tracking-[0.2em] text-[#e8b84b]">
-            Checkout
+            {t('checkout.title')}
           </p>
           <h2 className="text-2xl font-black uppercase leading-tight text-white">{ticket.title}</h2>
         </div>
@@ -235,27 +237,27 @@ export default function BuyTicketModal({ isOpen, onClose, ticket }: BuyTicketMod
           {/* FIX: Order Summary — transparency before payment */}
           <div className="mb-6 rounded-xl border border-[#e8b84b]/20 bg-[#e8b84b]/[0.04] p-4 text-sm">
             <div className="flex justify-between mb-2 text-white/70">
-              <span>Ticket</span>
+              <span>{t('checkout.ticket')}</span>
               <span className="text-white">{ticket.title}</span>
             </div>
             {ticket.eventDate ? (
               <div className="flex justify-between mb-2 text-white/70">
-                <span>Date</span>
+                <span>{t('checkout.date')}</span>
                 <span className="text-white">{ticket.eventDate}</span>
               </div>
             ) : null}
             {ticket.location ? (
               <div className="flex justify-between mb-2 text-white/70">
-                <span>Location</span>
+                <span>{t('checkout.location')}</span>
                 <span className="text-white">{ticket.location}</span>
               </div>
             ) : null}
             <div className="flex justify-between mb-2 text-white/70">
-              <span>Quantity</span>
+              <span>{t('checkout.quantity')}</span>
               <span className="text-white">1</span>
             </div>
             <div className="flex justify-between pt-3 mt-3 border-t border-[#e8b84b]/20 font-bold text-base">
-              <span className="text-white">Total</span>
+              <span className="text-white">{t('checkout.total')}</span>
               <span className="text-[#e8b84b]">{ticket.priceGel} ₾</span>
             </div>
           </div>
@@ -263,16 +265,16 @@ export default function BuyTicketModal({ isOpen, onClose, ticket }: BuyTicketMod
           <form onSubmit={handleSubmit} noValidate className="space-y-4">
             {/* Name */}
             <FormField
-              label="Name"
+              label={t('checkout.firstName')}
               required
-              hint={hints.name || 'Latin letters only — as written on your ID'}
+              hint={hints.name || t('buyTicket.latinOnlyHint')}
               hintType={hintTypes.name}
             >
               <input
                 type="text"
                 required
                 autoComplete="given-name"
-                placeholder="Giorgi"
+                placeholder={t('checkout.firstNamePlaceholder')}
                 disabled={isSubmitting}
                 className={inputClass(hintTypes.name)}
                 value={formData.name}
@@ -282,16 +284,16 @@ export default function BuyTicketModal({ isOpen, onClose, ticket }: BuyTicketMod
 
             {/* Surname */}
             <FormField
-              label="Surname"
+              label={t('checkout.surname')}
               required
-              hint={hints.surname || 'Latin letters only — as written on your ID'}
+              hint={hints.surname || t('buyTicket.latinOnlyHint')}
               hintType={hintTypes.surname}
             >
               <input
                 type="text"
                 required
                 autoComplete="family-name"
-                placeholder="Beridze"
+                placeholder={t('checkout.surnamePlaceholder')}
                 disabled={isSubmitting}
                 className={inputClass(hintTypes.surname)}
                 value={formData.surname}
@@ -301,9 +303,9 @@ export default function BuyTicketModal({ isOpen, onClose, ticket }: BuyTicketMod
 
             {/* Personal Number — FIX: numeric inputMode + 11-digit live check */}
             <FormField
-              label="Personal Number (ID)"
+              label={t('buyTicket.personalNumberLabel')}
               required
-              hint={hints.personalNumber || '11 digits — Georgian ID number'}
+              hint={hints.personalNumber || t('buyTicket.personalIdHint')}
               hintType={hintTypes.personalNumber}
             >
               <input
@@ -324,9 +326,9 @@ export default function BuyTicketModal({ isOpen, onClose, ticket }: BuyTicketMod
 
             {/* Email — FIX: typo detection */}
             <FormField
-              label="Email"
+              label={t('checkout.email')}
               required
-              hint={hints.email || 'Your ticket QR will be sent here'}
+              hint={hints.email || t('buyTicket.emailHint')}
               hintType={hintTypes.email}
             >
               <input
@@ -334,7 +336,7 @@ export default function BuyTicketModal({ isOpen, onClose, ticket }: BuyTicketMod
                 required
                 inputMode="email"
                 autoComplete="email"
-                placeholder="you@example.com"
+                placeholder={t('checkout.emailPlaceholder')}
                 disabled={isSubmitting}
                 className={inputClass(hintTypes.email)}
                 value={formData.email}
@@ -343,7 +345,7 @@ export default function BuyTicketModal({ isOpen, onClose, ticket }: BuyTicketMod
               />
               {emailSuggestion ? (
                 <p className="mt-1 text-xs text-[#e8b84b]">
-                  Did you mean{' '}
+                  {t('buyTicket.didYouMean')}{' '}
                   <button
                     type="button"
                     onClick={applyEmailSuggestion}
@@ -367,16 +369,16 @@ export default function BuyTicketModal({ isOpen, onClose, ticket }: BuyTicketMod
                 className="mt-[3px] accent-[#e8b84b]"
               />
               <span>
-                I agree to the{' '}
+                {t('checkout.agreePrefix')}
                 <a
                   href="/rules-and-terms"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="text-[#e8b84b] underline"
                 >
-                  Rules & Terms
-                </a>{' '}
-                and confirm my email is correct
+                  {t('rulesAndTerms.title')}
+                </a>
+                {t('checkout.agreeSuffix')}
               </span>
             </label>
 
@@ -408,7 +410,7 @@ export default function BuyTicketModal({ isOpen, onClose, ticket }: BuyTicketMod
             {/* Trust note */}
             <PaymentCardBadges className="pt-1" />
             <p className="text-center text-[11px] text-white/45">
-              🔒 Secure 3DS payment by Quipu · No card data stored
+              {t('buyTicket.secureNote')}
             </p>
           </form>
         </div>

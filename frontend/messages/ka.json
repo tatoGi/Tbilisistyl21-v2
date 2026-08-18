@@ -37,7 +37,13 @@
     "buyTicket": "ბილეთის ყიდვა",
     "buyTickets": "ბილეთების ყიდვა",
     "language": "ენა",
-    "followUs": "გამოგვყევით"
+    "followUs": "გამოგვყევით",
+    "viewAll": "ყველას ნახვა",
+    "soldOut": "ამოიწურა",
+    "buyNow": "ყიდვა ახლავე",
+    "noImage": "სურათი არ არის",
+    "readArticle": "სტატიის წაკითხვა",
+    "festivalMerchandise": "ფესტივალის მერჩენდაიზი"
   },
   "nav": {
     "mainStage": "მთავარი სცენა",
@@ -158,5 +164,118 @@
     "errorClosed": "ხმის მიცემა დასრულებულია.",
     "errorFailed": "ხმის მიცემა ვერ მოხერხდა. სცადე თავიდან.",
     "errorNetwork": "კავშირის შეცდომა. სცადე თავიდან."
+  },
+  "a11y": {
+    "close": "დახურვა",
+    "previous": "წინა",
+    "next": "შემდეგი",
+    "previousTrack": "წინა ტრეკი",
+    "nextTrack": "შემდეგი ტრეკი",
+    "play": "დაკვრა",
+    "pause": "პაუზა",
+    "playMusic": "მუსიკის დაკვრა",
+    "pauseMusic": "მუსიკის პაუზა",
+    "menu": "მენიუ",
+    "closeMenu": "მენიუს დახურვა",
+    "openTrackList": "ტრეკების სიის გახსნა",
+    "closeTrackList": "ტრეკების სიის დახურვა",
+    "languageSelector": "ენის არჩევანი",
+    "pagination": "გვერდები",
+    "viewImage": "სურათის ნახვა",
+    "weAcceptCards": "ვიღებთ Visa და Mastercard ბარათებს"
+  },
+  "checkout": {
+    "title": "გადახდა",
+    "product": "პროდუქტი",
+    "ticket": "ბილეთი",
+    "size": "ზომა",
+    "quantity": "რაოდენობა",
+    "total": "სულ",
+    "date": "თარიღი",
+    "location": "ლოკაცია",
+    "firstName": "სახელი",
+    "firstNamePlaceholder": "Giorgi",
+    "surname": "გვარი",
+    "surnamePlaceholder": "Beridze",
+    "email": "ელფოსტა",
+    "emailPlaceholder": "you@example.com",
+    "phone": "ტელეფონი",
+    "phonePlaceholder": "+995 5XX XX XX XX",
+    "agreePrefix": "ვეთანხმები ",
+    "agreeSuffix": " და ვადასტურებ, რომ ჩემი ელფოსტა სწორია",
+    "networkErrorPrefix": "ქსელის შეცდომა: ",
+    "networkErrorGeneric": "ქსელის შეცდომა. გთხოვთ, შეამოწმოთ კავშირი და სცადოთ თავიდან.",
+    "paymentStartError": "გადახდის დაწყება ვერ მოხერხდა. გთხოვთ, სცადოთ ცოტა ხანში.",
+    "redirecting": "გადამისამართება გადახდაზე…"
+  },
+  "buyProduct": {
+    "personalIdLabel": "პირადი ნომერი",
+    "payButton": "{price} ₾ გადახდა უსაფრთხოდ",
+    "reserving": "ნივთის დაჯავშნა…",
+    "selectSizeError": "გთხოვთ, აირჩიოთ ზომა.",
+    "firstNameError": "გთხოვთ, შეიყვანოთ სახელი.",
+    "surnameError": "გთხოვთ, შეიყვანოთ გვარი.",
+    "personalIdError": "პირადი ნომერი უნდა შედგებოდეს ზუსტად 11 ციფრისგან.",
+    "emailError": "გთხოვთ, შეიყვანოთ სწორი ელფოსტა.",
+    "phoneError": "გთხოვთ, შეიყვანოთ სწორი ტელეფონის ნომერი.",
+    "termsError": "გასაგრძელებლად გთხოვთ დაეთანხმოთ წესებსა და პირობებს.",
+    "personalIdHint": "11 ციფრი — როგორც პირადობის მოწმობაშია მითითებული",
+    "emailHint": "თქვენი მიღების QR კოდი გამოგეგზავნებათ აქ",
+    "secureNote": "🔒 უსაფრთხო 3DS გადახდა Quipu-ს მეშვეობით · აიღეთ ფესტივალზე"
+  },
+  "buyTicket": {
+    "personalNumberLabel": "პირადი ნომერი (ID)",
+    "payButton": "{price} ₾ გადახდა უსაფრთხოდ",
+    "checkingDetails": "მონაცემების შემოწმება…",
+    "reserving": "ბილეთის დაჯავშნა…",
+    "latinOnlyHint": "მხოლოდ ლათინური ასოები — როგორც პირადობის მოწმობაშია მითითებული",
+    "validFormat": "✓ სწორი ფორმატი",
+    "digitsProgress": "{count}/11 ციფრი",
+    "looksGood": "✓ ყველაფერი კარგადაა",
+    "invalidEmailHint": "⚠ გთხოვთ, შეიყვანოთ სწორი ელფოსტა",
+    "personalIdErrorHint": "⚠ პირადი ნომერი უნდა შედგებოდეს ზუსტად 11 ციფრისგან",
+    "invalidEmailError": "გთხოვთ, შეიყვანოთ სწორი ელფოსტა",
+    "termsError": "გასაგრძელებლად გთხოვთ დაეთანხმოთ წესებსა და პირობებს",
+    "maxTicketsError": "თქვენ უკვე შეიძინეთ მაქსიმუმ 3 ბილეთი ამ პირადი ნომრით.",
+    "personalIdHint": "11 ციფრი — ქართული პირადობის ნომერი",
+    "emailHint": "თქვენი ბილეთის QR კოდი გამოგეგზავნებათ აქ",
+    "didYouMean": "იქნებ გინდოდათ",
+    "secureNote": "🔒 უსაფრთხო 3DS გადახდა Quipu-ს მეშვეობით · ბარათის მონაცემები არ ინახება"
+  },
+  "shop": {
+    "noImage": "სურათი არ არის",
+    "notAvailable": "პროდუქტები ჯერ არ არის ხელმისაწვდომი."
+  },
+  "ticketsPage": {
+    "dateTba": "თარიღი დაზუსტდება",
+    "festivalPass": "ფესტივალის აბონემენტი",
+    "available": "{count} ხელმისაწვდომი",
+    "notAvailable": "ბილეთები ჯერ არ არის ხელმისაწვდომი."
+  },
+  "partnersPage": {
+    "metaTitle": "პარტნიორები — Tbilisi Style 21",
+    "subtitle": "ბრენდები და მედია, რომლებიც გვერდში გვედგნენ და ერთად ვქმნით ტბილისის ყველაზე დიდ ღამის ფესტივალს.",
+    "emptyState": "პარტნიორები ჯერ არ დამატებულა.",
+    "titlePartnerLabel": "მთავარი პარტნიორი",
+    "officialPartnersLabel": "ოფიციალური პარტნიორები",
+    "mediaPartnersLabel": "მედია პარტნიორები",
+    "ctaHeading": "გახდი Tbilisi Style-ის პარტნიორი",
+    "ctaBody": "დაუკავშირდი ჩვენს გუნდს პარტნიორობის შესაძლებლობებზე და მოიპოვე წვდომა 5000+ ვიზიტორზე.",
+    "ctaButton": "დაგვიკავშირდი"
+  },
+  "newsPage": {
+    "metaTitle": "სიახლეები — Tbilisi Style 21",
+    "emptyState": "სიახლეები ჯერ არ არის.",
+    "backToNews": "← სიახლეები"
+  },
+  "checkoutResult": {
+    "productSuccessMessage": "თქვენი შეკვეთა წარმატებით დასრულდა. აღების QR კოდი გამოგზავნილია თქვენს ელფოსტაზე.",
+    "ticketSuccessMessage": "თქვენი ბილეთის შეძენა წარმატებით დასრულდა.",
+    "paymentSuccessTitle": "გადახდა წარმატებით დასრულდა",
+    "backToShop": "მაღაზიაში დაბრუნება",
+    "backToHome": "მთავარზე დაბრუნება",
+    "paymentFailedTitle": "გადახდა ვერ განხორციელდა",
+    "paymentFailedBody": "სამწუხაროდ, გადახდის დამუშავებისას რაღაც ვერ მოხერხდა. სცადე ხელახლა.",
+    "tryAgain": "ხელახლა ცდა"
   }
 }

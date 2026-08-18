@@ -37,7 +37,13 @@
     "buyTicket": "Buy Ticket",
     "buyTickets": "Buy Tickets",
     "language": "Language",
-    "followUs": "Follow us"
+    "followUs": "Follow us",
+    "viewAll": "View all",
+    "soldOut": "Sold out",
+    "buyNow": "Buy now",
+    "noImage": "No image",
+    "readArticle": "Read Article",
+    "festivalMerchandise": "Festival Merchandise"
   },
   "nav": {
     "mainStage": "MAIN STAGE",
@@ -158,5 +164,118 @@
     "errorClosed": "Voting has closed.",
     "errorFailed": "Your vote could not be saved. Please try again.",
     "errorNetwork": "Connection error. Please try again."
+  },
+  "a11y": {
+    "close": "Close",
+    "previous": "Previous",
+    "next": "Next",
+    "previousTrack": "Previous track",
+    "nextTrack": "Next track",
+    "play": "Play",
+    "pause": "Pause",
+    "playMusic": "Play music",
+    "pauseMusic": "Pause music",
+    "menu": "Menu",
+    "closeMenu": "Close menu",
+    "openTrackList": "Open track list",
+    "closeTrackList": "Close track list",
+    "languageSelector": "Language selector",
+    "pagination": "Pagination",
+    "viewImage": "View image",
+    "weAcceptCards": "We accept Visa and Mastercard"
+  },
+  "checkout": {
+    "title": "Checkout",
+    "product": "Product",
+    "ticket": "Ticket",
+    "size": "Size",
+    "quantity": "Quantity",
+    "total": "Total",
+    "date": "Date",
+    "location": "Location",
+    "firstName": "First name",
+    "firstNamePlaceholder": "Giorgi",
+    "surname": "Surname",
+    "surnamePlaceholder": "Beridze",
+    "email": "Email",
+    "emailPlaceholder": "you@example.com",
+    "phone": "Phone",
+    "phonePlaceholder": "+995 5XX XX XX XX",
+    "agreePrefix": "I agree to the ",
+    "agreeSuffix": " and confirm my email is correct",
+    "networkErrorPrefix": "Network error: ",
+    "networkErrorGeneric": "Network error. Please check your connection and try again.",
+    "paymentStartError": "We could not start the payment. Please try again in a moment.",
+    "redirecting": "Redirecting to payment…"
+  },
+  "buyProduct": {
+    "personalIdLabel": "Personal ID number",
+    "payButton": "Pay {price} ₾ securely",
+    "reserving": "Reserving your item…",
+    "selectSizeError": "Please select a size.",
+    "firstNameError": "Please enter your first name.",
+    "surnameError": "Please enter your surname.",
+    "personalIdError": "Personal ID number must be exactly 11 digits.",
+    "emailError": "Please enter a valid email address.",
+    "phoneError": "Please enter a valid phone number.",
+    "termsError": "Please accept the Rules & Terms to continue.",
+    "personalIdHint": "11 digits — as written on your ID",
+    "emailHint": "Your pickup QR will be sent here",
+    "secureNote": "🔒 Secure 3DS payment by Quipu · Collect at the festival"
+  },
+  "buyTicket": {
+    "personalNumberLabel": "Personal Number (ID)",
+    "payButton": "Pay {price} ₾ securely",
+    "checkingDetails": "Checking your details…",
+    "reserving": "Reserving your ticket…",
+    "latinOnlyHint": "Latin letters only — as written on your ID",
+    "validFormat": "✓ Valid format",
+    "digitsProgress": "{count}/11 digits",
+    "looksGood": "✓ Looks good",
+    "invalidEmailHint": "⚠ Please enter a valid email address",
+    "personalIdErrorHint": "⚠ ID must be exactly 11 digits",
+    "invalidEmailError": "Please enter a valid email address",
+    "termsError": "Please accept the Rules & Terms to continue",
+    "maxTicketsError": "You have already purchased the maximum of 3 tickets with this ID.",
+    "personalIdHint": "11 digits — Georgian ID number",
+    "emailHint": "Your ticket QR will be sent here",
+    "didYouMean": "Did you mean",
+    "secureNote": "🔒 Secure 3DS payment by Quipu · No card data stored"
+  },
+  "shop": {
+    "noImage": "No image",
+    "notAvailable": "Products are not available yet."
+  },
+  "ticketsPage": {
+    "dateTba": "Date TBA",
+    "festivalPass": "Festival Pass",
+    "available": "{count} available",
+    "notAvailable": "Tickets are not available yet."
+  },
+  "partnersPage": {
+    "metaTitle": "Partners — Tbilisi Style 21",
+    "subtitle": "Brands and media who stand alongside us as we build Tbilisi's biggest night festival together.",
+    "emptyState": "No partners have been added yet.",
+    "titlePartnerLabel": "Title Partner",
+    "officialPartnersLabel": "Official Partners",
+    "mediaPartnersLabel": "Media Partners",
+    "ctaHeading": "Become a Tbilisi Style Partner",
+    "ctaBody": "Get in touch with our team about partnership opportunities and reach 5000+ visitors.",
+    "ctaButton": "Contact Us"
+  },
+  "newsPage": {
+    "metaTitle": "News — Tbilisi Style 21",
+    "emptyState": "No news yet.",
+    "backToNews": "← News"
+  },
+  "checkoutResult": {
+    "productSuccessMessage": "Your order has been completed successfully. The pickup QR code has been sent to your email.",
+    "ticketSuccessMessage": "Your ticket purchase has been completed successfully.",
+    "paymentSuccessTitle": "Payment completed successfully",
+    "backToShop": "BACK TO SHOP",
+    "backToHome": "BACK TO HOME",
+    "paymentFailedTitle": "Payment failed",
+    "paymentFailedBody": "Unfortunately, something went wrong while processing your payment. Please try again.",
+    "tryAgain": "Try again"
   }
 }

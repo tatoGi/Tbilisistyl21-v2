@@ -10,6 +10,7 @@ import {
   type ReactNode,
 } from "react";
 import Image from "next/image";
+import { useTranslations } from "next-intl";
 
 export type LightboxImage = { src: string; caption?: string };
 
@@ -34,6 +35,7 @@ export function LightboxProvider({
   images: LightboxImage[];
   children: ReactNode;
 }) {
+  const t = useTranslations();
   const [index, setIndex] = useState<number | null>(null);
   const count = images.length;
   const isOpen = index !== null && count > 0;
@@ -99,7 +101,7 @@ export function LightboxProvider({
               e.stopPropagation();
               close();
             }}
-            aria-label="Close"
+            aria-label={t("a11y.close")}
             className="absolute right-4 top-4 z-20 flex h-12 w-12 items-center justify-center rounded-full bg-[#e8b84b] text-[#1a1206] shadow-lg transition hover:scale-105 hover:bg-white"
           >
             <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" aria-hidden="true">
@@ -115,7 +117,7 @@ export function LightboxProvider({
                   e.stopPropagation();
                   prev();
                 }}
-                aria-label="Previous"
+                aria-label={t("a11y.previous")}
                 className="absolute left-3 top-1/2 z-10 flex h-12 w-12 -translate-y-1/2 items-center justify-center rounded-full bg-white/10 text-3xl text-white transition hover:bg-white/20 sm:left-6"
               >
                 &#8249;
@@ -126,7 +128,7 @@ export function LightboxProvider({
                   e.stopPropagation();
                   next();
                 }}
-                aria-label="Next"
+                aria-label={t("a11y.next")}
                 className="absolute right-3 top-1/2 z-10 flex h-12 w-12 -translate-y-1/2 items-center justify-center rounded-full bg-white/10 text-3xl text-white transition hover:bg-white/20 sm:right-6"
               >
                 &#8250;
@@ -176,12 +178,13 @@ export function LightboxTrigger({
   children: ReactNode;
 }) {
   const ctx = useLightbox();
+  const t = useTranslations();
   if (!ctx) return <>{children}</>;
   return (
     <button
       type="button"
       onClick={() => ctx.open(index)}
-      aria-label="View image"
+      aria-label={t("a11y.viewImage")}
       className={`block w-full cursor-zoom-in ${className ?? ""}`}
     >
       {children}

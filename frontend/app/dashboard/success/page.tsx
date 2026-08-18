@@ -1,4 +1,5 @@
 import Link from 'next/link'
+import { getTranslations } from 'next-intl/server'
 
 type SuccessPageProps = {
   searchParams: Promise<{
@@ -9,15 +10,13 @@ type SuccessPageProps = {
 }
 
 export default async function SuccessPage({ searchParams }: SuccessPageProps) {
-  const params = await searchParams
+  const [params, t] = await Promise.all([searchParams, getTranslations('checkoutResult')])
   const isProduct = params.type === 'product'
 
-  const message = isProduct
-    ? 'Your order has been completed successfully. The pickup QR code has been sent to your email.'
-    : 'Your ticket purchase has been completed successfully.'
+  const message = isProduct ? t('productSuccessMessage') : t('ticketSuccessMessage')
 
   const backHref = isProduct ? '/dashboard/shop' : '/dashboard/tickets'
-  const backLabel = isProduct ? 'BACK TO SHOP' : 'BACK TO HOME'
+  const backLabel = isProduct ? t('backToShop') : t('backToHome')
 
   return (
     <div className="min-h-screen bg-[#0b0906] text-[color:var(--ts-body)] flex items-center justify-center px-4 relative overflow-hidden">
@@ -33,7 +32,7 @@ export default async function SuccessPage({ searchParams }: SuccessPageProps) {
         </p>
 
         <h1 className="font-unbounded text-[clamp(2rem,5vw,2.75rem)] font-extrabold mb-4 leading-tight text-[color:var(--ts-head)]">
-          გადახდა წარმატებით დასრულდა
+          {t('paymentSuccessTitle')}
         </h1>
 
         <p className="text-[color:var(--ts-body)] text-base mb-10 leading-8">

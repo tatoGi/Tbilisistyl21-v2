@@ -1,13 +1,15 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import Image from "next/image";
+import { getTranslations } from "next-intl/server";
 import { getFeaturedPartners, type PartnerCard, type PartnerTier } from "@/lib/nav";
 
 export const dynamic = "force-dynamic";
 
-export const metadata: Metadata = {
-  title: "პარტნიორები — Tbilisi Style 21",
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getTranslations("partnersPage");
+  return { title: t("metaTitle") };
+}
 
 /** A single light logo tile (logos need a light background for contrast). */
 function LogoTile({
@@ -65,7 +67,10 @@ function SectionLabel({ children }: { children: React.ReactNode }) {
 }
 
 export default async function PartnersPage() {
-  const partners = await getFeaturedPartners();
+  const [partners, t] = await Promise.all([
+    getFeaturedPartners(),
+    getTranslations(),
+  ]);
   const byTier = (tier: PartnerTier) => partners.filter((p) => p.tier === tier);
   const title = byTier("title");
   const official = byTier("official");
@@ -85,20 +90,20 @@ export default async function PartnersPage() {
             </span>
           </div>
           <h1 className="font-unbounded text-[clamp(2.4rem,6vw,4.25rem)] font-extrabold tracking-[-0.01em] text-[color:var(--ts-head)]">
-            პარტნიორები
+            {t("nav.partners")}
           </h1>
           <p className="mt-4 max-w-[620px] text-[18px] leading-relaxed text-[color:var(--ts-muted)]">
-            ბრენდები და მედია, რომლებიც გვერდში გვედგნენ და ერთად ვქმნით ტბილისის ყველაზე დიდ ღამის ფესტივალს.
+            {t("partnersPage.subtitle")}
           </p>
         </div>
 
         {partners.length === 0 ? (
-          <p className="text-white/50">პარტნიორები ჯერ არ დამატებულა.</p>
+          <p className="text-white/50">{t("partnersPage.emptyState")}</p>
         ) : (
           <>
             {title.length ? (
               <section className="mb-12">
-                <SectionLabel>მთავარი პარტნიორი</SectionLabel>
+                <SectionLabel>{t("partnersPage.titlePartnerLabel")}</SectionLabel>
                 <div className="grid gap-5">
                   {title.map((p) => (
                     <LogoTile key={p.id} partner={p} size="title" />
@@ -109,7 +114,7 @@ export default async function PartnersPage() {
 
             {official.length ? (
               <section className="mb-12">
-                <SectionLabel>ოფიციალური პარტნიორები</SectionLabel>
+                <SectionLabel>{t("partnersPage.officialPartnersLabel")}</SectionLabel>
                 <div className="grid grid-cols-2 gap-5 sm:grid-cols-3 lg:grid-cols-4">
                   {official.map((p) => (
                     <LogoTile key={p.id} partner={p} size="official" />
@@ -120,7 +125,7 @@ export default async function PartnersPage() {
 
             {media.length ? (
               <section className="mb-12">
-                <SectionLabel>მედია პარტნიორები</SectionLabel>
+                <SectionLabel>{t("partnersPage.mediaPartnersLabel")}</SectionLabel>
                 <div className="grid grid-cols-3 gap-4 sm:grid-cols-4 lg:grid-cols-6">
                   {media.map((p) => (
                     <LogoTile key={p.id} partner={p} size="media" />
@@ -135,17 +140,17 @@ export default async function PartnersPage() {
         <div className="mt-4 flex flex-wrap items-center justify-between gap-8 rounded-[24px] border border-white/[0.12] bg-[linear-gradient(160deg,rgba(232,184,75,0.1),rgba(255,255,255,0.02))] p-10 sm:p-14">
           <div>
             <div className="font-unbounded mb-2.5 text-[26px] font-bold text-[color:var(--ts-head)]">
-              გახდი Tbilisi Style-ის პარტნიორი
+              {t("partnersPage.ctaHeading")}
             </div>
             <div className="max-w-[480px] text-[15px] text-[color:var(--ts-muted)]">
-              დაუკავშირდი ჩვენს გუნდს პარტნიორობის შესაძლებლობებზე და მოიპოვე წვდომა 5000+ ვიზიტორზე.
+              {t("partnersPage.ctaBody")}
             </div>
           </div>
           <Link
             href="/dashboard/contactUs"
             className="inline-flex items-center gap-2 whitespace-nowrap rounded-full bg-[#e8b84b] px-8 py-4 text-sm font-bold text-[#1a1206] transition duration-300 hover:bg-white"
           >
-            დაგვიკავშირდი <span>↗</span>
+            {t("partnersPage.ctaButton")} <span>↗</span>
           </Link>
         </div>
       </div>
