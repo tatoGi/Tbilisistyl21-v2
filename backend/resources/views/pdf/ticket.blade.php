@@ -43,18 +43,18 @@
             text-align: center;
             padding: 14px 0 0;
         }
-        /* Fixed square so the client-required 1:1 artwork renders edge-to-edge
-           with no letterboxing AND the whole ticket still fits on one page
+        /* Fixed square so the client-required 1:1 artwork fits on one page
            (a full-width 741px square overflows the 650x1000pt paper).
-           Rendered as a background-size:cover box (not a stretched <img>) so
-           non-square uploads get cropped to fill instead of squashed. */
+           background-size:contain (not cover) so non-square uploads are never
+           cropped — the body background is solid black, so any letterbox
+           gap is invisible instead of showing bars. */
         .artwork .crop {
             display: inline-block;
             width: 680px;
             height: 680px;
             background-repeat: no-repeat;
             background-position: center center;
-            background-size: cover;
+            background-size: contain;
         }
         /* Techno artwork is a portrait poster — constrain by height and let the
            width scale so it keeps its aspect ratio (no squashing) while using
@@ -114,9 +114,11 @@
         .qr-card {
             background: #ffffff;
             border: 2px solid #f5a623;
-            padding: 8px;
-            /* No fixed width/height — shrink-wrap to the image so DomPDF
-               cannot leave leftover content-box space on one side. */
+            /* No padding — the QR PNG already bakes in its own white quiet
+               zone (QrCodeService margin), so extra padding here just
+               doubles the border. No fixed width/height — shrink-wrap to
+               the image so DomPDF cannot leave leftover content-box space
+               on one side. */
             display: inline-block;
             line-height: 0;
         }
