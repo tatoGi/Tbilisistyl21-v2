@@ -13,7 +13,6 @@ export type Ticket = {
   priceGel: number;
   eventDate: string;
   location: string;
-  quantity: number;
   saleUrl: string;
   status: TicketStatus;
   createdAt: string;
@@ -22,8 +21,7 @@ export type Ticket = {
   category: string;
   features: string[];
   isFeatured: boolean;
-  remaining: number;
-  percentLeft: number;
+  soldOut: boolean;
 };
 
 function imageUrlOf(image: unknown): string | null {
@@ -34,12 +32,6 @@ function imageUrlOf(image: unknown): string | null {
 }
 
 function mapTicket(t0: ApiTicket, locale: string): Ticket {
-  const quantity = Number(t0.quantity ?? 0);
-  const sold = Math.max(0, Number(t0.sold ?? 0));
-  const remaining = Math.max(0, quantity - sold);
-  // percentLeft is meaningful only when a capacity is set; guard divide-by-zero.
-  const percentLeft = quantity > 0 ? Math.round((remaining / quantity) * 100) : 0;
-
   // features: admin enters newline-separated lines per locale; fall back to []
   const featuresText = t0.features ? t(t0.features, locale) : "";
   const features = featuresText
@@ -55,7 +47,6 @@ function mapTicket(t0: ApiTicket, locale: string): Ticket {
     priceGel: Number(t0.price_gel ?? 0),
     eventDate: t0.event_date ?? "",
     location: t0.location ?? "",
-    quantity,
     saleUrl: t0.sale_url ?? "",
     status: (t0.status as TicketStatus) ?? "draft",
     createdAt: t0.created_at ?? "",
@@ -63,8 +54,7 @@ function mapTicket(t0: ApiTicket, locale: string): Ticket {
     category: t0.category ? t(t0.category, locale) : "",
     features,
     isFeatured: Boolean(t0.is_featured),
-    remaining,
-    percentLeft,
+    soldOut: (t0.status as TicketStatus) === "sold_out",
   };
 }
 

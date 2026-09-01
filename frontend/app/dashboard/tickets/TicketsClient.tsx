@@ -26,12 +26,10 @@ interface Ticket {
   location?: string
   description?: string
   status: string
-  quantity: number
   category: string
   features: string[]
   isFeatured: boolean
-  remaining: number
-  percentLeft: number
+  soldOut: boolean
 }
 
 function DescriptionFallback({ content }: { content: string }) {
@@ -66,7 +64,7 @@ export default function TicketsClient({ tickets }: { tickets: Ticket[] }) {
       <div className="mt-12 grid gap-6 md:grid-cols-2 lg:grid-cols-3 lg:items-stretch">
         {tickets.length ? (
           tickets.map((ticket) => {
-            const soldOut = ticket.status === "sold_out" || ticket.remaining <= 0
+            const soldOut = ticket.soldOut
             const featured = ticket.isFeatured && !soldOut
 
             return (
@@ -129,24 +127,6 @@ export default function TicketsClient({ tickets }: { tickets: Ticket[] }) {
                   ) : ticket.description ? (
                     <DescriptionFallback content={ticket.description} />
                   ) : null}
-                </div>
-
-                {/* Availability */}
-                <div className="mb-5">
-                  <div className="mb-1.5 flex justify-between text-xs text-[color:var(--ts-muted)]">
-                    <span>
-                      {soldOut
-                        ? t("common.soldOut")
-                        : t("ticketsPage.available", { count: ticket.remaining })}
-                    </span>
-                    <span>{ticket.percentLeft}%</span>
-                  </div>
-                  <div className="h-1 overflow-hidden rounded-full bg-white/[0.08]">
-                    <div
-                      className="h-full rounded-full bg-[#e8b84b]"
-                      style={{ width: `${ticket.percentLeft}%` }}
-                    />
-                  </div>
                 </div>
 
                 {/* CTA */}

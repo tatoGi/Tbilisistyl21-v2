@@ -24,6 +24,7 @@ class TicketController extends Controller
 
         $data = $ticket->toArray();
         $data['price_gel'] = app(PaymentSurchargeService::class)->payable((float) $ticket->price_gel);
+        unset($data['quantity'], $data['sold']);
 
         return response()->json(['data' => $data]);
     }

@@ -30,6 +30,7 @@ class TicketService
 
         return array_map(function (array $row) use ($surcharge) {
             $row['price_gel'] = $surcharge->payable((float) ($row['price_gel'] ?? 0));
+            unset($row['quantity'], $row['sold']);
 
             return $row;
         }, $rows);
