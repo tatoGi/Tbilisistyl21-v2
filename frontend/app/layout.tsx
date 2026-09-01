@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Bebas_Neue, Noto_Sans_Georgian, Oswald, Unbounded } from "next/font/google";
 import { cookies } from "next/headers";
+import Script from "next/script";
 import { NextIntlClientProvider } from "next-intl";
 import { getMessages, getTranslations } from "next-intl/server";
 import { defaultLocale, isLocale, localeCookieName } from "@/i18n/config";
@@ -63,6 +64,7 @@ export default async function RootLayout({
   const requestedLocale = store.get(localeCookieName)?.value;
   const locale = isLocale(requestedLocale) ? requestedLocale : defaultLocale;
   const messages = await getMessages();
+  const gaId = process.env.NEXT_PUBLIC_GA_ID;
   const [pages, footerPages, social, contact, music, musicTracks] = await Promise.all([
     getNavPages(),
     getFooterPages(),
@@ -84,6 +86,17 @@ export default async function RootLayout({
           href="https://fonts.googleapis.com/css2?family=Bitcount+Single:wght@100..900&display=swap"
           rel="stylesheet"
         />
+        {gaId ? (
+          <>
+            <Script src={`https://www.googletagmanager.com/gtag/js?id=${gaId}`} strategy="afterInteractive" />
+            <Script id="ga4-init" strategy="afterInteractive">
+              {`window.dataLayer = window.dataLayer || [];
+function gtag(){dataLayer.push(arguments);}
+gtag('js', new Date());
+gtag('config', '${gaId}');`}
+            </Script>
+          </>
+        ) : null}
       </head>
       <body className="min-h-full flex flex-col" suppressHydrationWarning>
         <NextIntlClientProvider locale={locale} messages={messages}>
