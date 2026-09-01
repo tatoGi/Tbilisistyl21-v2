@@ -66,7 +66,7 @@
         include /etc/nginx/conf.d/proxy-laravel.conf;
     }
 
-    location ~ ^/(brand-logo\.jpeg|favicon\.ico|robots\.txt)$ {
+    location ~ ^/(brand-logo\.jpeg|favicon\.ico)$ {
         proxy_pass http://laravel;
         include /etc/nginx/conf.d/proxy-laravel.conf;
     }
