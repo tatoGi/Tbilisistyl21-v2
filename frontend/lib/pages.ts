@@ -104,6 +104,11 @@ export function listFooterPages(): Promise<PageSummary[]> {
   return listPages("footer");
 }
 
+/** All published CMS pages, regardless of nav/footer visibility (backs the sitemap). */
+export function listAllPages(): Promise<PageSummary[]> {
+  return listPages("all");
+}
+
 function toDetail(p: ApiPageDetail): PageDetail {
   return {
     ...toSummary(p),
